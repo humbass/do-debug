@@ -1,0 +1,7 @@
+
+[ module ] clipboard
+
+
+get()                -> promise(content)
+set(content)         -> promise()
+
