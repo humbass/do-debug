@@ -38,3 +38,8 @@ toast(message)
 toast(message, position)          // position：['top', 'center', 'bottom']
 toast(message, position, duation) // duation: [0, 1]  
 
+-------------------------------------------------------------
+
+dialog(string)          // 传入一个字符串
+dialog(false)           // 关闭对话，不传或者传 false/0
+

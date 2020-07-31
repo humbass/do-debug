@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Wed Jul 29 2020 15:39:28 GMT+0800 (China Standard Time)
+ * Build at: Fri Jul 31 2020 16:42:27 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -1001,7 +1001,7 @@ function mtClipBoardModule (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-07-17 17:48:10
+ * @Last Modified time: 2020-07-31 16:40:34
  */
 
 var MODULE_NAME$3 = 'DialogModule';
@@ -1011,13 +1011,121 @@ var POSITION = {
   bottom: 'bottom',
 };
 
+var Dialog = function Dialog(Vue) {
+  this.Vue = Vue;
+};
+Dialog.prototype.alert = function alert () {
+  if (!arguments.length) {
+    return throwError(("[" + MODULE_NAME$3 + "] alert need params."))
+  } else if (arguments.length === 1 && isString_1(arguments[0])) {
+    return this.Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'alert', {
+      title: '',
+      message: arguments[0],
+      radius: 5,
+      btnText: '好的',
+    })
+  } else if (
+    arguments.length === 2 &&
+    isString_1(arguments[0]) &&
+    isString_1(arguments[1])
+  ) {
+    return this.Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'alert', {
+      title: arguments[0],
+      message: arguments[1],
+      radius: 5,
+      btnText: '好的',
+    })
+  } else if (arguments.length === 1 && isObject_1$1(arguments[0])) {
+    return this.Vue.Native.callNativeWithPromise(
+      MODULE_NAME$3,
+      'alert',
+      arguments[0]
+    )
+  } else { return throwError(("[" + MODULE_NAME$3 + "] params error.")) }
+};
+
+Dialog.prototype.confirm = function confirm () {
+  if (!arguments.length) {
+    return throwError(("[" + MODULE_NAME$3 + "] alert need params."))
+  } else if (arguments.length === 1 && isString_1(arguments[0])) {
+    return this.Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'confirm', {
+      title: '',
+      message: arguments[0],
+      radius: 5,
+    })
+  } else if (
+    arguments.length === 2 &&
+    isString_1(arguments[0]) &&
+    isString_1(arguments[1])
+  ) {
+    return this.Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'confirm', {
+      title: arguments[0],
+      message: arguments[1],
+      radius: 5,
+    })
+  } else if (
+    arguments.length === 4 &&
+    isString_1(arguments[0]) &&
+    isString_1(arguments[1]) &&
+    isString_1(arguments[2]) &&
+    isString_1(arguments[3])
+  ) {
+    return this.Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'confirm', {
+      title: arguments[0],
+      message: arguments[1],
+      radius: 5,
+      lBtnText: arguments[2],
+      rBtnText: arguments[3],
+    })
+  } else if (arguments.length === 1 && isObject_1$1(arguments[0])) {
+    return this.Vue.Native.callNativeWithPromise(
+      MODULE_NAME$3,
+      'confirm',
+      arguments[0]
+    )
+  } else { return throwError(("[" + MODULE_NAME$3 + "] params error.")) }
+};
+
+Dialog.prototype.toast = function toast () {
+  if (!arguments.length) {
+    return throwError(("[" + MODULE_NAME$3 + "] empty params"))
+  }
+  if (!arguments[0] || !isString_1(arguments[0])) {
+    return throwError(("[" + MODULE_NAME$3 + "] message is required."))
+  }
+  var options = {
+    message: arguments[0],
+  };
+  if (arguments[1]) {
+    options.position = POSITION[arguments[1]] || POSITION[2];
+  }
+  options.duation = [0, 1].includes(arguments[2]) ? arguments[2] : 0;
+  this.Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'toast', options);
+};
+
+Dialog.prototype.loading = function loading () {
+  if (arguments.length > 0) {
+    var arg = arguments[0];
+    if (arg && isString_1(arg)) {
+      this.Vue.Native.callNative(MODULE_NAME$3, 'openLoading', {
+        loadingText: arg,
+      });
+    } else {
+      this.Vue.Native.callNative(MODULE_NAME$3, 'closeLoading');
+    }
+  } else { this.Vue.Native.callNative(MODULE_NAME$3, 'closeLoading'); }
+};
+
 function mtDialogModule(Vue) {
-  Vue.prototype.$dialog = {
-    alert: function alert() {
+  Vue.prototype.$dialog = new Dialog(Vue);
+}
+
+/*
+    alert() {
       if (!arguments.length) {
-        return throwError(("[" + MODULE_NAME$3 + "] alert need params."))
-      } else if (arguments.length === 1 && isString_1(arguments[0])) {
-        return Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'alert', {
+        return throwError(`[${MODULE_NAME}] alert need params.`)
+      } else if (arguments.length === 1 && isString(arguments[0])) {
+        return Vue.Native.callNativeWithPromise(MODULE_NAME, 'alert', {
           title: '',
           message: arguments[0],
           radius: 5,
@@ -1025,82 +1133,81 @@ function mtDialogModule(Vue) {
         })
       } else if (
         arguments.length === 2 &&
-        isString_1(arguments[0]) &&
-        isString_1(arguments[1])
+        isString(arguments[0]) &&
+        isString(arguments[1])
       ) {
-        return Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'alert', {
+        return Vue.Native.callNativeWithPromise(MODULE_NAME, 'alert', {
           title: arguments[0],
           message: arguments[1],
           radius: 5,
           btnText: '好的',
         })
-      } else if (arguments.length === 1 && isObject_1$1(arguments[0])) {
+      } else if (arguments.length === 1 && isObject(arguments[0])) {
         return Vue.Native.callNativeWithPromise(
-          MODULE_NAME$3,
+          MODULE_NAME,
           'alert',
           arguments[0]
         )
-      } else { return throwError(("[" + MODULE_NAME$3 + "] params error.")) }
+      } else return throwError(`[${MODULE_NAME}] params error.`)
     },
-    confirm: function confirm() {
+    confirm() {
       if (!arguments.length) {
-        return throwError(("[" + MODULE_NAME$3 + "] alert need params."))
-      } else if (arguments.length === 1 && isString_1(arguments[0])) {
-        return Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'confirm', {
+        return throwError(`[${MODULE_NAME}] alert need params.`)
+      } else if (arguments.length === 1 && isString(arguments[0])) {
+        return Vue.Native.callNativeWithPromise(MODULE_NAME, 'confirm', {
           title: '',
           message: arguments[0],
           radius: 5,
         })
       } else if (
         arguments.length === 2 &&
-        isString_1(arguments[0]) &&
-        isString_1(arguments[1])
+        isString(arguments[0]) &&
+        isString(arguments[1])
       ) {
-        return Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'confirm', {
+        return Vue.Native.callNativeWithPromise(MODULE_NAME, 'confirm', {
           title: arguments[0],
           message: arguments[1],
           radius: 5,
         })
       } else if (
         arguments.length === 4 &&
-        isString_1(arguments[0]) &&
-        isString_1(arguments[1]) &&
-        isString_1(arguments[2]) &&
-        isString_1(arguments[3])
+        isString(arguments[0]) &&
+        isString(arguments[1]) &&
+        isString(arguments[2]) &&
+        isString(arguments[3])
       ) {
-        return Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'confirm', {
+        return Vue.Native.callNativeWithPromise(MODULE_NAME, 'confirm', {
           title: arguments[0],
           message: arguments[1],
           radius: 5,
           lBtnText: arguments[2],
           rBtnText: arguments[3],
         })
-      } else if (arguments.length === 1 && isObject_1$1(arguments[0])) {
+      } else if (arguments.length === 1 && isObject(arguments[0])) {
         return Vue.Native.callNativeWithPromise(
-          MODULE_NAME$3,
+          MODULE_NAME,
           'confirm',
           arguments[0]
         )
-      } else { return throwError(("[" + MODULE_NAME$3 + "] params error.")) }
+      } else return throwError(`[${MODULE_NAME}] params error.`)
     },
-    toast: function toast() {
+    toast() {
       if (!arguments.length) {
-        return throwError(("[" + MODULE_NAME$3 + "] empty params"))
+        return throwError(`[${MODULE_NAME}] empty params`)
       }
-      if (!arguments[0] || !isString_1(arguments[0])) {
-        return throwError(("[" + MODULE_NAME$3 + "] message is required."))
+      if (!arguments[0] || !isString(arguments[0])) {
+        return throwError(`[${MODULE_NAME}] message is required.`)
       }
-      var options = {
+      const options = {
         message: arguments[0],
-      };
-      if (arguments[1]) {
-        options.position = POSITION[arguments[1]] || POSITION[2];
       }
-      options.duation = [0, 1].includes(arguments[2]) ? arguments[2] : 0;
-      Vue.Native.callNativeWithPromise(MODULE_NAME$3, 'toast', options);
+      if (arguments[1]) {
+        options.position = POSITION[arguments[1]] || POSITION[2]
+      }
+      options.duation = [0, 1].includes(arguments[2]) ? arguments[2] : 0
+      Vue.Native.callNativeWithPromise(MODULE_NAME, 'toast', options)
     },
-  };
-}
+    */
 
 /*
  * @Author: dali.chen
@@ -2123,6 +2230,124 @@ function mtBroadcastModule(Vue) {
 
 /*
  * @Author: dali.chen
+ * @Date: 2020-07-30 10:28:05
+ * @Last Modified by: dali.chen
+ * @Last Modified time: 2020-07-31 14:49:58
+ */
+
+var UUID_REG = /^[a-zA-Z0-9]{8}(-[a-zA-Z0-9]{4}){3}-[a-zA-Z0-9]{12}$/;
+var MODULE_NAME$c = 'BluetoothModule';
+
+var Ble = function Ble(Vue) {
+  this.Vue = Vue;
+};
+Ble.prototype.check = function check () {
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$c, 'check')
+};
+Ble.prototype.enable = function enable () {
+  this.Vue.Native.callNative(MODULE_NAME$c, 'enable');
+};
+Ble.prototype.disable = function disable () {
+  this.Vue.Native.callNative(MODULE_NAME$c, 'enable');
+};
+Ble.prototype.startScan = function startScan () {
+  this.Vue.Native.callNative(MODULE_NAME$c, 'startScan');
+};
+Ble.prototype.stopScan = function stopScan () {
+  this.Vue.Native.callNative(MODULE_NAME$c, 'stopScan');
+};
+Ble.prototype.connect = function connect (mac) {
+  if (isString_1(mac)) {
+    this.Vue.Native.callNative(MODULE_NAME$c, 'connect', mac);
+  }
+};
+Ble.prototype.disConnect = function disConnect (mac) {
+  if (!isString_1(mac)) {
+    return throwError(("[" + MODULE_NAME$c + "] mac required String."))
+  }
+  this.Vue.Native.callNative(MODULE_NAME$c, 'disConnect', mac);
+};
+Ble.prototype.notify = function notify (mac, serviceUuid, notifyUuid) {
+  if (!isString_1(mac)) {
+    return throwError(("[" + MODULE_NAME$c + "] mac required String."))
+  }
+  if (!UUID_REG.test(serviceUuid) || !UUID_REG.test(notifyUuid)) {
+    return throwError(
+      ("[" + MODULE_NAME$c + "] serviceUuid or notifyUuid required uuid format.")
+    )
+  }
+  this.Vue.Native.callNative(MODULE_NAME$c, 'notify', {
+    mac: mac,
+    serviceUuid: serviceUuid,
+    notifyUuid: notifyUuid,
+  });
+};
+Ble.prototype.unNotify = function unNotify (mac, serviceUuid, notifyUuid) {
+  if (!isString_1(mac)) {
+    return throwError(("[" + MODULE_NAME$c + "] mac required String."))
+  }
+  if (!UUID_REG.test(serviceUuid) || !UUID_REG.test(notifyUuid)) {
+    return throwError(
+      ("[" + MODULE_NAME$c + "] serviceUuid or notifyUuid required uuid format.")
+    )
+  }
+  this.Vue.Native.callNative(MODULE_NAME$c, 'unNotify', {
+    mac: mac,
+    serviceUuid: serviceUuid,
+    notifyUuid: notifyUuid,
+  });
+};
+Ble.prototype.write = function write (mac, serviceUuid, notifyUuid, data) {
+  if (!isString_1(mac)) {
+    return throwError(("[" + MODULE_NAME$c + "] mac required String."))
+  }
+  if (!UUID_REG.test(serviceUuid) || !UUID_REG.test(notifyUuid)) {
+    return throwError(
+      ("[" + MODULE_NAME$c + "] serviceUuid or notifyUuid required uuid format.")
+    )
+  }
+  if (!isString_1(data)) {
+    return throwError(("[" + MODULE_NAME$c + "] data required String."))
+  }
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$c, 'write', {
+    mac: mac,
+    serviceUuid: serviceUuid,
+    notifyUuid: notifyUuid,
+    data: data,
+  })
+};
+Ble.prototype.read = function read (mac, serviceUuid, notifyUuid) {
+  if (!isString_1(mac)) {
+    return throwError(("[" + MODULE_NAME$c + "] mac required String."))
+  }
+  if (!UUID_REG.test(serviceUuid) || !UUID_REG.test(notifyUuid)) {
+    return throwError(
+      ("[" + MODULE_NAME$c + "] serviceUuid or notifyUuid required uuid format.")
+    )
+  }
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$c, 'read', {
+    mac: mac,
+    serviceUuid: serviceUuid,
+    notifyUuid: notifyUuid,
+  })
+};
+Ble.prototype.onBleEvent = function onBleEvent (callback) {
+  if (!isFunction_1$1(callback)) {
+    return throwError(("[" + MODULE_NAME$c + "] callback required Function."))
+  }
+  console.log(("[" + MODULE_NAME$c + "] onBleEvent ready..."));
+  var instance = this.Vue.prototype;
+  instance.$nextTick(function () { return instance.$app.$on('onBleEvent', function (res) {
+    callback(res);
+  }); });
+};
+
+function mtBluetoothModule(Vue) {
+  Vue.prototype.$bluetooth = new Ble(Vue);
+}
+
+/*
+ * @Author: dali.chen
  * @Date: 2020-06-15 13:44:22
  * @Last Modified by: dali.chen
  * @Last Modified time: 2020-07-17 15:33:55
@@ -2301,7 +2526,7 @@ function mtQrcodeComponent (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-10 23:05:07
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-07-06 19:07:40
+ * @Last Modified time: 2020-07-31 12:05:53
  */
 
 /**
@@ -2326,6 +2551,7 @@ var HippyMtComponents = {
     mtDownloadModule(Vue);
     MtDataBaseModule(Vue);
     mtBroadcastModule(Vue);
+    mtBluetoothModule(Vue);
     
     // component
     mtSvgaComponent(Vue);
