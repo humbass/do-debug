@@ -40,6 +40,6 @@ toast(message, position, duation) // duation: [0, 1]
 
 -------------------------------------------------------------
 
-dialog(string)          // 传入一个字符串
-dialog(false)           // 关闭对话，不传或者传 false/0
+loading(string)          // 传入一个字符串
+loading(false)           // 关闭对话，不传或者传 false/0
 
