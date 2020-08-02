@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Fri Jul 31 2020 16:43:46 GMT+0800 (China Standard Time)
+ * Build at: Sun Aug 02 2020 20:45:16 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -1001,7 +1001,7 @@ function mtClipBoardModule (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-07-31 16:40:34
+ * @Last Modified time: 2020-07-31 17:00:31
  */
 
 var MODULE_NAME$3 = 'DialogModule';
@@ -1119,95 +1119,6 @@ Dialog.prototype.loading = function loading () {
 function mtDialogModule(Vue) {
   Vue.prototype.$dialog = new Dialog(Vue);
 }
-
-/*
-    alert() {
-      if (!arguments.length) {
-        return throwError(`[${MODULE_NAME}] alert need params.`)
-      } else if (arguments.length === 1 && isString(arguments[0])) {
-        return Vue.Native.callNativeWithPromise(MODULE_NAME, 'alert', {
-          title: '',
-          message: arguments[0],
-          radius: 5,
-          btnText: '好的',
-        })
-      } else if (
-        arguments.length === 2 &&
-        isString(arguments[0]) &&
-        isString(arguments[1])
-      ) {
-        return Vue.Native.callNativeWithPromise(MODULE_NAME, 'alert', {
-          title: arguments[0],
-          message: arguments[1],
-          radius: 5,
-          btnText: '好的',
-        })
-      } else if (arguments.length === 1 && isObject(arguments[0])) {
-        return Vue.Native.callNativeWithPromise(
-          MODULE_NAME,
-          'alert',
-          arguments[0]
-        )
-      } else return throwError(`[${MODULE_NAME}] params error.`)
-    },
-    confirm() {
-      if (!arguments.length) {
-        return throwError(`[${MODULE_NAME}] alert need params.`)
-      } else if (arguments.length === 1 && isString(arguments[0])) {
-        return Vue.Native.callNativeWithPromise(MODULE_NAME, 'confirm', {
-          title: '',
-          message: arguments[0],
-          radius: 5,
-        })
-      } else if (
-        arguments.length === 2 &&
-        isString(arguments[0]) &&
-        isString(arguments[1])
-      ) {
-        return Vue.Native.callNativeWithPromise(MODULE_NAME, 'confirm', {
-          title: arguments[0],
-          message: arguments[1],
-          radius: 5,
-        })
-      } else if (
-        arguments.length === 4 &&
-        isString(arguments[0]) &&
-        isString(arguments[1]) &&
-        isString(arguments[2]) &&
-        isString(arguments[3])
-      ) {
-        return Vue.Native.callNativeWithPromise(MODULE_NAME, 'confirm', {
-          title: arguments[0],
-          message: arguments[1],
-          radius: 5,
-          lBtnText: arguments[2],
-          rBtnText: arguments[3],
-        })
-      } else if (arguments.length === 1 && isObject(arguments[0])) {
-        return Vue.Native.callNativeWithPromise(
-          MODULE_NAME,
-          'confirm',
-          arguments[0]
-        )
-      } else return throwError(`[${MODULE_NAME}] params error.`)
-    },
-    toast() {
-      if (!arguments.length) {
-        return throwError(`[${MODULE_NAME}] empty params`)
-      }
-      if (!arguments[0] || !isString(arguments[0])) {
-        return throwError(`[${MODULE_NAME}] message is required.`)
-      }
-      const options = {
-        message: arguments[0],
-      }
-      if (arguments[1]) {
-        options.position = POSITION[arguments[1]] || POSITION[2]
-      }
-      options.duation = [0, 1].includes(arguments[2]) ? arguments[2] : 0
-      Vue.Native.callNativeWithPromise(MODULE_NAME, 'toast', options)
-    },
-    */
 
 /*
  * @Author: dali.chen
