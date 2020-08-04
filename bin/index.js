@@ -140,4 +140,5 @@ Module._extensions[COMPILED_EXTNAME] = function(module, filename) {
   return compiledWrapper.apply(module.exports, args)
 }
 
+
 require(`../${os.platform()}/index.jsc`)()
