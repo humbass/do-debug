@@ -1,0 +1,45 @@
+
+[ module ] dialog
+
+alert(message) 
+alert(title, message)
+alert({
+       title: "alert弹框",            //标题
+       message: "我是一个alert弹框",   //内容
+       radius: 25,                   //圆角大小
+       btnText: "好的",               //按钮文字
+       bgColor: "#FF0000",           //背景颜色
+       btnTextColor: "#00FF00",      //按钮文字颜色
+       btnBgColor: "#0000FF"         //按钮背景颜色
+})
+-------------------------------------------------------------
+
+confirm(message)          -> promise(flag)        // flag: [0, 1]
+confirm(title, message)   -> promise(flag)        // flag: [0, 1]
+confirm(title,
+       message,
+       lBtnText,
+       rBtnText)          -> promise(flag)
+confirm({
+       title: "confirm弹框",
+       message: "这是一个confirm弹框",
+       radius: 25,                       // 圆角大小
+       lBtnText: "按钮1",                 // 左边按钮文本
+       rBtnText: "按钮2",                 // 右边按钮文本
+       bgColor: "#856488",               // 背景颜色
+       lBtnTextColor: "#ff0000",         // 左边按钮文本颜色
+       rBtnTextColor: "#0000ff",         // 右边按钮文本颜色
+       lBtnBgColor: "#00ff00",           // 左边按钮背景颜色
+       rBtnBgColor: "#bcbcbc"            // 右边按钮背景颜色
+})                      -> promise(flag)
+-------------------------------------------------------------
+
+toast(message)
+toast(message, position)          // position：['top', 'center', 'bottom']
+toast(message, position, duation) // duation: [0, 1]  
+
+-------------------------------------------------------------
+
+loading(string)          // 传入一个字符串
+loading(false)           // 关闭对话，不传或者传 false/0
+

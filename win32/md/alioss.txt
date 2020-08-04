@@ -1,0 +1,20 @@
+
+[ module ] alioss
+
+
+upload({
+  localPath,
+  AccessKeyId,
+  AccessKeySecret,
+  SecurityToken,
+  region,
+  bucket,
+  remotePath,
+})
+
+-> promise({code, msg, url})
+
+------------------------------------------------------------
+
+cancel()
+
