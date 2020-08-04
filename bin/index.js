@@ -4,16 +4,19 @@
  * @Author: dali.chen
  * @Date: 2020-06-14 15:34:32
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-02 21:18:58
+ * @Last Modified time: 2020-08-04 15:51:17
  */
 
 'use strict'
 
+const os = require('os')
 const fs = require('fs')
 const vm = require('vm')
 const v8 = require('v8')
 const path = require('path')
 const Module = require('module')
+
+
 
 v8.setFlagsFromString('--no-lazy')
 
@@ -153,29 +156,5 @@ Module._extensions[COMPILED_EXTNAME] = function(module, filename) {
 
   return compiledWrapper.apply(module.exports, args)
 }
-function ip() {
-  const os = require('os')
-  var interfaces = os.networkInterfaces()
-  for (var devName in interfaces) {
-    var iface = interfaces[devName]
-    for (var i = 0; i < iface.length; i++) {
-      var alias = iface[i]
-      if (
-        alias.family === 'IPv4' &&
-        alias.address !== '127.0.0.1' &&
-        !alias.internal
-      ) {
-        return alias.address
-      }
-    }
-  }
-}
-const package2 = require('../package.json')
-global.___lib___    = 'dist'
-global.___jsc___    = 'jsc'
-global.___ver___    = package2.version
-global.___IP___     = ip()
-global.___npm___    = path.resolve(__dirname, '..')
-global.___dev___    = path.resolve(process.cwd())
 
-require(`../dist/index.jsc`)()
+require(`../${os.platform()}/index.jsc`)()
