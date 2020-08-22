@@ -1,0 +1,27 @@
+
+[ module ] music
+
+
+play(path)       -> promise({statu, total, path})
+
+- 切换音乐直接调用 play, 传入不同的path即可
+- 反复执行，且path没有变化，相当于 pause/resume 切换
+
+-------------------------------------------------------------
+
+pause
+resume
+stop
+isPlaying        -> promise(boolean)
+isLoop           -> promise(boolean)
+setSeek(int)     -> promise({statu, total, path})
+setSpeed(int)
+setLoop(boolean)
+
+-------------------------------------------------------------
+
+onProgress((total, current) => {})
+onEnd(() => {})
+onLoading(boolean => {})
+onError((code, msg) => {})
+

@@ -1,0 +1,33 @@
+
+[ module ] media
+
+
+camera({
+  size = 1024,       // 压缩大小（单位：kb），当图片大于这个值时才会被压缩，不传返回原图
+  isCrop = false,    // 是否裁剪, 设置为false,以下三项无效
+  width = 800,       // 裁剪后的图片宽度，默认输出800像素
+  height = 800,      // 裁剪后的图片高度，默认输出800像素
+  coverStyle,        // 裁剪样式，默认是矩形 可选:circle=圆形 rectangle=矩形
+})
+
+-> promise({path, imgWidth, imgSize, imgHeight})
+{
+  path: "/storage/emulated/xx.jpg",
+  imgWidth: 4032,
+  imgSize: 7149268,
+  imgHeight: 3016,
+}
+
+-------------------------------------------------------------
+
+album({
+  count  = 1,
+  size   = 1024,
+  isCrop = true,            //  when count = 1
+  width  = 200,             //  when count = 1
+  height = 200              //  when count = 1
+})
+
+-> promise(albumList)       //  相册列表
+
+

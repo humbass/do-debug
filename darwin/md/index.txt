@@ -1,0 +1,28 @@
+
+====================
+widgets command list
+====================
+
+usage example:      hipply widget clipboard
+
+-  hippyEvent
+-  ios              [module]
+
+-  agoraRtc         [module]
+-  alioss           [module]
+-  clipboard        [module]
+-  contants         [module]
+-  dialog           [module]
+-  media            [module]
+-  mqtt             [module]
+-  navigator        [module]
+-  storage          [module]
+-  download         [module]
+-  music            [module]
+-  database         [module]
+-  broadcast        [module]
+
+-  svga             [component]
+-  qrcode           [component]
+
+

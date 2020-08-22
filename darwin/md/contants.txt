@@ -1,0 +1,28 @@
+
+[ contants ]
+
+
+usage example:
+
+const barheight = this.$statusBarHeight
+
+-------------------------------------------------------------
+
+platform                    ios / android
+version                     hippy version
+isIPhoneX                   
+screenIsVertical
+statusBarHeight
+screenHeight
+screenWidth
+windowHeight
+windowWidth
+
+-------------------------------------------------------------
+
+tips: 
+
+screenHeight == windowHeight + statusBarHeight
+screenWidth  == windowWidth
+                        
+

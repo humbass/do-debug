@@ -1,0 +1,26 @@
+
+[ module ] navigator
+
+
+push({
+   pageName: "searchIndex",         // required
+   pageData: {},
+   backgroundColor: "#f2f3f4",      // default: #fff
+   transparent: false,              // default: false
+   statusBarStyle: "Default"        // default: Default
+   animationMode: "slide_l2r",      //
+   canNotBack: false                // for Android
+})
+
+-------------------------------------------------------------
+
+pop()                      //  关闭当前页面
+pop(count)                 //  [Number] 关闭多个页面
+pop(pageName)              //  [String] 关闭页面，回到pageName
+
+-------------------------------------------------------------
+
+setStatusBarStyle(style)   // ['default', 'light']
+setBackgroundColor(color)  // /^#[a-zA-Z0-9]{6}$/
+
+

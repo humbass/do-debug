@@ -1,0 +1,38 @@
+
+[ module ] download
+
+
+addTask({
+  tag: 'test1',                                    // required
+  url: 'http://www.meitehudong.com/mp3/test.mp3'   // required
+})
+start({tag: 'test1'})
+pause({tag: 'test1'})
+restart({tag: 'test1'})
+remove({tag: 'test1', isRemoveFile: true,})
+startAll
+pauseAll
+removeAll
+
+getTaskList            -> promise(res)
+getDownloadingList     -> promise(res)
+getFinishedList        -> promise(res)
+
+-------------------------------------------------------------
+
+onDownloadStart({fileName, totalSize, folder, filePath, tag} => {})
+//{fileName: "", totalSize: -1, folder: "/storage/emulated/0/Android/data/com.mthd.hz52/files/Download", filePath: "", tag: "t1", …}
+
+onDownloadProgress({fileName, totalSize, folder, filePath, tag} => {})
+//{fileName: "", totalSize: -1, folder: "/storage/emulated/0/Android/data/com.mthd.hz52/files/Download", filePath: "", tag: "t1", …}
+
+onDownloadError({fileName, totalSize, folder, filePath, tag, error, url, fraction, currentSize, status} => {})
+//{"fileName":"","totalSize":-1,"folder":"/storage/emulated/0/Android/data/com.mthd.hz52/files/Download","filePath":"","tag":"t5","error":"network error! http response code is 404 or 5xx!","speed":0,"url":"https://data.meitehudong.com/sh/2019-10-25.bin.zi","fraction":0,"currentSize":0,"status":4}
+
+onDownloadFinish({fileName, totalSize, folder, filePath, tag} => {})
+//{fileName: "1.svga", totalSize: 5179225, folder: "/storage/emulated/0/Android/data/com.mthd.hz52/files/Download", filePath: "/storage/emulated/0/Android/data/com.mthd.hz52/files/Download/1.svga", tag: "t1", …}
+
+onDownloadRemove({fileName, totalSize, folder, filePath, tag} => {})
+//{fileName: "1.svga", totalSize: 5179225, folder: "/storage/emulated/0/Android/data/com.mthd.hz52/files/Download", filePath: "/storage/emulated/0/Android/data/com.mthd.hz52/files/Download/1.svga", tag: "t1", …}
+
+

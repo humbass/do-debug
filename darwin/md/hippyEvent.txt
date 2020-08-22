@@ -1,0 +1,13 @@
+
+[ hippyEvent ] 
+
+appActive:         // app in frontend
+appDeactive:       // app back to backend
+pageApear:         // page show
+pageDisappear:     // page hide
+pageDestroy:       // page destroy
+pageTouchBack:     // user touch back button
+
+
+unmounted:         // page destroy, alias pageDestroy
+
