@@ -75,3 +75,16 @@ toast(message, position, duation) // duation: [0, 1]
 loading(string)          // 传入一个字符串
 loading(false)           // 关闭对话，不传或者传 false/0
 
+-------------------------------------------------------------
+
+float({
+       url: 'mtLocal://assets/company/123.jpeg',
+       bottom: 100,
+       right: 100
+}, {abc: 123})         
+
+float(false)
+
+onFloatClick(params => {
+       console.log(params)   //{abc: 123}
+})

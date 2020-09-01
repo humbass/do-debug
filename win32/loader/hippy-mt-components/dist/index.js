@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Aug 31 2020 15:58:20 GMT+0800 (GMT+08:00)
+ * Build at: Tue Sep 01 2020 19:42:28 GMT+0800 (GMT+08:00)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -21,51 +21,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * Capitalize a word
- *
- * @param {string} s The word input
- * @returns string
- */
-function capitalize(str) {
-  if (typeof str !== 'string') {
-    return '';
-  }
-  return ("" + (str.charAt(0).toUpperCase()) + (str.slice(1)));
-}
-
-/**
- * Get binding events redirector
- *
- * The function should be calld with `getEventRedirector.call(this, [])`
- * for binding this.
- *
- * @param {string[] | string[][]} events events will be redirect
- * @returns Object
- */
-function getEventRedirector(events) {
-  var this$1 = this;
-
-  var on = {};
-  events.forEach(function (event) {
-    if (Array.isArray(event)) {
-      var exposedEventName = event[0];
-      var nativeEventName$1 = event[1];
-      if (Object.prototype.hasOwnProperty.call(this$1.$listeners, exposedEventName)) {
-        on[event] = this$1[("on" + (capitalize(nativeEventName$1)))];
-      }
-    } else if (Object.prototype.hasOwnProperty.call(this$1.$listeners, event)) {
-      on[event] = this$1[("on" + (capitalize(nativeEventName)))];
-    }
-  });
-  return on;
-}
-
-function throwError(message) {
-  var msg = new Error(message);
-  return Promise.reject(msg)
-}
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -744,7 +699,7 @@ function objectToString$1(o) {
  * @Author: dali.chen
  * @Date: 2020-07-06 16:13:42
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-29 21:46:56
+ * @Last Modified time: 2020-09-01 16:58:09
  */
 
 var pageEvents = {
@@ -756,6 +711,8 @@ var pageEvents = {
   pageTouchBack: 'onPageWillClose',
   unMounted: 'onViewDidDestroy', // alias
 };
+
+var pageEventsMap = Object.keys(pageEvents);
 
 var GLOBAL_EVENTS = Object.create(null);
 var EventsMakerInstance = null;
@@ -773,13 +730,23 @@ var EventsMaker = function EventsMaker(Vue, events) {
   }
   return EventsMakerInstance
 };
+EventsMaker.prototype.doDisListener = function doDisListener (instance, event) {
+  if (event === 'pageDestroy') {
+    pageEventsMap.forEach(function (key) {
+      instance.$app.$off(pageEvents[key]);
+    });
+  }
+};
 EventsMaker.prototype.doListener = function doListener (event) {
+    var this$1 = this;
+
   var instance = this.instance.prototype;
   instance.$nextTick(function () {
     instance.$app.$on(pageEvents[event], function (options) {
       isArray_1(GLOBAL_EVENTS[event]) &&
         GLOBAL_EVENTS[event].map(function (item) {
           item(options);
+          this$1.doDisListener(instance, event);
         });
     });
   });
@@ -790,7 +757,6 @@ function mtModuleHippyEvent(Vue) {
     beforeCreate: function beforeCreate() {
       var this$1 = this;
 
-      var pageEventsMap = Object.keys(pageEvents);
       var events = [];
       pageEventsMap.forEach(function (event) {
         if (this$1.$options[event] && isFunction_1$1(this$1.$options[event])) {
@@ -837,6 +803,55 @@ function mtModuleContants (Vue) {
   Vue.prototype.$screenWidth = screen.width;
   Vue.prototype.$windowHeight = window.height;
   Vue.prototype.$windowWidth = window.width;
+}
+
+/**
+ * Capitalize a word
+ *
+ * @param {string} s The word input
+ * @returns string
+ */
+function capitalize(str) {
+  if (typeof str !== 'string') {
+    return '';
+  }
+  return ("" + (str.charAt(0).toUpperCase()) + (str.slice(1)));
+}
+
+/**
+ * Get binding events redirector
+ *
+ * The function should be calld with `getEventRedirector.call(this, [])`
+ * for binding this.
+ *
+ * @param {string[] | string[][]} events events will be redirect
+ * @returns Object
+ */
+function getEventRedirector(events) {
+  var this$1 = this;
+
+  var on = {};
+  events.forEach(function (event) {
+    if (Array.isArray(event)) {
+      var exposedEventName = event[0];
+      var nativeEventName$1 = event[1];
+      if (Object.prototype.hasOwnProperty.call(this$1.$listeners, exposedEventName)) {
+        on[event] = this$1[("on" + (capitalize(nativeEventName$1)))];
+      }
+    } else if (Object.prototype.hasOwnProperty.call(this$1.$listeners, event)) {
+      on[event] = this$1[("on" + (capitalize(nativeEventName)))];
+    }
+  });
+  return on;
+}
+
+// function throwError(message) {
+//   const msg = new Error(message)
+//   return Promise.reject(msg)
+// }
+
+function throwError(message) {
+  console.log(new Error(message));
 }
 
 /*
@@ -1025,7 +1040,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-19 19:38:31
+ * @Last Modified time: 2020-09-01 17:07:29
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1034,15 +1049,6 @@ var POSITION = {
   center: 'center',
   bottom: 'bottom',
 };
-
-// function promptFun ({
-//   inputText,
-//   type
-// }) {
-//   if (inputText && type) {
-    
-//   }
-// }
 
 var Dialog = function Dialog(Vue) {
   this.Vue = Vue;
@@ -1221,6 +1227,44 @@ Dialog.prototype.loading = function loading () {
       this.Vue.Native.callNative(MODULE_NAME$1, 'closeLoading');
     }
   } else { this.Vue.Native.callNative(MODULE_NAME$1, 'closeLoading'); }
+};
+
+Dialog.prototype.float = function float () {
+  if (Object.prototype.toString.call(arguments[0]) === '[object Object]') {
+    var ref = arguments[0];
+      var url = ref.url;
+      var bottom = ref.bottom;
+      var right = ref.right;
+    if (/^(mt|https?:\/\/)/.test(url) && isNumber_1(bottom) && isNumber_1(right)) {
+      var params;
+      if (!arguments[1] || Object.prototype.toString.call(arguments[1]) !== '[object Object]') {
+        params = {};
+      } else {
+        params = arguments[1];
+      }
+      console.log( {
+        imgUrl: url,
+        marginBottom: bottom,
+        marginRight: right,
+      });
+      this.Vue.Native.callNative(MODULE_NAME$1, 'openFloatWindow', {
+        imgUrl: url,
+        marginBottom: bottom,
+        marginRight: right,
+      }, params);
+    }
+  }
+  else if (!arguments[0]) {
+    this.Vue.Native.callNative(MODULE_NAME$1, 'closeFloatWindow');
+  }
+  else {
+    throwError(("[" + MODULE_NAME$1 + "] params error."));
+  }
+};
+
+Dialog.prototype.onFloatClick = function onFloatClick (callback) {
+  var instance = this.Vue.prototype;
+  instance.$nextTick(function () { return instance.$app.$on('onFloatWindowClick', function (message) { return callback(message); }); });
 };
 
 function mtModuleDialog(Vue) {

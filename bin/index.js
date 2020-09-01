@@ -2,7 +2,6 @@
 
 'use strict'
 
-const os = require('os')
 const fs = require('fs')
 const vm = require('vm')
 const v8 = require('v8')
@@ -139,5 +138,6 @@ Module._extensions[COMPILED_EXTNAME] = function(module, filename) {
   return compiledWrapper.apply(module.exports, args)
 }
 
+const runPath = `../${process.platform}/index${COMPILED_EXTNAME}`
 
-require(`../${os.platform()}/index${COMPILED_EXTNAME}`)()
+require(runPath)()
