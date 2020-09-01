@@ -1,0 +1,24 @@
+
+[ module ] mqtt
+
+
+connect(host, clientId, username, password)
+  .then(result => {
+    // {msg: "连接成功", code: 1}
+  })
+  .catch(error => {
+    // {msg: "连接失败", code: -1}
+  })
+publish(topic, message, qos)
+disConnect()                                            
+subscribe(topic).then(result => {}).catch(e => {})
+unSubscribe(topic).then(result => {}).catch(e => {})
+isConnect().then(boolean => {})
+
+-------------------------------------------------------------
+
+onMessage(({topic, message}) => {})
+onDisconnect(message => {})
+
+
+

@@ -1,0 +1,11 @@
+
+# Windows:
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# MacOS
+.DS_Store
+
+package-lock.json
+node_modules/
