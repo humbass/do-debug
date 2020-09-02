@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Sep 01 2020 19:42:28 GMT+0800 (GMT+08:00)
+ * Build at: Thu Sep 03 2020 00:52:06 GMT+0800 (GMT+08:00)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2303,7 +2303,7 @@ function mtModuleBroadcast(Vue) {
  * @Author: dali.chen
  * @Date: 2020-07-30 10:28:05
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-27 13:28:05
+ * @Last Modified time: 2020-09-02 22:28:49
  */
 
 var UUID_REG = /^[a-zA-Z0-9]{8}(-[a-zA-Z0-9]{4}){3}-[a-zA-Z0-9]{12}$/;
@@ -2368,11 +2368,11 @@ Ble.prototype.unNotify = function unNotify (mac, serviceUuid, notifyUuid) {
     notifyUuid: notifyUuid,
   });
 };
-Ble.prototype.write = function write (mac, serviceUuid, notifyUuid, data) {
+Ble.prototype.write = function write (mac, serviceUuid, writeUuid, data) {
   if (!isString_1(mac)) {
     return throwError(("[" + MODULE_NAME$8 + "] mac required String."))
   }
-  if (!UUID_REG.test(serviceUuid) || !UUID_REG.test(notifyUuid)) {
+  if (!UUID_REG.test(serviceUuid) || !UUID_REG.test(writeUuid)) {
     return throwError(
       ("[" + MODULE_NAME$8 + "] serviceUuid or notifyUuid required uuid format.")
     )
@@ -2383,7 +2383,7 @@ Ble.prototype.write = function write (mac, serviceUuid, notifyUuid, data) {
   return this.Vue.Native.callNativeWithPromise(MODULE_NAME$8, 'write', {
     mac: mac,
     serviceUuid: serviceUuid,
-    notifyUuid: notifyUuid,
+    writeUuid: writeUuid,
     data: data,
   })
 };

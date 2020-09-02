@@ -15,10 +15,11 @@ disConnect(mac)
 notify(mac, serviceUuid, notifyUuid)
 unNotify(mac, serviceUuid, notifyUuid)
 
-write(mac, serviceUuid, notifyUuid, data)
+write(mac, serviceUuid, writeUuid, data)
 read(mac, serviceUuid, notifyUuid)
 
 ------------------------------------------------------------
+
 
 onBleEvent(event => {
   swith(event.eventName) {
