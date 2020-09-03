@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Thu Sep 03 2020 16:02:32 GMT+0800 (China Standard Time)
+ * Build at: Thu Sep 03 2020 16:12:04 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -858,7 +858,7 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-27 13:11:37
+ * @Last Modified time: 2020-09-03 16:11:55
  */
 
 var MODULE_NAME = 'NavigatorModule';
@@ -888,39 +888,39 @@ var Navigator = function Navigator(Vue) {
 Navigator.prototype.push = function push (obj) {
   if (isMultiClick()) { return throwError("[navigator] multi click in 500ms") }
   if (isObject_1$1(obj)) {
-    var pageName$1 = obj.pageName;
+    var pageName = obj.pageName;
       var pageData = obj.pageData; if ( pageData === void 0 ) pageData = {};
       var statusBarStyle = obj.statusBarStyle; if ( statusBarStyle === void 0 ) statusBarStyle = STATUS_MODE.default;
       var transparent = obj.transparent; if ( transparent === void 0 ) transparent = false;
       var backgroundColor = obj.backgroundColor; if ( backgroundColor === void 0 ) backgroundColor = '#ffffff';
       var animationMode = obj.animationMode; if ( animationMode === void 0 ) animationMode = ANIMATION_MODE.slide_r2l;
-      var canNotBack = obj.canNotBack; if ( canNotBack === void 0 ) canNotBack = false;
-    if (!pageName$1 || !this.Vue.config.pages.hasOwnProperty(pageName$1)) {
+      var translucent = obj.translucent; if ( translucent === void 0 ) translucent = false;
+    if (!pageName || !this.Vue.config.pages.hasOwnProperty(pageName)) {
       return throwError("[navigator] pathName no defined in pages")
     }
     var options = {
-      pageName: pageName$1,
+      pageName: pageName,
       pageData: pageData,
       statusBarStyle: statusBarStyle,
       transparent: transparent,
       backgroundColor: backgroundColor,
       animationMode: animationMode,
-      canNotBack: canNotBack,
+      translucent: translucent,
     };
     this.Vue.Native.callNative(MODULE_NAME, 'push', options);
   }
   else if (isString_1(obj)) {
-    if (!pageName || !this.Vue.config.pages.hasOwnProperty(pageName)) {
+    if (!obj || !this.Vue.config.pages.hasOwnProperty(obj)) {
       return throwError("[navigator] pathName no defined in pages")
     }
     var options$1 = {
-      pageName: pageName,
+      pageName: obj,
       pageData: {},
       statusBarStyle: STATUS_MODE.default,
       transparent: false,
       backgroundColor: '#ffffff',
       animationMode: ANIMATION_MODE.slide_r2l,
-      canNotBack: false,
+      translucent: false,
     };
     this.Vue.Native.callNative(MODULE_NAME, 'push', options$1);
   }
