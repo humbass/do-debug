@@ -8,7 +8,8 @@ push({
    backgroundColor: "#f2f3f4",      // default: #fff
    transparent: false,              // default: false
    statusBarStyle: "Default"        // default: Default
-   animationMode: "slide_l2r",      //
+   animationMode: "slide_l2r",      // 页面进入方向
+   translucent: fase,               // 页面是否透明
 })
 
 push('searchIndex')                 // 简写跳转
