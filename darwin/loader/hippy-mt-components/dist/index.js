@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Thu Sep 03 2020 16:13:55 GMT+0800 (China Standard Time)
+ * Build at: Sat Sep 05 2020 20:00:21 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -858,19 +858,13 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-03 16:11:55
+ * @Last Modified time: 2020-09-03 17:08:18
  */
 
 var MODULE_NAME = 'NavigatorModule';
 var STATUS_MODE = {
   default: 'Default',
   light: 'LightContent',
-};
-var ANIMATION_MODE = {
-  'slide_t2b': 'slide_t2b',
-  'slide_b2t': 'slide_b2t',
-  'slide_l2r': 'slide_l2r',
-  'slide_r2l': 'slide_r2l',
 };
 var lastStamp = 0;
 function isMultiClick() {
@@ -893,7 +887,7 @@ Navigator.prototype.push = function push (obj) {
       var statusBarStyle = obj.statusBarStyle; if ( statusBarStyle === void 0 ) statusBarStyle = STATUS_MODE.default;
       var transparent = obj.transparent; if ( transparent === void 0 ) transparent = false;
       var backgroundColor = obj.backgroundColor; if ( backgroundColor === void 0 ) backgroundColor = '#ffffff';
-      var animationMode = obj.animationMode; if ( animationMode === void 0 ) animationMode = ANIMATION_MODE.slide_r2l;
+      var animationMode = obj.animationMode; if ( animationMode === void 0 ) animationMode = '';
       var translucent = obj.translucent; if ( translucent === void 0 ) translucent = false;
     if (!pageName || !this.Vue.config.pages.hasOwnProperty(pageName)) {
       return throwError("[navigator] pathName no defined in pages")
@@ -919,7 +913,7 @@ Navigator.prototype.push = function push (obj) {
       statusBarStyle: STATUS_MODE.default,
       transparent: false,
       backgroundColor: '#ffffff',
-      animationMode: ANIMATION_MODE.slide_r2l,
+      animationMode: '',
       translucent: false,
     };
     this.Vue.Native.callNative(MODULE_NAME, 'push', options$1);
@@ -1661,7 +1655,7 @@ function mtModuleMusic(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-17 14:13:18
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-27 22:21:20
+ * @Last Modified time: 2020-09-05 19:58:46
  */
 
 var MODULE_NAME$5 = 'AgoraRtcModule';
@@ -1810,7 +1804,7 @@ function mtModuleAgoraRtc(Vue) {
       )
     },
     enableLocalAudio: function enableLocalAudio(muted) {
-      if (!isBoolean_1(enabled)) {
+      if (!isBoolean_1(muted)) {
         return throwError("[agoraRtc] enabled error")
       }
       return Vue.Native.callNativeWithPromise(MODULE_NAME$5, 'enableLocalAudio', {
