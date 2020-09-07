@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Sep 07 2020 10:31:52 GMT+0800 (China Standard Time)
+ * Build at: Mon Sep 07 2020 15:31:15 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -699,7 +699,7 @@ function objectToString$1(o) {
  * @Author: dali.chen
  * @Date: 2020-07-06 16:13:42
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-07 10:31:28
+ * @Last Modified time: 2020-09-07 11:07:48
  */
 
 var pageEvents = {
@@ -1040,7 +1040,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-01 17:07:29
+ * @Last Modified time: 2020-09-07 15:30:35
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1242,11 +1242,6 @@ Dialog.prototype.float = function float () {
       } else {
         params = arguments[1];
       }
-      console.log( {
-        imgUrl: url,
-        marginBottom: bottom,
-        marginRight: right,
-      });
       this.Vue.Native.callNative(MODULE_NAME$1, 'openFloatWindow', {
         imgUrl: url,
         marginBottom: bottom,
@@ -1275,7 +1270,7 @@ function mtModuleDialog(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 22:52:23
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-19 18:40:39
+ * @Last Modified time: 2020-09-07 11:07:50
  */
 
 var MODULE_NAME$2 = 'MediaModule';
@@ -1298,7 +1293,6 @@ Media.prototype.camera = function camera (params) {
       height: 800,
       coverStyle: COVER_STYLE.rectangle,
     };
-    console.log('Vue.prototype.$media    ', JSON.stringify(options));
   } else if (isNumber_1(params)) {
     options = {
       size: params,
@@ -1367,7 +1361,7 @@ function mtModuleMedia(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-16 18:03:28
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-21 16:56:53
+ * @Last Modified time: 2020-09-07 11:07:53
  */
 
 var QOSS = [0, 1, 2];
@@ -1451,7 +1445,6 @@ function mtModuleMqtt(Vue) {
     },
 
     onMessage: function onMessage(callback) {
-      console.log('[mqtt] onMessage   ready...');
       var instance = Vue.prototype;
       instance.$nextTick(function () { return instance.$app.$on(CMD_ONMESSAGE, function (topic, message) {
         callback(topic, message);
@@ -1516,7 +1509,7 @@ function mtModuleAliOss(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-19 09:42:25
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-07-20 14:36:51
+ * @Last Modified time: 2020-09-07 11:07:51
  */
 
 var MODULE_NAME$4 = 'MusicModule';
@@ -1545,7 +1538,6 @@ function mtModuleMusic(Vue) {
     play: function play(path) {
       var this$1 = this;
 
-      console.log((path !== mp3.path), path, mp3.path);
       return new Promise(function (resolve, reject) {
         if (path !== mp3.path) {
           Vue.Native.callNative(MODULE_NAME$4, CMD_STOP);
@@ -1883,7 +1875,6 @@ function mtModuleAgoraRtc(Vue) {
         replace: replace,
         cycle: cycle,
       };
-      console.log('startAudioMixing   ', options);
       return Vue.Native.callNativeWithPromise(
         MODULE_NAME$5,
         'startAudioMixing',
@@ -2303,7 +2294,7 @@ function mtModuleBroadcast(Vue) {
  * @Author: dali.chen
  * @Date: 2020-07-30 10:28:05
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-02 22:28:49
+ * @Last Modified time: 2020-09-07 11:07:59
  */
 
 var UUID_REG = /^[a-zA-Z0-9]{8}(-[a-zA-Z0-9]{4}){3}-[a-zA-Z0-9]{12}$/;
@@ -2406,7 +2397,6 @@ Ble.prototype.onBleEvent = function onBleEvent (callback) {
   if (!isFunction_1$1(callback)) {
     return throwError(("[" + MODULE_NAME$8 + "] callback required Function."))
   }
-  console.log(("[" + MODULE_NAME$8 + "] onBleEvent ready..."));
   var instance = this.Vue.prototype;
   instance.$nextTick(function () { return instance.$app.$on('onBleEvent', function (res) {
     callback(res);
@@ -2455,7 +2445,7 @@ function mtModuleIos(Vue) {
  * @Author: dali.chen 
  * @Date: 2020-08-29 21:50:35 
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-31 15:51:55
+ * @Last Modified time: 2020-09-07 11:06:56
  */
 
 var HiProgressView = 'hi-progress-view';
@@ -2503,7 +2493,6 @@ function mtComponentProgress(Vue) {
       }
     },
     beforeMount: function beforeMount() {
-      console.log('beforeMount, ', this.max);
     },
     methods: {
       onProgressChanged: function onProgressChanged(evt) {
