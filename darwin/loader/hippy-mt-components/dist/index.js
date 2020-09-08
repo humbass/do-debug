@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Sep 08 2020 19:06:22 GMT+0800 (China Standard Time)
+ * Build at: Tue Sep 08 2020 22:19:03 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -1040,7 +1040,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-08 18:57:36
+ * @Last Modified time: 2020-09-08 22:18:12
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1062,7 +1062,6 @@ Dialog.prototype.alert = function alert () {
       message: arguments[0],
       radius: 5,
       btnText: '好的',
-      rootViewId: global.$rootViewId,
     })
   } else if (
     arguments.length === 2 &&
@@ -1074,13 +1073,13 @@ Dialog.prototype.alert = function alert () {
       message: arguments[1],
       radius: 5,
       btnText: '好的',
-      rootViewId: global.$rootViewId,
     })
   } else if (arguments.length === 1 && isObject_1$1(arguments[0])) {
-    var json = Object.assign(arguments[0], {
-      rootViewId: global.$rootViewId,
-    });
-    return this.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'alert', json)
+    return this.Vue.Native.callNativeWithPromise(
+      MODULE_NAME$1,
+      'alert',
+      arguments[0]
+    )
   } else { return throwError(("[" + MODULE_NAME$1 + "] params error.")) }
 };
 
@@ -1092,7 +1091,6 @@ Dialog.prototype.confirm = function confirm () {
       title: '',
       message: arguments[0],
       radius: 5,
-      rootViewId: global.$rootViewId,
     })
   } else if (
     arguments.length === 2 &&
@@ -1103,7 +1101,6 @@ Dialog.prototype.confirm = function confirm () {
       title: arguments[0],
       message: arguments[1],
       radius: 5,
-      rootViewId: global.$rootViewId,
     })
   } else if (
     arguments.length === 4 &&
@@ -1118,13 +1115,13 @@ Dialog.prototype.confirm = function confirm () {
       radius: 5,
       lBtnText: arguments[2],
       rBtnText: arguments[3],
-      rootViewId: global.$rootViewId,
     })
   } else if (arguments.length === 1 && isObject_1$1(arguments[0])) {
-    var json = Object.assign(arguments[0], {
-      rootViewId: global.$rootViewId,
-    });
-    return this.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'confirm', json)
+    return this.Vue.Native.callNativeWithPromise(
+      MODULE_NAME$1,
+      'confirm',
+      arguments[0]
+    )
   } else { return throwError(("[" + MODULE_NAME$1 + "] params error.")) }
 };
 Dialog.prototype.prompt = function prompt () {
@@ -1138,7 +1135,6 @@ Dialog.prototype.prompt = function prompt () {
         radius: 5,
         inputBorderColor: '#aaaaaa',
         inputBorderWidth: 1,
-        rootViewId: global.$rootViewId,
       }).then(function (ref) {
           var inputText = ref.inputText;
           var type = ref.type;
@@ -1154,7 +1150,6 @@ Dialog.prototype.prompt = function prompt () {
         radius: 5,
         inputBorderColor: '#aaaaaa',
         inputBorderWidth: 1,
-        rootViewId: global.$rootViewId,
       }).then(function (ref) {
           var inputText = ref.inputText;
           var type = ref.type;
@@ -1177,7 +1172,6 @@ Dialog.prototype.prompt = function prompt () {
         rBtnText: arguments$1[2],
         inputBorderColor: '#aaaaaa',
         inputBorderWidth: 1,
-        rootViewId: global.$rootViewId,
       }).then(function (ref) {
           var inputText = ref.inputText;
           var type = ref.type;
@@ -1188,13 +1182,10 @@ Dialog.prototype.prompt = function prompt () {
         resovle(null);
       });
     } else if (arguments$1.length === 1 && isObject_1$1(arguments$1[0])) {
-      var json = Object.assign(arguments$1[0], {
-        rootViewId: global.$rootViewId,
-      });
       this$1.Vue.Native.callNativeWithPromise(
         MODULE_NAME$1,
         'confirm',
-        json
+        arguments$1[0]
       ).then(function (ref) {
           var inputText = ref.inputText;
           var type = ref.type;
@@ -1222,8 +1213,6 @@ Dialog.prototype.toast = function toast () {
     options.position = POSITION[arguments[1]] || POSITION[2];
   }
   options.duation = [0, 1].includes(arguments[2]) ? arguments[2] : 0;
-  options.rootViewId = global.$rootViewId;
-
   this.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'toast', options);
 };
 
@@ -1233,12 +1222,11 @@ Dialog.prototype.loading = function loading () {
     if (arg && isString_1(arg)) {
       this.Vue.Native.callNative(MODULE_NAME$1, 'openLoading', {
         loadingText: arg,
-        rootViewId: global.$rootViewId,
       });
     } else {
-      this.Vue.Native.callNative(MODULE_NAME$1, 'closeLoading', global.$rootViewId);
+      this.Vue.Native.callNative(MODULE_NAME$1, 'closeLoading');
     }
-  } else { this.Vue.Native.callNative(MODULE_NAME$1, 'closeLoading', global.$rootViewId); }
+  } else { this.Vue.Native.callNative(MODULE_NAME$1, 'closeLoading'); }
 };
 
 Dialog.prototype.float = function float () {
@@ -1247,43 +1235,34 @@ Dialog.prototype.float = function float () {
       var url = ref.url;
       var bottom = ref.bottom;
       var right = ref.right;
-    if (
-      /^(mt|https?:\/\/)/.test(url) &&
-      isNumber_1(bottom) &&
-      isNumber_1(right)
-    ) {
+      var rootViewId = ref.rootViewId;
+    if (/^(mt|https?:\/\/)/.test(url) && isNumber_1(bottom) && isNumber_1(right)) {
       var params;
-      if (
-        !arguments[1] ||
-        Object.prototype.toString.call(arguments[1]) !== '[object Object]'
-      ) {
+      if (!arguments[1] || Object.prototype.toString.call(arguments[1]) !== '[object Object]') {
         params = {};
       } else {
         params = arguments[1];
       }
-      this.Vue.Native.callNative(
-        MODULE_NAME$1,
-        'openFloatWindow',
-        {
-          imgUrl: url,
-          marginBottom: bottom,
-          marginRight: right,
-          rootViewId: global.$rootViewId,
-        },
-        params
-      );
+      this.Vue.Native.callNative(MODULE_NAME$1, 'openFloatWindow', {
+        imgUrl: url,
+        marginBottom: bottom,
+        marginRight: right,
+        rootViewId: rootViewId,
+      }, params);
     }
-  } else if (!arguments[0]) {
-    this.Vue.Native.callNative(MODULE_NAME$1, 'closeFloatWindow', global.$rootViewId);
-  } else {
+  }
+  else if (!arguments[0]) {
+    this.Vue.Native.callNative(MODULE_NAME$1, 'closeFloatWindow');
+  }
+  else {
     throwError(("[" + MODULE_NAME$1 + "] params error."));
   }
 };
 
+  
 Dialog.prototype.onFloatClick = function onFloatClick (callback) {
   var instance = this.Vue.prototype;
-  instance.$nextTick(function () { return instance.$app.$on('onFloatWindowClick', function (message) { return callback(message); }); }
-  );
+  instance.$nextTick(function () { return instance.$app.$on('onFloatWindowClick', function (message) { return callback(message); }); });
 };
 
 function mtModuleDialog(Vue) {
@@ -2725,7 +2704,7 @@ function mtComponentQrcode (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-10 23:05:07
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-31 15:51:30
+ * @Last Modified time: 2020-09-08 21:16:37
  */
 
 /**
