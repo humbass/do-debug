@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Sep 08 2020 22:19:03 GMT+0800 (China Standard Time)
+ * Build at: Tue Sep 15 2020 16:49:44 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -699,12 +699,13 @@ function objectToString$1(o) {
  * @Author: dali.chen
  * @Date: 2020-07-06 16:13:42
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-07 11:07:48
+ * @Last Modified time: 2020-09-15 16:45:58
  */
 
 var pageEvents = {
   appActive: 'onAppActive',
   appDeactive: 'onAppDeactive',
+  appNetworkChanged: 'onNetworkChanged',
   pageApear: 'onViewDidAppear',
   pageWillDisappear: 'onViewWillDisappear',
   pageDestroy: 'onViewDidDestroy',
@@ -1040,7 +1041,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-08 22:18:12
+ * @Last Modified time: 2020-09-15 15:52:25
  */
 
 var MODULE_NAME$1 = 'DialogModule';
