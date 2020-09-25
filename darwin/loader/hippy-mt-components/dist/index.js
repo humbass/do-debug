@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Sep 15 2020 16:49:44 GMT+0800 (China Standard Time)
+ * Build at: Fri Sep 25 2020 19:57:32 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -859,7 +859,7 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-07 10:30:54
+ * @Last Modified time: 2020-09-25 19:55:15
  */
 
 var MODULE_NAME = 'NavigatorModule';
@@ -873,10 +873,11 @@ var ANIMATION_MODE = {
   'slide_l2r': 'slide_l2r',
   'slide_r2l': 'slide_r2l',
 };
+var limitTime = 200;
 var lastStamp = 0;
 function isMultiClick() {
   var stamp = new Date().getTime();
-  if (stamp - lastStamp > 500) {
+  if (stamp - lastStamp > limitTime) {
     lastStamp = stamp;
     return false
   }
@@ -887,7 +888,7 @@ var Navigator = function Navigator(Vue) {
   this.Vue = Vue;
 };
 Navigator.prototype.push = function push (obj) {
-  if (isMultiClick()) { return throwError("[navigator] multi click in 500ms") }
+  if (isMultiClick()) { return throwError(("[navigator] multi click in " + limitTime + " ms")) }
   if (isObject_1$1(obj)) {
     var pageName = obj.pageName;
       var pageData = obj.pageData; if ( pageData === void 0 ) pageData = {};
@@ -896,6 +897,7 @@ Navigator.prototype.push = function push (obj) {
       var backgroundColor = obj.backgroundColor; if ( backgroundColor === void 0 ) backgroundColor = '#ffffff';
       var animationMode = obj.animationMode; if ( animationMode === void 0 ) animationMode = ANIMATION_MODE.slide_r2l;
       var translucent = obj.translucent; if ( translucent === void 0 ) translucent = false;
+      var loadingViewBackgroundColor = obj.loadingViewBackgroundColor; if ( loadingViewBackgroundColor === void 0 ) loadingViewBackgroundColor = '#ffffff';
     if (!pageName || !this.Vue.config.pages.hasOwnProperty(pageName)) {
       return throwError("[navigator] pathName no defined in pages")
     }
@@ -907,6 +909,7 @@ Navigator.prototype.push = function push (obj) {
       backgroundColor: backgroundColor,
       animationMode: animationMode,
       translucent: translucent,
+      loadingViewBackgroundColor: loadingViewBackgroundColor
     };
     this.Vue.Native.callNative(MODULE_NAME, 'push', options);
   }
@@ -1274,7 +1277,7 @@ function mtModuleDialog(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 22:52:23
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-07 11:07:50
+ * @Last Modified time: 2020-09-19 11:47:55
  */
 
 var MODULE_NAME$2 = 'MediaModule';
@@ -1353,6 +1356,7 @@ Media.prototype.album = function album (params) {
       camera: params.camera
     };
   }
+  console.log('options => ', options);
   if (!options) { return throwError('params error') }
   return this.Vue.Native.callNativeWithPromise(MODULE_NAME$2, 'album', options)
 };
