@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-css-loader v2.0.3
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Fri Sep 25 2020 19:57:32 GMT+0800 (China Standard Time)
+ * Build at: Fri Sep 25 2020 20:45:44 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.

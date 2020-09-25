@@ -13,6 +13,7 @@ push({
    loadingViewBackgroundColor: "#ffffff"  // 默认 #ffffff
 })
 
+
 push('searchIndex')                 // 简写跳转
 
 -------------------------------------------------------------
