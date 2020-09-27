@@ -85,6 +85,11 @@ float({
 
 float(false)
 
+[Event]
 onFloatClick(params => {
-       console.log(params)   //{abc: 123}
+       console.log(params)
+       {
+              clickType: 'open',   // 'close'
+              abc: 123,
+       }
 })

@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Sun Sep 27 2020 00:22:48 GMT+0800 (China Standard Time)
+ * Build at: Sun Sep 27 2020 18:02:49 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -859,7 +859,7 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-25 19:55:15
+ * @Last Modified time: 2020-09-27 17:43:22
  */
 
 var MODULE_NAME = 'NavigatorModule';
@@ -897,7 +897,7 @@ Navigator.prototype.push = function push (obj) {
       var backgroundColor = obj.backgroundColor; if ( backgroundColor === void 0 ) backgroundColor = '#ffffff';
       var animationMode = obj.animationMode; if ( animationMode === void 0 ) animationMode = ANIMATION_MODE.slide_r2l;
       var translucent = obj.translucent; if ( translucent === void 0 ) translucent = false;
-      var loadingViewBackgroundColor = obj.loadingViewBackgroundColor; if ( loadingViewBackgroundColor === void 0 ) loadingViewBackgroundColor = '#ffffff';
+      var loadingViewBackgroundColor = obj.loadingViewBackgroundColor; if ( loadingViewBackgroundColor === void 0 ) loadingViewBackgroundColor = '';
     if (!pageName || !this.Vue.config.pages.hasOwnProperty(pageName)) {
       return throwError("[navigator] pathName no defined in pages")
     }
@@ -909,7 +909,7 @@ Navigator.prototype.push = function push (obj) {
       backgroundColor: backgroundColor,
       animationMode: animationMode,
       translucent: translucent,
-      loadingViewBackgroundColor: loadingViewBackgroundColor
+      loadingViewBackgroundColor: loadingViewBackgroundColor,
     };
     this.Vue.Native.callNative(MODULE_NAME, 'push', options);
   }
@@ -1044,7 +1044,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-26 23:24:24
+ * @Last Modified time: 2020-09-27 17:51:57
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1240,33 +1240,47 @@ Dialog.prototype.float = function float () {
       var bottom = ref.bottom;
       var right = ref.right;
       var rootViewId = ref.rootViewId;
-    if (/^(mt|https?:\/\/)/.test(url) && isNumber_1(bottom) && isNumber_1(right)) {
+    if (
+      /^(mt|https?:\/\/)/.test(url) &&
+      isNumber_1(bottom) &&
+      isNumber_1(right)
+    ) {
       var params;
-      if (!arguments[1] || Object.prototype.toString.call(arguments[1]) !== '[object Object]') {
+      if (
+        !arguments[1] ||
+        Object.prototype.toString.call(arguments[1]) !== '[object Object]'
+      ) {
         params = {};
       } else {
         params = arguments[1];
       }
-      this.Vue.Native.callNative(MODULE_NAME$1, 'openFloatWindow', {
-        imgUrl: url,
-        marginBottom: bottom,
-        marginRight: right,
-        rootViewId: rootViewId,
-      }, params);
+      this.Vue.Native.callNative(
+        MODULE_NAME$1,
+        'openFloatWindow',
+        {
+          imgUrl: url,
+          marginBottom: bottom,
+          marginRight: right,
+          rootViewId: rootViewId,
+        },
+        params
+      );
     }
-  }
-  else if (!arguments[0]) {
+  } else if (!arguments[0]) {
     this.Vue.Native.callNative(MODULE_NAME$1, 'closeFloatWindow');
-  }
-  else {
+  } else {
     throwError(("[" + MODULE_NAME$1 + "] params error."));
   }
 };
 
-  
 Dialog.prototype.onFloatClick = function onFloatClick (callback) {
   var instance = this.Vue.prototype;
-  instance.$nextTick(function () { return instance.$app.$on('onFloatWindowClick', function (message) { return callback(message); }); });
+  instance.$nextTick(function () {
+    instance.$app.$on('onFloatWindowClick', function (message) { return callback(Object.assign({ clickType: 'open' }, message)); }
+    );
+    instance.$app.$on('onFloatWindowClose', function (message) { return callback(Object.assign({ clickType: 'close' }, message)); }
+    );
+  });
 };
 
 function mtModuleDialog(Vue) {
