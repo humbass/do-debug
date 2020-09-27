@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Fri Sep 25 2020 20:45:44 GMT+0800 (China Standard Time)
+ * Build at: Sun Sep 27 2020 00:22:48 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -1044,7 +1044,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-25 20:39:26
+ * @Last Modified time: 2020-09-26 23:24:24
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1158,7 +1158,7 @@ Dialog.prototype.prompt = function prompt () {
           var inputText = ref.inputText;
           var type = ref.type;
 
-        if (inputText && type) {
+        if (inputText) {
           resovle(inputText);
         }
         resovle(null);

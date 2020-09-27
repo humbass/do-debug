@@ -10,7 +10,9 @@ push({
    statusBarStyle: "Default"        // default: Default
    animationMode: "slide_l2r",      // 页面进入方向
    translucent: fase,               // 页面是否透明
+   loadingViewBackgroundColor: "#ffffff"  // 默认 #ffffff
 })
+
 
 push('searchIndex')                 // 简写跳转
 

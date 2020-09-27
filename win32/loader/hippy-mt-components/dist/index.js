@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Thu Sep 03 2020 16:22:12 GMT+0800 (GMT+08:00)
+ * Build at: Sun Sep 27 2020 10:46:03 GMT+0700 (GMT+07:00)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -699,12 +699,13 @@ function objectToString$1(o) {
  * @Author: dali.chen
  * @Date: 2020-07-06 16:13:42
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-01 16:58:09
+ * @Last Modified time: 2020-09-15 16:45:58
  */
 
 var pageEvents = {
   appActive: 'onAppActive',
   appDeactive: 'onAppDeactive',
+  appNetworkChanged: 'onNetworkChanged',
   pageApear: 'onViewDidAppear',
   pageWillDisappear: 'onViewWillDisappear',
   pageDestroy: 'onViewDidDestroy',
@@ -858,7 +859,7 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-03 16:11:55
+ * @Last Modified time: 2020-09-25 19:55:15
  */
 
 var MODULE_NAME = 'NavigatorModule';
@@ -872,10 +873,11 @@ var ANIMATION_MODE = {
   'slide_l2r': 'slide_l2r',
   'slide_r2l': 'slide_r2l',
 };
+var limitTime = 200;
 var lastStamp = 0;
 function isMultiClick() {
   var stamp = new Date().getTime();
-  if (stamp - lastStamp > 500) {
+  if (stamp - lastStamp > limitTime) {
     lastStamp = stamp;
     return false
   }
@@ -886,7 +888,7 @@ var Navigator = function Navigator(Vue) {
   this.Vue = Vue;
 };
 Navigator.prototype.push = function push (obj) {
-  if (isMultiClick()) { return throwError("[navigator] multi click in 500ms") }
+  if (isMultiClick()) { return throwError(("[navigator] multi click in " + limitTime + " ms")) }
   if (isObject_1$1(obj)) {
     var pageName = obj.pageName;
       var pageData = obj.pageData; if ( pageData === void 0 ) pageData = {};
@@ -895,6 +897,7 @@ Navigator.prototype.push = function push (obj) {
       var backgroundColor = obj.backgroundColor; if ( backgroundColor === void 0 ) backgroundColor = '#ffffff';
       var animationMode = obj.animationMode; if ( animationMode === void 0 ) animationMode = ANIMATION_MODE.slide_r2l;
       var translucent = obj.translucent; if ( translucent === void 0 ) translucent = false;
+      var loadingViewBackgroundColor = obj.loadingViewBackgroundColor; if ( loadingViewBackgroundColor === void 0 ) loadingViewBackgroundColor = '#ffffff';
     if (!pageName || !this.Vue.config.pages.hasOwnProperty(pageName)) {
       return throwError("[navigator] pathName no defined in pages")
     }
@@ -906,6 +909,7 @@ Navigator.prototype.push = function push (obj) {
       backgroundColor: backgroundColor,
       animationMode: animationMode,
       translucent: translucent,
+      loadingViewBackgroundColor: loadingViewBackgroundColor
     };
     this.Vue.Native.callNative(MODULE_NAME, 'push', options);
   }
@@ -1040,7 +1044,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-01 17:07:29
+ * @Last Modified time: 2020-09-26 23:24:24
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1154,7 +1158,7 @@ Dialog.prototype.prompt = function prompt () {
           var inputText = ref.inputText;
           var type = ref.type;
 
-        if (inputText && type) {
+        if (inputText) {
           resovle(inputText);
         }
         resovle(null);
@@ -1184,7 +1188,7 @@ Dialog.prototype.prompt = function prompt () {
     } else if (arguments$1.length === 1 && isObject_1$1(arguments$1[0])) {
       this$1.Vue.Native.callNativeWithPromise(
         MODULE_NAME$1,
-        'confirm',
+        'prompt',
         arguments$1[0]
       ).then(function (ref) {
           var inputText = ref.inputText;
@@ -1235,6 +1239,7 @@ Dialog.prototype.float = function float () {
       var url = ref.url;
       var bottom = ref.bottom;
       var right = ref.right;
+      var rootViewId = ref.rootViewId;
     if (/^(mt|https?:\/\/)/.test(url) && isNumber_1(bottom) && isNumber_1(right)) {
       var params;
       if (!arguments[1] || Object.prototype.toString.call(arguments[1]) !== '[object Object]') {
@@ -1242,15 +1247,11 @@ Dialog.prototype.float = function float () {
       } else {
         params = arguments[1];
       }
-      console.log( {
-        imgUrl: url,
-        marginBottom: bottom,
-        marginRight: right,
-      });
       this.Vue.Native.callNative(MODULE_NAME$1, 'openFloatWindow', {
         imgUrl: url,
         marginBottom: bottom,
         marginRight: right,
+        rootViewId: rootViewId,
       }, params);
     }
   }
@@ -1262,6 +1263,7 @@ Dialog.prototype.float = function float () {
   }
 };
 
+  
 Dialog.prototype.onFloatClick = function onFloatClick (callback) {
   var instance = this.Vue.prototype;
   instance.$nextTick(function () { return instance.$app.$on('onFloatWindowClick', function (message) { return callback(message); }); });
@@ -1275,7 +1277,7 @@ function mtModuleDialog(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 22:52:23
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-19 18:40:39
+ * @Last Modified time: 2020-09-19 11:47:55
  */
 
 var MODULE_NAME$2 = 'MediaModule';
@@ -1298,7 +1300,6 @@ Media.prototype.camera = function camera (params) {
       height: 800,
       coverStyle: COVER_STYLE.rectangle,
     };
-    console.log('Vue.prototype.$media    ', JSON.stringify(options));
   } else if (isNumber_1(params)) {
     options = {
       size: params,
@@ -1355,6 +1356,7 @@ Media.prototype.album = function album (params) {
       camera: params.camera
     };
   }
+  console.log('options => ', options);
   if (!options) { return throwError('params error') }
   return this.Vue.Native.callNativeWithPromise(MODULE_NAME$2, 'album', options)
 };
@@ -1367,7 +1369,7 @@ function mtModuleMedia(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-16 18:03:28
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-21 16:56:53
+ * @Last Modified time: 2020-09-07 11:07:53
  */
 
 var QOSS = [0, 1, 2];
@@ -1451,7 +1453,6 @@ function mtModuleMqtt(Vue) {
     },
 
     onMessage: function onMessage(callback) {
-      console.log('[mqtt] onMessage   ready...');
       var instance = Vue.prototype;
       instance.$nextTick(function () { return instance.$app.$on(CMD_ONMESSAGE, function (topic, message) {
         callback(topic, message);
@@ -1516,7 +1517,7 @@ function mtModuleAliOss(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-19 09:42:25
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-07-20 14:36:51
+ * @Last Modified time: 2020-09-07 11:07:51
  */
 
 var MODULE_NAME$4 = 'MusicModule';
@@ -1545,7 +1546,6 @@ function mtModuleMusic(Vue) {
     play: function play(path) {
       var this$1 = this;
 
-      console.log((path !== mp3.path), path, mp3.path);
       return new Promise(function (resolve, reject) {
         if (path !== mp3.path) {
           Vue.Native.callNative(MODULE_NAME$4, CMD_STOP);
@@ -1661,7 +1661,7 @@ function mtModuleMusic(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-17 14:13:18
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-27 22:21:20
+ * @Last Modified time: 2020-09-05 19:58:46
  */
 
 var MODULE_NAME$5 = 'AgoraRtcModule';
@@ -1810,7 +1810,7 @@ function mtModuleAgoraRtc(Vue) {
       )
     },
     enableLocalAudio: function enableLocalAudio(muted) {
-      if (!isBoolean_1(enabled)) {
+      if (!isBoolean_1(muted)) {
         return throwError("[agoraRtc] enabled error")
       }
       return Vue.Native.callNativeWithPromise(MODULE_NAME$5, 'enableLocalAudio', {
@@ -1883,7 +1883,6 @@ function mtModuleAgoraRtc(Vue) {
         replace: replace,
         cycle: cycle,
       };
-      console.log('startAudioMixing   ', options);
       return Vue.Native.callNativeWithPromise(
         MODULE_NAME$5,
         'startAudioMixing',
@@ -2303,7 +2302,7 @@ function mtModuleBroadcast(Vue) {
  * @Author: dali.chen
  * @Date: 2020-07-30 10:28:05
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-02 22:28:49
+ * @Last Modified time: 2020-09-07 11:07:59
  */
 
 var UUID_REG = /^[a-zA-Z0-9]{8}(-[a-zA-Z0-9]{4}){3}-[a-zA-Z0-9]{12}$/;
@@ -2406,7 +2405,6 @@ Ble.prototype.onBleEvent = function onBleEvent (callback) {
   if (!isFunction_1$1(callback)) {
     return throwError(("[" + MODULE_NAME$8 + "] callback required Function."))
   }
-  console.log(("[" + MODULE_NAME$8 + "] onBleEvent ready..."));
   var instance = this.Vue.prototype;
   instance.$nextTick(function () { return instance.$app.$on('onBleEvent', function (res) {
     callback(res);
@@ -2455,7 +2453,7 @@ function mtModuleIos(Vue) {
  * @Author: dali.chen 
  * @Date: 2020-08-29 21:50:35 
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-31 15:51:55
+ * @Last Modified time: 2020-09-07 11:06:56
  */
 
 var HiProgressView = 'hi-progress-view';
@@ -2503,7 +2501,6 @@ function mtComponentProgress(Vue) {
       }
     },
     beforeMount: function beforeMount() {
-      console.log('beforeMount, ', this.max);
     },
     methods: {
       onProgressChanged: function onProgressChanged(evt) {
@@ -2712,7 +2709,7 @@ function mtComponentQrcode (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-10 23:05:07
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-31 15:51:30
+ * @Last Modified time: 2020-09-08 21:16:37
  */
 
 /**
