@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Sep 28 2020 14:56:51 GMT+0800 (China Standard Time)
+ * Build at: Mon Sep 28 2020 15:04:29 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -1044,7 +1044,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-28 14:55:14
+ * @Last Modified time: 2020-09-28 15:04:09
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1129,46 +1129,41 @@ Dialog.prototype.confirm = function confirm () {
   } else { return throwError(("[" + MODULE_NAME$1 + "] params error.")) }
 };
 Dialog.prototype.prompt = function prompt () {
-    var arguments$1 = arguments;
-    var this$1 = this;
-
-  return new Promise(function (resovle, reject) {
-    if (!arguments$1.length) {
-      return this$1.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
-        title: '请输入',
-        radius: 5,
-        inputBorderColor: '#aaaaaa',
-        inputBorderWidth: 1,
-      })
-    } else if (arguments$1.length === 1 && isString_1(arguments$1[0])) {
-      return this$1.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
-        title: arguments$1[0],
-        radius: 5,
-        inputBorderColor: '#aaaaaa',
-        inputBorderWidth: 1,
-      })
-    } else if (
-      arguments$1.length === 3 &&
-      isString_1(arguments$1[0]) &&
-      isString_1(arguments$1[1]) &&
-      isString_1(arguments$1[2])
-    ) {
-      return this$1.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
-        title: arguments$1[0],
-        radius: 5,
-        lBtnText: arguments$1[1],
-        rBtnText: arguments$1[2],
-        inputBorderColor: '#aaaaaa',
-        inputBorderWidth: 1,
-      })
-    } else if (arguments$1.length === 1 && isObject_1$1(arguments$1[0])) {
-      return this$1.Vue.Native.callNativeWithPromise(
-        MODULE_NAME$1,
-        'prompt',
-        arguments$1[0]
-      )
-    } else { return throwError(("[" + MODULE_NAME$1 + "] params error.")) }
-  })
+  if (!arguments.length) {
+    return this.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
+      title: '请输入',
+      radius: 5,
+      inputBorderColor: '#aaaaaa',
+      inputBorderWidth: 1,
+    })
+  } else if (arguments.length === 1 && isString_1(arguments[0])) {
+    return this.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
+      title: arguments[0],
+      radius: 5,
+      inputBorderColor: '#aaaaaa',
+      inputBorderWidth: 1,
+    })
+  } else if (
+    arguments.length === 3 &&
+    isString_1(arguments[0]) &&
+    isString_1(arguments[1]) &&
+    isString_1(arguments[2])
+  ) {
+    return this.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
+      title: arguments[0],
+      radius: 5,
+      lBtnText: arguments[1],
+      rBtnText: arguments[2],
+      inputBorderColor: '#aaaaaa',
+      inputBorderWidth: 1,
+    })
+  } else if (arguments.length === 1 && isObject_1$1(arguments[0])) {
+    return this.Vue.Native.callNativeWithPromise(
+      MODULE_NAME$1,
+      'prompt',
+      arguments[0]
+    )
+  } else { return throwError(("[" + MODULE_NAME$1 + "] params error.")) }
 };
 
 Dialog.prototype.toast = function toast () {
