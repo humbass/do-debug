@@ -1,0 +1,178 @@
+
+[ module ] agoraRtc
+
+/**
+*  声网事件处理 (所有的事件在这里处理，需要switch事件名)
+*/
+
+onAgoraEvent(callback)
+
+--onConnectionStateChanged    网络连接状态已改变回调
+--onJoinChannelSuccess        本地用户成功加入频道时，会触发该回调
+--onRejoinChannelSuccess      重新加入频道回调
+--onLeaveChannel              离开频道回调
+--onClientRoleChanged         直播场景下用户角色切换回调
+--onUserJoined                远端用户（通信场景）/主播（直播场景）加入当前频道回调
+--onUserOffline               远端用户（通信场景）/主播（直播场景）离开当前频道回调
+--onNetworkTypeChanged        本地网络类型发生改变回调
+--onConnectionLost            网络连接中断，且 SDK 无法在 10 秒内连接服务器回调
+--onTokenPrivilegeWillExpire  Token 服务即将过期回调
+--onRequestToken              Token 已过期回调
+--onLocalAudioStateChanged    本地音频状态改变回调
+--onLocalVideoStateChanged    本地视频状态改变回调
+--onFirstLocalAudioFrame      已发送本地音频首帧回调
+--onFirstLocalVideoFrame      已显示本地视频首帧回调
+--onRemoteAudioStateChanged   远端音频状态发生改变回调
+--onRemoteVideoStateChanged   远端用户视频状态已变化回调
+--onFirstRemoteVideoFrame     已显示远端视频首帧回调
+--onAudioMixingStateChanged   本地用户的音乐文件播放状态改变
+--onAudioEffectFinished       本地音效文件播放已结束回调
+--onError                     发生错误回调
+
+e.g.
+
+onAgoraEvent((event) => {
+  switch(event.eventName) {
+    case 'onConnectionStateChanged':
+      // do something...
+      break;
+  }
+})
+
+-------------------------------------------------------------
+
+/**
+*  频道管理
+*/
+声网初始化 三个参数
+init(appid, title = '52赫兹', content = '广播中...')
+
+设置频道类型 // 0,1,2   默认 1，直播场景
+setChannelProfile(profile)
+
+设置用户类型 // 1,2
+setClientRole(role)    
+
+加入频道
+joinChannel(token, channel, uid)
+
+离开频道
+leaveChannel()
+
+切换频道
+switchChannel(token, channelName)
+
+更新声网TOKEN
+renewToken()
+
+获取声网的连接状态
+getConnectionState()  -> 1,2,3,4,5
+
+-------------------------------------------------------------
+
+/**
+*  音频管理
+*/
+启用音频   返回 -1,0
+enableAudio()   -> 0: success, -1: false
+
+禁用音频
+disableAudio()
+
+设置音频编码配置
+setAudioProfile(profile, scenario)
+
+调节录音的音量
+adjustRecordingSignalVolume(volume)
+
+调节本地播放的指定远端用户音量
+adjustUserPlaybackSignalVolume(uid, volume)
+
+调节本地播放的所有远端用户音量
+adjustPlaybackSignalVolume(volume)
+
+开/关本地音频采集
+enableLocalAudio(muted)
+
+停止/恢复发送本地音频流
+muteLocalAudioStream(muted)
+
+停止/恢复接收指定音频流
+muteRemoteAudioStream(uid, muted)
+
+停止/恢复接收所有音频流
+muteAllRemoteAudioStreams(muted)
+
+设置是否默认接收音频流
+setDefaultMuteAllRemoteAudioStreams(muted)
+
+-------------------------------------------------------------
+
+/**
+*  音乐文件播放及混音
+*/
+开始播放音乐文件及混音
+startAudioMixing(filePath, loopback = false, replace = false, cycle = 1)
+
+停止播放音乐
+stopAudioMixing()
+
+暂停播放
+pauseAudioMixing()
+
+恢复播放
+resumeAudioMixing()
+
+调节音乐文件的播放音量   0~100  100为原来音量
+adjustAudioMixingVolume(volume = 100)
+
+调节音乐文件的本地播放音量
+adjustAudioMixingPlayoutVolume(volume = 100)
+
+调节音乐文件的远端播放音量
+adjustAudioMixingPublishVolume(volume = 100)
+
+调整本地播放的音乐文件的音调  [-12,12]
+setAudioMixingPitch(pitch)
+
+获取音乐文件的本地播放音量 ->  [0, 100]
+getAudioMixingPlayoutVolume()
+
+获取音乐文件的远端播放音量 ->  [0, 100]
+getAudioMixingPublishVolume()
+
+获取音乐文件的时长   -> 毫秒
+getAudioMixingDuration()
+
+获取音乐文件的播放进度 -> 毫秒
+getAudioMixingCurrentPosition()
+
+设置音乐文件的播放位置
+setAudioMixingPosition(pos)    //毫秒
+
+-------------------------------------------------------------
+
+/**
+*  变声与混响
+*/
+设置本地语音变声、美音或语聊美声效果
+setLocalVoiceChanger(voiceChanger)
+
+设置本地语音混响（含虚拟立体声效果）
+setLocalVoiceReverbPreset(preset)
+
+设置本地语音音调 (该方法改变本地说话人声音的音调) [0.5, 2.0]
+setLocalVoicePitch(pitch)   
+
+设置本地语音音效均衡   [0-9], [-15，15]
+setLocalVoiceEqualization(bandFrequency, bandGain)
+
+设置本地音效混响
+setLocalVoiceReverb(reverbKey, value)
+
+-------------------------------------------------------------
+
+声网参考链接
+https://docs.agora.io/cn/faq/API%20Reference/java/classio_1_1agora_1_1rtc_1_1_rtc_engine.html
+
+

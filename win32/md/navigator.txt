@@ -1,0 +1,30 @@
+
+[ module ] navigator
+
+
+push({
+   pageName: "searchIndex",         // required
+   pageData: {},
+   backgroundColor: "#f2f3f4",      // default: #fff
+   transparent: false,              // default: false
+   statusBarStyle: "Default"        // default: Default
+   animationMode: "slide_l2r",      // 页面进入方向
+   translucent: fase,               // 页面是否透明
+   loadingViewBackgroundColor: "#ffffff"  // 默认 #ffffff
+})
+
+
+push('searchIndex')                 // 简写跳转
+
+-------------------------------------------------------------
+
+pop()                      //  关闭当前页面
+pop(count)                 //  [Number] 关闭多个页面
+pop(pageName)              //  [String] 关闭页面，回到pageName
+
+-------------------------------------------------------------
+
+setStatusBarStyle(style)   // ['default', 'light']
+setBackgroundColor(color)  // /^#[a-zA-Z0-9]{6}$/
+setCanNotBack(boolean)     // 是否允许侧滑返回
+

@@ -1,0 +1,14 @@
+
+[ hippyEvent ] 
+
+appActive:              // app in frontend
+appDeactive:            // app back to backend
+appNetworkChanged(flag) // flag  0: 没网 1:3g/4g 2:wifi
+pageApear:              // page show
+pageWillDisappear       // page will hide
+pageDestroy:            // page destroy
+pageTouchBack:          // user touch back button
+
+
+unMounted:         // page destroy, alias pageDestroy
+

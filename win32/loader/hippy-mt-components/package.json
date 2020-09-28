@@ -1,0 +1,11 @@
+{
+  "name": "hippy-mt-components",
+  "version": "1.0.1",
+  "description": "meitehudong hippy ui component",
+  "main": "dist/index.js",
+  "author": "dali@meitehudong.com",
+  "license": "ISC",
+  "devDependencies": {
+    "ava": "^3.5.0"
+  }
+}

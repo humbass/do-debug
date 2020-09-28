@@ -1,0 +1,17 @@
+
+[ component ] process
+
+<process
+  :initialValue="30"                    // 初始值
+  :min="0"                              // 最小值
+  :max="100"                            // 最大值
+  :enableTouch="true"                   // 是否允许手势调整
+  tagName="process1"                    // 事件返回标识
+  @processChanged="processChanged"      // 事件回调
+/>
+
+-------------------------------------------------------------
+
+[ events ]
+
+processChanged({ tagName, process, isFromUser })
