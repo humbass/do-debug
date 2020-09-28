@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Sun Sep 27 2020 18:02:49 GMT+0800 (China Standard Time)
+ * Build at: Mon Sep 28 2020 14:56:51 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -859,7 +859,7 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-27 17:43:22
+ * @Last Modified time: 2020-09-27 18:32:37
  */
 
 var MODULE_NAME = 'NavigatorModule';
@@ -1044,7 +1044,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-27 17:51:57
+ * @Last Modified time: 2020-09-28 14:55:14
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1134,71 +1134,39 @@ Dialog.prototype.prompt = function prompt () {
 
   return new Promise(function (resovle, reject) {
     if (!arguments$1.length) {
-      this$1.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
+      return this$1.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
         title: '请输入',
         radius: 5,
         inputBorderColor: '#aaaaaa',
         inputBorderWidth: 1,
-      }).then(function (ref) {
-          var inputText = ref.inputText;
-          var type = ref.type;
-
-        if (inputText && type) {
-          resovle(inputText);
-        }
-        resovle(null);
-      });
+      })
     } else if (arguments$1.length === 1 && isString_1(arguments$1[0])) {
-      this$1.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
+      return this$1.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
         title: arguments$1[0],
         radius: 5,
         inputBorderColor: '#aaaaaa',
         inputBorderWidth: 1,
-      }).then(function (ref) {
-          var inputText = ref.inputText;
-          var type = ref.type;
-
-        if (inputText) {
-          resovle(inputText);
-        }
-        resovle(null);
-      });
+      })
     } else if (
       arguments$1.length === 3 &&
       isString_1(arguments$1[0]) &&
       isString_1(arguments$1[1]) &&
       isString_1(arguments$1[2])
     ) {
-      this$1.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
+      return this$1.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
         title: arguments$1[0],
         radius: 5,
         lBtnText: arguments$1[1],
         rBtnText: arguments$1[2],
         inputBorderColor: '#aaaaaa',
         inputBorderWidth: 1,
-      }).then(function (ref) {
-          var inputText = ref.inputText;
-          var type = ref.type;
-
-        if (inputText && type) {
-          resovle(inputText);
-        }
-        resovle(null);
-      });
+      })
     } else if (arguments$1.length === 1 && isObject_1$1(arguments$1[0])) {
-      this$1.Vue.Native.callNativeWithPromise(
+      return this$1.Vue.Native.callNativeWithPromise(
         MODULE_NAME$1,
         'prompt',
         arguments$1[0]
-      ).then(function (ref) {
-          var inputText = ref.inputText;
-          var type = ref.type;
-
-        if (inputText && type) {
-          resovle(inputText);
-        }
-        resovle(null);
-      });
+      )
     } else { return throwError(("[" + MODULE_NAME$1 + "] params error.")) }
   })
 };
