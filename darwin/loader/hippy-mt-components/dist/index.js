@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Sep 28 2020 15:41:05 GMT+0800 (China Standard Time)
+ * Build at: Mon Sep 28 2020 20:04:46 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2279,10 +2279,9 @@ function mtModuleBroadcast(Vue) {
  * @Author: dali.chen
  * @Date: 2020-07-30 10:28:05
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-07 11:07:59
+ * @Last Modified time: 2020-09-28 20:04:30
  */
 
-var UUID_REG = /^[a-zA-Z0-9]{8}(-[a-zA-Z0-9]{4}){3}-[a-zA-Z0-9]{12}$/;
 var MODULE_NAME$8 = 'BluetoothModule';
 
 var Ble = function Ble(Vue) {
@@ -2318,7 +2317,7 @@ Ble.prototype.notify = function notify (mac, serviceUuid, notifyUuid) {
   if (!isString_1(mac)) {
     return throwError(("[" + MODULE_NAME$8 + "] mac required String."))
   }
-  if (!UUID_REG.test(serviceUuid) || !UUID_REG.test(notifyUuid)) {
+  if (!serviceUuid || !notifyUuid) {
     return throwError(
       ("[" + MODULE_NAME$8 + "] serviceUuid or notifyUuid required uuid format.")
     )
@@ -2333,7 +2332,7 @@ Ble.prototype.unNotify = function unNotify (mac, serviceUuid, notifyUuid) {
   if (!isString_1(mac)) {
     return throwError(("[" + MODULE_NAME$8 + "] mac required String."))
   }
-  if (!UUID_REG.test(serviceUuid) || !UUID_REG.test(notifyUuid)) {
+  if (!serviceUuid || !notifyUuid) {
     return throwError(
       ("[" + MODULE_NAME$8 + "] serviceUuid or notifyUuid required uuid format.")
     )
@@ -2348,7 +2347,7 @@ Ble.prototype.write = function write (mac, serviceUuid, writeUuid, data) {
   if (!isString_1(mac)) {
     return throwError(("[" + MODULE_NAME$8 + "] mac required String."))
   }
-  if (!UUID_REG.test(serviceUuid) || !UUID_REG.test(writeUuid)) {
+  if (!serviceUuid || !notifyUuid) {
     return throwError(
       ("[" + MODULE_NAME$8 + "] serviceUuid or notifyUuid required uuid format.")
     )
@@ -2367,7 +2366,7 @@ Ble.prototype.read = function read (mac, serviceUuid, notifyUuid) {
   if (!isString_1(mac)) {
     return throwError(("[" + MODULE_NAME$8 + "] mac required String."))
   }
-  if (!UUID_REG.test(serviceUuid) || !UUID_REG.test(notifyUuid)) {
+  if (!serviceUuid || !notifyUuid) {
     return throwError(
       ("[" + MODULE_NAME$8 + "] serviceUuid or notifyUuid required uuid format.")
     )
