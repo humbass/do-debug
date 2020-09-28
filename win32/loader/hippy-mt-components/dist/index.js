@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Sep 28 2020 15:04:29 GMT+0800 (China Standard Time)
+ * Build at: Mon Sep 28 2020 15:41:05 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -859,7 +859,7 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-27 18:32:37
+ * @Last Modified time: 2020-09-28 15:39:24
  */
 
 var MODULE_NAME = 'NavigatorModule';
@@ -873,7 +873,7 @@ var ANIMATION_MODE = {
   'slide_l2r': 'slide_l2r',
   'slide_r2l': 'slide_r2l',
 };
-var limitTime = 200;
+var limitTime = 500;
 var lastStamp = 0;
 function isMultiClick() {
   var stamp = new Date().getTime();
