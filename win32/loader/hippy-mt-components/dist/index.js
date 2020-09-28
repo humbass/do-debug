@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Sep 28 2020 20:04:46 GMT+0800 (China Standard Time)
+ * Build at: Mon Sep 28 2020 20:29:20 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2279,7 +2279,7 @@ function mtModuleBroadcast(Vue) {
  * @Author: dali.chen
  * @Date: 2020-07-30 10:28:05
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-28 20:04:30
+ * @Last Modified time: 2020-09-28 20:28:57
  */
 
 var MODULE_NAME$8 = 'BluetoothModule';
@@ -2347,7 +2347,7 @@ Ble.prototype.write = function write (mac, serviceUuid, writeUuid, data) {
   if (!isString_1(mac)) {
     return throwError(("[" + MODULE_NAME$8 + "] mac required String."))
   }
-  if (!serviceUuid || !notifyUuid) {
+  if (!serviceUuid || !writeUuid) {
     return throwError(
       ("[" + MODULE_NAME$8 + "] serviceUuid or notifyUuid required uuid format.")
     )
