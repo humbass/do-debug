@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Sep 28 2020 20:29:20 GMT+0800 (China Standard Time)
+ * Build at: Thu Oct 08 2020 17:01:05 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -1044,7 +1044,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-28 15:04:09
+ * @Last Modified time: 2020-10-08 16:59:49
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1239,10 +1239,16 @@ Dialog.prototype.float = function float () {
 Dialog.prototype.onFloatClick = function onFloatClick (callback) {
   var instance = this.Vue.prototype;
   instance.$nextTick(function () {
-    instance.$app.$on('onFloatWindowClick', function (message) { return callback(Object.assign({ clickType: 'open' }, message)); }
-    );
-    instance.$app.$on('onFloatWindowClose', function (message) { return callback(Object.assign({ clickType: 'close' }, message)); }
-    );
+    instance.$app.$on('onFloatWindowClick', function (message) {
+      var json = Object.assign({}, message,
+        {clickType: 'open'});
+      callback(json);
+    });
+    instance.$app.$on('onFloatWindowClose', function (message) {
+      var json = Object.assign({}, message,
+        {clickType: 'close'});
+      callback(json);
+    });
   });
 };
 
