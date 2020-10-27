@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Thu Oct 08 2020 17:01:05 GMT+0800 (China Standard Time)
+ * Build at: Tue Oct 27 2020 20:35:29 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -699,7 +699,7 @@ function objectToString$1(o) {
  * @Author: dali.chen
  * @Date: 2020-07-06 16:13:42
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-15 16:45:58
+ * @Last Modified time: 2020-10-21 19:25:29
  */
 
 var pageEvents = {
@@ -707,7 +707,7 @@ var pageEvents = {
   appDeactive: 'onAppDeactive',
   appNetworkChanged: 'onNetworkChanged',
   pageApear: 'onViewDidAppear',
-  pageWillDisappear: 'onViewWillDisappear',
+  // pageWillDisappear: 'onViewWillDisappear',
   pageDestroy: 'onViewDidDestroy',
   pageTouchBack: 'onPageWillClose',
   unMounted: 'onViewDidDestroy', // alias
@@ -2433,6 +2433,114 @@ function mtModuleIos(Vue) {
 
 /*
  * @Author: dali.chen 
+ * @Date: 2020-10-27 19:57:05 
+ * @Last Modified by: dali.chen
+ * @Last Modified time: 2020-10-27 20:14:42
+ */
+
+var MODULE_NAME$9 = 'WechatModule';
+
+var WechatModule = function WechatModule(Vue) {
+  this.Vue = Vue;
+};
+WechatModule.prototype.init = function init (appId, appSecret) {
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$9, 'init', {
+    appId: appId,
+    appSecret: appSecret,
+  })
+};
+WechatModule.prototype.isWXAppInstalled = function isWXAppInstalled () {
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$9, 'isWXAppInstalled')
+};
+WechatModule.prototype.payment = function payment (ref) {
+    var partnerId = ref.partnerId;
+    var prepayId = ref.prepayId;
+    var nonceStr = ref.nonceStr;
+    var timeStamp = ref.timeStamp;
+    var sign = ref.sign;
+
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$9, 'payment', {
+    partnerId: partnerId,
+    prepayId: prepayId,
+    nonceStr: nonceStr,
+    timeStamp: timeStamp,
+    sign: sign,
+  })
+};
+WechatModule.prototype.shareText = function shareText (text, target) {
+    if ( text === void 0 ) text = '';
+    if ( target === void 0 ) target = 0;
+
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$9, 'shareText', {
+    text: text,
+    target: target
+  })
+};
+WechatModule.prototype.shareImage = function shareImage (img, target) {
+    if ( target === void 0 ) target = 0;
+
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$9, 'shareImage', {
+    img: img,
+    target: target
+  })
+};
+WechatModule.prototype.shareMusic = function shareMusic (ref) {
+    var musicUrl = ref.musicUrl;
+    var title = ref.title;
+    var content = ref.content;
+    var thumbnail = ref.thumbnail;
+    var target = ref.target; if ( target === void 0 ) target = 0;
+
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$9, 'shareMusic', {
+    musicUrl: musicUrl,
+    title: title,
+    content: content,
+    thumbnail: thumbnail,
+    target: target,
+  })
+};
+WechatModule.prototype.shareVideo = function shareVideo (ref) {
+    var videoUrl = ref.videoUrl;
+    var title = ref.title;
+    var content = ref.content;
+    var thumbnail = ref.thumbnail;
+    var target = ref.target; if ( target === void 0 ) target = 0;
+
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$9, 'shareVideo', {
+    videoUrl: videoUrl,
+    title: title,
+    content: content,
+    thumbnail: thumbnail,
+    target: target,
+  })
+};
+WechatModule.prototype.shareUrl = function shareUrl (ref) {
+    var url = ref.url;
+    var title = ref.title;
+    var content = ref.content;
+    var thumbnail = ref.thumbnail;
+    var target = ref.target; if ( target === void 0 ) target = 0;
+
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$9, 'shareUrl', {
+    url: url,
+    title: title,
+    content: content,
+    thumbnail: thumbnail,
+    target: target,
+  })
+};
+WechatModule.prototype.onWechatEvent = function onWechatEvent (callback) {
+  var instance = this.Vue.prototype;
+  instance.$nextTick(function () { return instance.$app.$on('onWechatEvent', function (response) { return callback(response); }); }
+  );
+};
+
+function mtModuleWechat (Vue) {
+  Vue.prototype.$wechat = new WechatModule(Vue);
+}
+
+/*
+ * @Author: dali.chen 
  * @Date: 2020-08-29 21:50:35 
  * @Last Modified by: dali.chen
  * @Last Modified time: 2020-09-07 11:06:56
@@ -2691,7 +2799,7 @@ function mtComponentQrcode (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-10 23:05:07
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-08 21:16:37
+ * @Last Modified time: 2020-10-27 20:33:58
  */
 
 /**
@@ -2719,6 +2827,7 @@ var HippyMtComponents = {
     mtModuleBluetooth(Vue);
     mtModuleConsole(Vue); 
     mtModuleIos(Vue);
+    mtModuleWechat(Vue);
     
     // component
     mtComponentProgress(Vue);
