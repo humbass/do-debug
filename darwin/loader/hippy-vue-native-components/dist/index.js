@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-native-components v2.0.3
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Oct 27 2020 20:35:29 GMT+0800 (China Standard Time)
+ * Build at: Wed Oct 28 2020 16:09:46 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.

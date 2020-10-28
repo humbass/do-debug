@@ -1,4 +1,8 @@
 ----
+[2020.10.26]
+add wechat module
+
+----
 [2020.07.10]
 hippy debug support 2 android devices
 

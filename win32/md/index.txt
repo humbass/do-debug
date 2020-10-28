@@ -21,7 +21,6 @@ usage example:      hipply widget clipboard
 -  music            [module]
 -  database         [module]
 -  broadcast        [module]
--  webchat          [module]
 
 -  svga             [component]
 -  qrcode           [component]

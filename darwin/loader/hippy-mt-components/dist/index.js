@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Oct 27 2020 20:35:29 GMT+0800 (China Standard Time)
+ * Build at: Wed Oct 28 2020 16:09:46 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2435,7 +2435,7 @@ function mtModuleIos(Vue) {
  * @Author: dali.chen 
  * @Date: 2020-10-27 19:57:05 
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-10-27 20:14:42
+ * @Last Modified time: 2020-10-28 16:03:11
  */
 
 var MODULE_NAME$9 = 'WechatModule';
@@ -2455,6 +2455,7 @@ WechatModule.prototype.isWXAppInstalled = function isWXAppInstalled () {
 WechatModule.prototype.payment = function payment (ref) {
     var partnerId = ref.partnerId;
     var prepayId = ref.prepayId;
+    var packageValue = ref.packageValue;
     var nonceStr = ref.nonceStr;
     var timeStamp = ref.timeStamp;
     var sign = ref.sign;
@@ -2462,6 +2463,7 @@ WechatModule.prototype.payment = function payment (ref) {
   return this.Vue.Native.callNativeWithPromise(MODULE_NAME$9, 'payment', {
     partnerId: partnerId,
     prepayId: prepayId,
+    packageValue: packageValue,
     nonceStr: nonceStr,
     timeStamp: timeStamp,
     sign: sign,
