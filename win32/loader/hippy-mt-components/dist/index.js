@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Fri Oct 30 2020 18:32:40 GMT+0800 (China Standard Time)
+ * Build at: Fri Oct 30 2020 18:53:52 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2285,7 +2285,7 @@ function mtModuleBroadcast(Vue) {
  * @Author: dali.chen
  * @Date: 2020-07-30 10:28:05
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-10-30 18:32:33
+ * @Last Modified time: 2020-10-30 18:53:02
  */
 
 var MODULE_NAME$8 = 'BluetoothModule';
@@ -2338,7 +2338,7 @@ Ble.prototype.notify = function notify (mac, serviceUuid, notifyUuid) {
     }).then(function () {
       resolve(true);
     }).catch(function (e) {
-      reject(e);
+      resolve(false);
     });
   })
 
