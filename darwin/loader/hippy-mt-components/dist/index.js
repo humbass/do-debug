@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Wed Oct 28 2020 16:09:46 GMT+0800 (China Standard Time)
+ * Build at: Fri Oct 30 2020 18:11:13 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2426,6 +2426,18 @@ IosModule.prototype.getPaddingBottomIOS = function getPaddingBottomIOS () {
     'getPaddingBottomIOS'
   )
 };
+IosModule.prototype.payment = function payment (productIdentifier) {
+  if (!isString_1(productIdentifier)) {
+    return throwError("[ios] productIdentifier error.")
+  }
+  return this.Vue.Native.callNativeWithPromise(
+    'iOSModule',
+    'payment',
+    {
+      productIdentifier: productIdentifier
+    }
+  )
+};
 
 function mtModuleIos(Vue) {
   Vue.prototype.$ios = new IosModule(Vue);
@@ -2701,7 +2713,7 @@ function mtComponentSvga(Vue) {
  * @Author: dali.chen 
  * @Date: 2020-06-17 21:57:49 
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-07-02 15:09:25
+ * @Last Modified time: 2020-10-28 19:56:33
  */
 
 var HiQrcodeView = 'hi-qrcode-view';
