@@ -2,10 +2,10 @@
 [ module ] ios
 
 
-getSafeAreaInsets()  -> promise({
+getSafeAreaInsets()       -> promise({
     isIphoneX,
     iphonePaddingTop,
     iphonePaddingTopBottom
 })
 
-iphoneXBottomHeight()   -> promise(number)
+payment(productIdentifier) -> promise()

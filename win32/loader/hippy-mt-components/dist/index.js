@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Oct 27 2020 20:35:29 GMT+0800 (China Standard Time)
+ * Build at: Fri Oct 30 2020 18:32:40 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2285,7 +2285,7 @@ function mtModuleBroadcast(Vue) {
  * @Author: dali.chen
  * @Date: 2020-07-30 10:28:05
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-28 20:28:57
+ * @Last Modified time: 2020-10-30 18:32:33
  */
 
 var MODULE_NAME$8 = 'BluetoothModule';
@@ -2320,6 +2320,8 @@ Ble.prototype.disConnect = function disConnect (mac) {
   this.Vue.Native.callNative(MODULE_NAME$8, 'disConnect', mac);
 };
 Ble.prototype.notify = function notify (mac, serviceUuid, notifyUuid) {
+    var this$1 = this;
+
   if (!isString_1(mac)) {
     return throwError(("[" + MODULE_NAME$8 + "] mac required String."))
   }
@@ -2328,11 +2330,18 @@ Ble.prototype.notify = function notify (mac, serviceUuid, notifyUuid) {
       ("[" + MODULE_NAME$8 + "] serviceUuid or notifyUuid required uuid format.")
     )
   }
-  this.Vue.Native.callNative(MODULE_NAME$8, 'notify', {
-    mac: mac,
-    serviceUuid: serviceUuid,
-    notifyUuid: notifyUuid,
-  });
+  return new Promise(function (resolve, reject) {
+    this$1.Vue.Native.callNativeWithPromise(MODULE_NAME$8, 'notify', {
+      mac: mac,
+      serviceUuid: serviceUuid,
+      notifyUuid: notifyUuid,
+    }).then(function () {
+      resolve(true);
+    }).catch(function (e) {
+      reject(e);
+    });
+  })
+
 };
 Ble.prototype.unNotify = function unNotify (mac, serviceUuid, notifyUuid) {
   if (!isString_1(mac)) {
@@ -2426,6 +2435,18 @@ IosModule.prototype.getPaddingBottomIOS = function getPaddingBottomIOS () {
     'getPaddingBottomIOS'
   )
 };
+IosModule.prototype.payment = function payment (productIdentifier) {
+  if (!isString_1(productIdentifier)) {
+    return throwError("[ios] productIdentifier error.")
+  }
+  return this.Vue.Native.callNativeWithPromise(
+    'iOSModule',
+    'payment',
+    {
+      productIdentifier: productIdentifier
+    }
+  )
+};
 
 function mtModuleIos(Vue) {
   Vue.prototype.$ios = new IosModule(Vue);
@@ -2435,7 +2456,7 @@ function mtModuleIos(Vue) {
  * @Author: dali.chen 
  * @Date: 2020-10-27 19:57:05 
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-10-27 20:14:42
+ * @Last Modified time: 2020-10-28 16:03:11
  */
 
 var MODULE_NAME$9 = 'WechatModule';
@@ -2455,6 +2476,7 @@ WechatModule.prototype.isWXAppInstalled = function isWXAppInstalled () {
 WechatModule.prototype.payment = function payment (ref) {
     var partnerId = ref.partnerId;
     var prepayId = ref.prepayId;
+    var packageValue = ref.packageValue;
     var nonceStr = ref.nonceStr;
     var timeStamp = ref.timeStamp;
     var sign = ref.sign;
@@ -2462,6 +2484,7 @@ WechatModule.prototype.payment = function payment (ref) {
   return this.Vue.Native.callNativeWithPromise(MODULE_NAME$9, 'payment', {
     partnerId: partnerId,
     prepayId: prepayId,
+    packageValue: packageValue,
     nonceStr: nonceStr,
     timeStamp: timeStamp,
     sign: sign,
@@ -2699,7 +2722,7 @@ function mtComponentSvga(Vue) {
  * @Author: dali.chen 
  * @Date: 2020-06-17 21:57:49 
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-07-02 15:09:25
+ * @Last Modified time: 2020-10-28 19:56:33
  */
 
 var HiQrcodeView = 'hi-qrcode-view';
