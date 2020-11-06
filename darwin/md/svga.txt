@@ -7,6 +7,9 @@
   ref="mysvga"
   loops="1"
   style="width:200;height:200"
+  :addTextModels="[]"
+  :addImageModels="[]"
+  :clearsAfterStop="false"
   @finished="finished"
   @loadError="loadError"
 />
@@ -24,5 +27,39 @@ stopAnimation
 
 finished()               no response return
 loadError(evt)           const { msg } = evt
+
+-------------------------------------------------------------
+
+[ clearsAfterStop ]
+boolean	    是否保留最后一帧
+
+
+[ addTextModels ]
+key	        string	  需要添加文本的素材名称
+text	      string	  需要添加的文本
+textSize	  number	  文本的大小，默认10
+textColor	  string	  文本颜色，默认黑色
+fontPath	  string	  字体文件的路径或地址
+
+[
+	{
+    text: '张三',
+    key: 'name1',
+    textColor: "#ff0000"
+    textSize: fontSize,
+    fontPath: 'mtLocal://QuartzEF.ttf',
+	}
+]
+
+[ addTextModels ]
+key	        string	  需要添加图片的素材名称
+imagePath	  string	  图片路径或地址
+
+[
+  {
+    key: 'gift',
+    imagePath: 'https://xxxx.xxx.com/img/1.png',
+  },
+]
 
 

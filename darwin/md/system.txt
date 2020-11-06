@@ -1,0 +1,14 @@
+
+[ module ] system
+
+
+playSound(path)
+
+path startsWith: mtLocal://assets || https?://
+
+-------------------------------------------------------------
+
+vibrate(flag)
+
+flag: 0 / 1 / 2
+
