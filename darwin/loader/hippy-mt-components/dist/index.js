@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Fri Oct 30 2020 23:14:07 GMT+0800 (China Standard Time)
+ * Build at: Fri Nov 06 2020 22:31:15 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -859,19 +859,13 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-28 15:39:24
+ * @Last Modified time: 2020-11-06 22:29:37
  */
 
 var MODULE_NAME = 'NavigatorModule';
 var STATUS_MODE = {
   default: 'Default',
   light: 'LightContent',
-};
-var ANIMATION_MODE = {
-  'slide_t2b': 'slide_t2b',
-  'slide_b2t': 'slide_b2t',
-  'slide_l2r': 'slide_l2r',
-  'slide_r2l': 'slide_r2l',
 };
 var limitTime = 500;
 var lastStamp = 0;
@@ -890,43 +884,20 @@ var Navigator = function Navigator(Vue) {
 Navigator.prototype.push = function push (obj) {
   if (isMultiClick()) { return throwError(("[navigator] multi click in " + limitTime + " ms")) }
   if (isObject_1$1(obj)) {
-    var pageName = obj.pageName;
-      var pageData = obj.pageData; if ( pageData === void 0 ) pageData = {};
-      var statusBarStyle = obj.statusBarStyle; if ( statusBarStyle === void 0 ) statusBarStyle = STATUS_MODE.default;
-      var transparent = obj.transparent; if ( transparent === void 0 ) transparent = false;
-      var backgroundColor = obj.backgroundColor; if ( backgroundColor === void 0 ) backgroundColor = '#ffffff';
-      var animationMode = obj.animationMode; if ( animationMode === void 0 ) animationMode = ANIMATION_MODE.slide_r2l;
-      var translucent = obj.translucent; if ( translucent === void 0 ) translucent = false;
-      var loadingViewBackgroundColor = obj.loadingViewBackgroundColor; if ( loadingViewBackgroundColor === void 0 ) loadingViewBackgroundColor = '';
-    if (!pageName || !this.Vue.config.pages.hasOwnProperty(pageName)) {
-      return throwError("[navigator] pathName no defined in pages")
+    if ((!obj.pageName) || !isString_1(obj.pageName) || !this.Vue.config.pages.hasOwnProperty(obj.pageName)) {
+      return throwError("[push] The path name is not defined in the config file!")
     }
-    var options = {
-      pageName: pageName,
-      pageData: pageData,
-      statusBarStyle: statusBarStyle,
-      transparent: transparent,
-      backgroundColor: backgroundColor,
-      animationMode: animationMode,
-      translucent: translucent,
-      loadingViewBackgroundColor: loadingViewBackgroundColor,
-    };
-    this.Vue.Native.callNative(MODULE_NAME, 'push', options);
+    this.Vue.Native.callNative(MODULE_NAME, 'push', obj);
   }
   else if (isString_1(obj)) {
     if (!obj || !this.Vue.config.pages.hasOwnProperty(obj)) {
-      return throwError("[navigator] pathName no defined in pages")
+      return throwError("[push] The path name is not defined in the config file!")
     }
-    var options$1 = {
+    var options = {
       pageName: obj,
-      pageData: {},
-      statusBarStyle: STATUS_MODE.default,
-      transparent: false,
-      backgroundColor: '#ffffff',
-      animationMode: ANIMATION_MODE.slide_r2l,
-      translucent: false,
+      animationMode: 'slide_l2r',
     };
-    this.Vue.Native.callNative(MODULE_NAME, 'push', options$1);
+    this.Vue.Native.callNative(MODULE_NAME, 'push', options);
   }
   else { return throwError("[navigator] push params error.") }
 };
@@ -2564,6 +2535,36 @@ function mtModuleWechat (Vue) {
 
 /*
  * @Author: dali.chen 
+ * @Date: 2020-06-11 10:04:12 
+ * @Last Modified by: dali.chen
+ * @Last Modified time: 2020-11-06 22:14:40
+ */
+
+
+var SystemModule = function SystemModule(Vue) {
+  this.Vue = Vue;
+};
+SystemModule.prototype.playSound = function playSound (path) {
+  if (!isString_1(path) || (!path.startsWith('mtLocal://assets') && !path.startsWith('http'))) {
+    return throwError('[playSound] path start with mtlocal or http!')
+  }
+  return this.Vue.Native.callNative('SystemModule', 'playSound', path)
+};
+SystemModule.prototype.vibrate = function vibrate (flag) {
+    if ( flag === void 0 ) flag = 0;
+
+  if (!isNumber_1(flag) || ![0,1,2].includes(flag)) {
+    flag = 0;
+  }
+  return this.Vue.Native.callNative('SystemModule', 'vibrate', flag)
+};
+
+function mtModuleSystem (Vue) {
+  Vue.prototype.$system = new SystemModule(Vue);
+}
+
+/*
+ * @Author: dali.chen 
  * @Date: 2020-08-29 21:50:35 
  * @Last Modified by: dali.chen
  * @Last Modified time: 2020-09-07 11:06:56
@@ -2822,7 +2823,7 @@ function mtComponentQrcode (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-10 23:05:07
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-10-27 20:33:58
+ * @Last Modified time: 2020-11-06 22:06:47
  */
 
 /**
@@ -2851,6 +2852,7 @@ var HippyMtComponents = {
     mtModuleConsole(Vue); 
     mtModuleIos(Vue);
     mtModuleWechat(Vue);
+    mtModuleSystem(Vue);
     
     // component
     mtComponentProgress(Vue);
