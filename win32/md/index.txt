@@ -10,20 +10,22 @@ usage example:      hipply widget clipboard
 
 -  agoraRtc         [module]
 -  alioss           [module]
+-  broadcast        [module]
 -  clipboard        [module]
 -  contants         [module]
+-  database         [module]
 -  dialog           [module]
+-  download         [module]
 -  media            [module]
 -  mqtt             [module]
+-  music            [module]
 -  navigator        [module]
 -  storage          [module]
--  download         [module]
--  music            [module]
--  database         [module]
--  broadcast        [module]
+-  system           [module]
 -  webchat          [module]
 
--  svga             [component]
+-  process           [component]
 -  qrcode           [component]
+-  svga             [component]
 
 
