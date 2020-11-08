@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Fri Nov 06 2020 22:31:15 GMT+0800 (China Standard Time)
+ * Build at: Sun Nov 08 2020 21:35:47 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -859,7 +859,7 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-06 22:29:37
+ * @Last Modified time: 2020-11-08 21:33:20
  */
 
 var MODULE_NAME = 'NavigatorModule';
@@ -867,8 +867,17 @@ var STATUS_MODE = {
   default: 'Default',
   light: 'LightContent',
 };
+var slideList = [
+  'slide_r2l',
+  'slide_b2t',
+  'slide_l2r',
+  'slide_t2b',
+  'none'
+];
+
 var limitTime = 500;
 var lastStamp = 0;
+
 function isMultiClick() {
   var stamp = new Date().getTime();
   if (stamp - lastStamp > limitTime) {
@@ -876,6 +885,18 @@ function isMultiClick() {
     return false
   }
   return true
+}
+
+function slideFilter(obj) {
+  if (!obj.hasOwnProperty('animationMode') || !slideList.includes(obj)) {
+    obj.animationMode = slideList[0];
+    return obj
+  }
+  if (obj.animationMode === 'none') {
+    delete obj.animationMode;
+    return obj
+  }
+  return obj
 }
 
 var Navigator = function Navigator(Vue) {
@@ -887,7 +908,8 @@ Navigator.prototype.push = function push (obj) {
     if ((!obj.pageName) || !isString_1(obj.pageName) || !this.Vue.config.pages.hasOwnProperty(obj.pageName)) {
       return throwError("[push] The path name is not defined in the config file!")
     }
-    this.Vue.Native.callNative(MODULE_NAME, 'push', obj);
+    var objFileter = slideFilter(obj);
+    this.Vue.Native.callNative(MODULE_NAME, 'push', objFileter);
   }
   else if (isString_1(obj)) {
     if (!obj || !this.Vue.config.pages.hasOwnProperty(obj)) {
@@ -895,7 +917,7 @@ Navigator.prototype.push = function push (obj) {
     }
     var options = {
       pageName: obj,
-      animationMode: 'slide_l2r',
+      animationMode: 'slide_r2l',
     };
     this.Vue.Native.callNative(MODULE_NAME, 'push', options);
   }
@@ -914,7 +936,7 @@ Navigator.prototype.pop = function pop (value) {
   }
   else { return throwError(("[" + MODULE_NAME + "] params error.")) }
 };
-  
+
 Navigator.prototype.setStatusBarStyle = function setStatusBarStyle (style) {
     if ( style === void 0 ) style = 'default';
 
@@ -932,7 +954,7 @@ Navigator.prototype.setCanNotBack = function setCanNotBack (flag) {
   this.Vue.Native.callNative(MODULE_NAME, 'setCanNotBack', flag);
 };
 
-function mtModuleNavigator(Vue) {
+function mtModuleNavigator (Vue) {
   Vue.prototype.$navigator = new Navigator(Vue);
 }
 
