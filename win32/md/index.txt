@@ -16,6 +16,7 @@ usage example:      hipply widget clipboard
 -  database         [module]
 -  dialog           [module]
 -  download         [module]
+-  jpush            [module]
 -  media            [module]
 -  mqtt             [module]
 -  music            [module]

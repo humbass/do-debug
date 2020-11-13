@@ -18,3 +18,7 @@ pageTouchBack:          // user touch back button
 ------------------------------------------------------------
 
 pageData(data):         // accept data from navigator.push(pageData)
+
+------------------------------------------------------------
+
+appScheme(string):      // string from h5 scheme mthd://index?abc=123

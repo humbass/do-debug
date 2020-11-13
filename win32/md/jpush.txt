@@ -1,0 +1,28 @@
+
+[ module ] jpush
+
+
+getRegistrationID       // 获取设备ID
+
+e.g.
+this.$jpush.getRegistrationID().then(res => {})
+------------------------------------------------------------
+
+setAlias(name)
+deleteAlias(name)
+deleteAlias(name)
+setTags(arr)
+addTags(arr)
+deleteTags(arr)
+cleanTags()
+getAllTags()
+checkTagBindState(tagName)
+pushOff()
+pushOn()
+
+
+
+------------------------------------------------------------
+
+[ event ]
+onEvent((data) => {})

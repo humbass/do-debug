@@ -1,4 +1,8 @@
 ----
+[2020.11.13]
+add jpush module
+
+----
 [2020.10.26]
 add wechat module
 
