@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Sun Nov 08 2020 23:24:45 GMT+0800 (China Standard Time)
+ * Build at: Fri Nov 13 2020 18:48:47 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -699,7 +699,7 @@ function objectToString$1(o) {
  * @Author: dali.chen
  * @Date: 2020-07-06 16:13:42
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-08 23:24:17
+ * @Last Modified time: 2020-11-13 17:44:00
  */
 
 var pageEvents = {
@@ -760,7 +760,14 @@ function mtModuleHippyEvent (Vue) {
 
       if (this.$options['pageData'] && isFunction_1$1(this.$options['pageData'])) {
         this.$nextTick(function () {
-          this$1.$options['pageData'].call(null, this$1.$superProps);
+          this$1.$options['pageData'].call(null, this$1.$superProps, this$1.$rootViewId);
+        });
+      }
+      if (this.$options['appScheme'] && isFunction_1$1(this.$options['appScheme'])) {
+        this.$nextTick(function () {
+          this$1.$app.$on("onScheme", function (scheme) {
+            this$1.$options['appScheme'].call(null, scheme);
+          });
         });
       }
       var events = [];
@@ -864,7 +871,7 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-08 21:33:20
+ * @Last Modified time: 2020-11-09 12:02:41
  */
 
 var MODULE_NAME = 'NavigatorModule';
@@ -893,7 +900,7 @@ function isMultiClick() {
 }
 
 function slideFilter(obj) {
-  if (!obj.hasOwnProperty('animationMode') || !slideList.includes(obj)) {
+  if (!obj.hasOwnProperty('animationMode') || !slideList.includes(obj.animationMode)) {
     obj.animationMode = slideList[0];
     return obj
   }
@@ -913,18 +920,18 @@ Navigator.prototype.push = function push (obj) {
     if ((!obj.pageName) || !isString_1(obj.pageName) || !this.Vue.config.pages.hasOwnProperty(obj.pageName)) {
       return throwError("[push] The path name is not defined in the config file!")
     }
-    var objFileter = slideFilter(obj);
-    this.Vue.Native.callNative(MODULE_NAME, 'push', objFileter);
+    var options = slideFilter(obj);
+    this.Vue.Native.callNative(MODULE_NAME, 'push', options);
   }
   else if (isString_1(obj)) {
     if (!obj || !this.Vue.config.pages.hasOwnProperty(obj)) {
       return throwError("[push] The path name is not defined in the config file!")
     }
-    var options = {
+    var options$1 = {
       pageName: obj,
       animationMode: 'slide_r2l',
     };
-    this.Vue.Native.callNative(MODULE_NAME, 'push', options);
+    this.Vue.Native.callNative(MODULE_NAME, 'push', options$1);
   }
   else { return throwError("[navigator] push params error.") }
 };
@@ -2590,6 +2597,63 @@ function mtModuleSystem (Vue) {
   Vue.prototype.$system = new SystemModule(Vue);
 }
 
+var moudlename = "JpushModule";
+
+var JpushModule = function JpushModule(Vue) {
+  this.Vue = Vue;
+};
+JpushModule.prototype.setAlias = function setAlias (name) {
+  this.Vue.Native.callNative(moudlename, "setAlias", name);
+};
+JpushModule.prototype.deleteAlias = function deleteAlias (name) {
+  this.Vue.Native.callNative(moudlename, "deleteAlias", name);
+};
+JpushModule.prototype.getAlias = function getAlias (name) {
+  this.Vue.Native.callNative(moudlename, "getAlias", name);
+};
+JpushModule.prototype.setTags = function setTags (arr) {
+  this.Vue.Native.callNative(moudlename, "setTags", arr);
+};
+JpushModule.prototype.addTags = function addTags (arr) {
+  this.Vue.Native.callNative(moudlename, "addTags", arr);
+};
+JpushModule.prototype.deleteTags = function deleteTags (arr) {
+  this.Vue.Native.callNative(moudlename, "deleteTags", arr);
+};
+JpushModule.prototype.cleanTags = function cleanTags () {
+  Vue.Native.callNative(moudlename, "cleanTags");
+};
+JpushModule.prototype.getAllTags = function getAllTags () {
+  this.Vue.Native.callNative(moudlename, "getAllTags");
+};
+JpushModule.prototype.checkTagBindState = function checkTagBindState (tagName) {
+  this.Vue.Native.callNative(moudlename, "checkTagBindState", tagName);
+};
+JpushModule.prototype.pushOff = function pushOff () {
+  return this.Vue.Native.callNativeWithPromise(moudlename, "pushOff")
+};
+JpushModule.prototype.pushOn = function pushOn () {
+  return this.Vue.Native.callNativeWithPromise(moudlename, "pushOn")
+};
+JpushModule.prototype.getRegistrationID = function getRegistrationID () {
+  return this.Vue.Native.callNativeWithPromise(moudlename, "getRegistrationID")
+};
+JpushModule.prototype.onEvent = function onEvent (callback) {
+    var this$1 = this;
+
+  this.$nextTick(function () {
+    this$1.$app.$on('onJpushEvent', function (event) {
+      if (isFunction_1$1(callback)) {
+        callback(event);
+      }
+    });
+  });
+};
+
+function mtModuleJpush (Vue) {
+  Vue.prototype.$jpush = new JpushModule(Vue);
+}
+
 /*
  * @Author: dali.chen 
  * @Date: 2020-08-29 21:50:35 
@@ -2850,7 +2914,7 @@ function mtComponentQrcode (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-10 23:05:07
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-06 22:06:47
+ * @Last Modified time: 2020-11-12 21:23:33
  */
 
 /**
@@ -2880,6 +2944,7 @@ var HippyMtComponents = {
     mtModuleIos(Vue);
     mtModuleWechat(Vue);
     mtModuleSystem(Vue);
+    mtModuleJpush(Vue);
     
     // component
     mtComponentProgress(Vue);
