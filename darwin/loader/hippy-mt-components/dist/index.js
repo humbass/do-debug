@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Fri Nov 13 2020 19:00:54 GMT+0800 (China Standard Time)
+ * Build at: Tue Nov 17 2020 11:43:21 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -699,10 +699,11 @@ function objectToString$1(o) {
  * @Author: dali.chen
  * @Date: 2020-07-06 16:13:42
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-13 17:44:00
+ * @Last Modified time: 2020-11-16 11:06:29
  */
 
 var pageEvents = {
+  appScheme: 'onScheme',
   appActive: 'onAppActive',
   appDeactive: 'onAppDeactive',
   appNetworkChanged: 'onNetworkChanged',
@@ -710,7 +711,7 @@ var pageEvents = {
   // pageWillDisappear: 'onViewWillDisappear',
   pageDestroy: 'onViewDidDestroy',
   pageTouchBack: 'onPageWillClose',
-  unMounted: 'onViewDidDestroy', // alias
+  unMounted: 'onViewDidDestroy',
 };
 
 var pageEventsMap = Object.keys(pageEvents);
@@ -761,13 +762,6 @@ function mtModuleHippyEvent (Vue) {
       if (this.$options['pageData'] && isFunction_1$1(this.$options['pageData'])) {
         this.$nextTick(function () {
           this$1.$options['pageData'].call(null, this$1.$superProps, this$1.$rootViewId);
-        });
-      }
-      if (this.$options['appScheme'] && isFunction_1$1(this.$options['appScheme'])) {
-        this.$nextTick(function () {
-          this$1.$app.$on("onScheme", function (scheme) {
-            this$1.$options['appScheme'].call(null, scheme);
-          });
         });
       }
       var events = [];
@@ -2639,10 +2633,9 @@ JpushModule.prototype.getRegistrationID = function getRegistrationID () {
   return this.Vue.Native.callNativeWithPromise(moudlename, "getRegistrationID")
 };
 JpushModule.prototype.onEvent = function onEvent (callback) {
-    var this$1 = this;
-
-  this.$nextTick(function () {
-    this$1.$app.$on('onJpushEvent', function (event) {
+  var instance = this.Vue.prototype;
+  instance.$nextTick(function () {
+    instance.$app.$on('onJpushEvent', function (event) {
       if (isFunction_1$1(callback)) {
         callback(event);
       }

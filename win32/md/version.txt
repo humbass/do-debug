@@ -1,16 +1,68 @@
 ----
-[2020.11.13]
-add jpush module
+
 
 ----
-[2020.10.26]
-add wechat module
 
 ----
-[2020.07.10]
-hippy debug support 2 android devices
 
 ----
+
+
+
+----
+
+
+
+----
+
+
+----
+
+
+
+----
+
+
+----
+
+
+
+[2020.06.10] 
+- contants   this.screenHeight 等等
+- clipboard 
+- storage 
+- navigator  
+
+[2020.06.11]
+- dialog
+- util.js    move to hippy tools root folder
+
+[2020.06.17]
+- mqtt      this.$mqtt
+- media     this.$media 
+- alioss    this.$alioss 
+- svga      svga component
+
+[2020.06.20]
+- agoraRtc
+- qrcode
+- music
+
+[2020.06.22]
+- download         [module]
+
+[2020.07.01]
+- broadcast        [module]
+- database         [module]
+
+[2020.07.4]
+arguments update
+* AgoraRtc
+* database
+* dialog
+* mqtt
+
+
 [2020.07.9]
 * Navigator
 push
@@ -20,73 +72,12 @@ setBackgroundColor
 * AgoraRtc
 * hippyEvent
 
-
-----
-[2020.07.4]
-arguments update
-
-* AgoraRtc
-init(rtcId, audioReverb = 0)
-joinChannel(token, channel, uid) 
-
-* database
-create(version, sql_array)
-upgrade(version, sql_array)
-insert(table, data)
-update(table, where, data)
-delete(table, where)
-query(sql)
-exec(sql)
-
-* dialog
-alert(message) 
-alert(title, message)
-confirm(message).then(boolean => {})
-confirm(title, message).then(boolean => {})
-toast(message)
-toast(message, position)
-toast(message, position, duation)
+[2020.07.10]
+hippy debug support 2 android devices
 
 
-* mqtt
-connect(host, clientId, userName, password)
-publish(topic, message, qos = 0)
+[2020.10.26]
+add wechat module
 
-
-----
-[2020.07.01]
-- broadcast        [module]
-- database         [module]
-
-
-----
-[2020.06.22]
-- download         [module]
-
-
-----
-[2020.06.20]
-- agoraRtc
-- qrcode
-- music
-
-
-----
-[2020.06.17]
-- mqtt      this.$mqtt
-- media     this.$media 
-- alioss    this.$alioss 
-- svga      svga component
-
-
-[2020.06.11]
-- dialog
-- util.js    move to hippy tools root folder
-
-----
-[2020.06.10] 
-- contants   this.screenHeight 等等
-- clipboard 
-- storage 
-- navigator  
-
+[2020.11.13]
+add jpush module
