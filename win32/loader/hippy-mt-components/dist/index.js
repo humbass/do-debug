@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Nov 24 2020 17:27:47 GMT+0800 (China Standard Time)
+ * Build at: Tue Nov 24 2020 18:26:37 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -674,10 +674,10 @@ function isNumber(arg) {
 }
 var isNumber_1 = isNumber;
 
-function isString$1(arg) {
+function isString(arg) {
   return typeof arg === 'string';
 }
-var isString_1 = isString$1;
+var isString_1 = isString;
 
 function isObject$1(arg) {
   return typeof arg === 'object' && arg !== null;
@@ -2565,7 +2565,7 @@ function mtModuleWechat (Vue) {
  * @Author: dali.chen 
  * @Date: 2020-06-11 10:04:12 
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-24 17:27:19
+ * @Last Modified time: 2020-11-24 18:26:34
  */
 
 
@@ -2573,7 +2573,7 @@ var SystemModule = function SystemModule(Vue) {
   this.Vue = Vue;
 };
 SystemModule.prototype.playSound = function playSound (path) {
-  if (!isString(path) || (!path.startsWith('mtLocal://assets') && !path.startsWith('http'))) {
+  if (!isString_1(path)) {
     return throwError('[playSound] path start with mtlocal or http!')
   }
   return this.Vue.Native.callNative('SystemModule', 'playSound', path)
