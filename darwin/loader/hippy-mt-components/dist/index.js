@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Nov 24 2020 19:07:09 GMT+0800 (China Standard Time)
+ * Build at: Thu Nov 26 2020 18:26:28 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2728,12 +2728,12 @@ function mtComponentProgress(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-15 13:44:22
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-07-17 15:33:55
+ * @Last Modified time: 2020-11-26 18:26:06
  */
 
 var HiSvgaView = 'hi-svga-view';
 
-function mtComponentSvga(Vue) {
+function mtComponentSvga (Vue) {
   Vue.registerElement(HiSvgaView, {
     component: {
       name: 'SvgaView',
@@ -2756,13 +2756,37 @@ function mtComponentSvga(Vue) {
         type: Number,
         defaultValue: 1,
       },
+      width: {
+        type: Number,
+        defaultValue: 0,
+      },
+      height: {
+        type: Number,
+        defaultValue: 0,
+      },
+      style: {
+        type: Object,
+        defaultValue: {},
+      },
+      clearsAfterStop: {
+        type: Boolean,
+        defaultValue: false,
+      },
+      addTextModels: {
+        type: Array,
+        defaultValue: [],
+      },
+      addImageModels: {
+        type: Array,
+        defaultValue: [],
+      },
     },
     data: function data() {
       return {
         timeStamp: 0,
       }
     },
-    beforeMount: function beforeMount() {},
+    beforeMount: function beforeMount() { },
     methods: {
       startAnimation: function startAnimation() {
         Vue.Native.callUIFunction(this.$refs[HiSvgaView], 'startAnimation');
@@ -2784,17 +2808,38 @@ function mtComponentSvga(Vue) {
       var on = getEventRedirector.call(this, [
         ['finished', 'finished'],
         ['loadError', 'loadError'] ]);
+      var style =  Object.assign({}, this.style);
+      if (this.height) {
+        style.height = this.height;
+      }
+      if (this.width) {
+        style.width = this.width;
+      }
       return h(
-        HiSvgaView,
+        'div',
         {
-          on: on,
-          ref: HiSvgaView,
-          attrs: {
-            src: this.src,
-            loops: this.loops,
-          },
+          style: style,
         },
-        this.$slots.default
+        [
+          h(
+            HiSvgaView,
+            {
+              on: on,
+              ref: HiSvgaView,
+              attrs: {
+                src: this.src,
+                loops: this.loops,
+                clearsAfterStop: this.clearsAfterStop,
+                addTextModels: this.addTextModels,
+                addImageModels: this.addImageModels,
+              },
+              style: {
+                flex: 1
+              }
+            },
+            this.$slots.default
+          )
+        ]
       )
     },
   });
