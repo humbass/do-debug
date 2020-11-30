@@ -1,0 +1,19 @@
+
+[ module ] alipay
+
+
+isAliPayInstalled() -> promise(flag)            // false || true
+
+payment(orderInfo)  -> promise({status, msg})  // android only
+
+------------------------------------------------------------
+
+[status]
+
+9000	支付成功
+4000	支付失败
+5000	重复请求
+6001	用户中途取消
+6002	网络连接出错
+
+

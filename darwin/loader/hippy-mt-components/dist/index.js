@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Nov 30 2020 17:47:12 GMT+0800 (China Standard Time)
+ * Build at: Mon Nov 30 2020 17:56:13 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2646,6 +2646,30 @@ function mtModuleJpush (Vue) {
 
 /*
  * @Author: dali.chen 
+ * @Date: 2020-10-27 19:57:05 
+ * @Last Modified by: dali.chen
+ * @Last Modified time: 2020-11-30 17:54:05
+ */
+
+var MODULE_NAME$a = 'AliPayModule';
+
+var AlipayModule = function AlipayModule(Vue) {
+  this.Vue = Vue;
+};
+AlipayModule.prototype.isAliPayInstalled = function isAliPayInstalled () {
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$a, "isAliPayInstalled")
+};
+AlipayModule.prototype.payment = function payment (orderInfo) {
+  if (!isString_1(orderInfo)) { return throwError("[alipy] orderInfo is String(required)") }
+  return this.Vue.Native.callNativeWithPromise(MODULE_NAME$a, "payment", orderInfo)
+};
+
+function mtModuleAlipay (Vue) {
+  Vue.prototype.$alipay = new AlipayModule(Vue);
+}
+
+/*
+ * @Author: dali.chen 
  * @Date: 2020-08-29 21:50:35 
  * @Last Modified by: dali.chen
  * @Last Modified time: 2020-09-07 11:06:56
@@ -2949,7 +2973,7 @@ function mtComponentQrcode (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-10 23:05:07
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-12 21:23:33
+ * @Last Modified time: 2020-11-30 17:54:50
  */
 
 /**
@@ -2980,6 +3004,7 @@ var HippyMtComponents = {
     mtModuleWechat(Vue);
     mtModuleSystem(Vue);
     mtModuleJpush(Vue);
+    mtModuleAlipay(Vue);
     
     // component
     mtComponentProgress(Vue);

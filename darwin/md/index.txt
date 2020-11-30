@@ -24,8 +24,9 @@ usage example:      hipply widget clipboard
 -  storage          [module]
 -  system           [module]
 -  webchat          [module]
+-  alipay           [module]
 
--  process           [component]
+-  process          [component]
 -  qrcode           [component]
 -  svga             [component]
 
