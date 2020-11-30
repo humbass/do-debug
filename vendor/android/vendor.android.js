@@ -2,7 +2,7 @@ var hippyVueBase=function(t){var e={};function n(r){if(e[r])return e[r].exports;
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Thu Nov 26 2020 18:26:28 GMT+0800 (China Standard Time)
+ * Build at: Mon Nov 30 2020 17:47:12 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -26,7 +26,7 @@ var r="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof window?windo
 /*!
  * @hippy/vue-native-components v2.0.3
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Thu Nov 26 2020 18:26:28 GMT+0800 (China Standard Time)
+ * Build at: Mon Nov 30 2020 17:47:12 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -50,7 +50,7 @@ function r(t,e){var n={};for(var r in t)Object.prototype.hasOwnProperty.call(t,r
 /*!
  * @hippy/vue v2.0.3
  * (Using Vue v2.6.11)
- * Build at: Thu Nov 26 2020 18:26:28 GMT+0800 (China Standard Time)
+ * Build at: Mon Nov 30 2020 17:47:12 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.

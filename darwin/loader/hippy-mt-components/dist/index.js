@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Thu Nov 26 2020 18:26:28 GMT+0800 (China Standard Time)
+ * Build at: Mon Nov 30 2020 17:47:12 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2728,7 +2728,7 @@ function mtComponentProgress(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-15 13:44:22
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-26 18:26:06
+ * @Last Modified time: 2020-11-26 18:35:56
  */
 
 var HiSvgaView = 'hi-svga-view';
