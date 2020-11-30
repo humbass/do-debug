@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Nov 30 2020 17:56:13 GMT+0800 (China Standard Time)
+ * Build at: Mon Nov 30 2020 23:52:41 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -851,11 +851,6 @@ function getEventRedirector(events) {
   });
   return on;
 }
-
-// function throwError(message) {
-//   const msg = new Error(message)
-//   return Promise.reject(msg)
-// }
 
 function throwError(message) {
   console.log(new Error(message));
