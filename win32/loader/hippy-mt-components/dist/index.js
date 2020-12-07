@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Nov 30 2020 23:52:41 GMT+0800 (China Standard Time)
+ * Build at: Mon Dec 07 2020 20:37:10 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2965,10 +2965,89 @@ function mtComponentQrcode (Vue) {
 }
 
 /*
+ * @Author: dali.chen 
+ * @Date: 2020-06-17 21:57:49 
+ * @Last Modified by: dali.chen
+ * @Last Modified time: 2020-12-07 10:23:38
+ */
+
+var HiViewPager = 'hi-viewpager';
+
+function mtComponentSlider (Vue) {
+  Vue.registerElement(HiViewPager, {
+    component: {
+      name: 'ViewPager',
+      processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
+        event.nativeEventName = nativeEventName;
+        event.nativeEventParams = nativeEventParams;
+        return event
+      },
+    },
+  });
+  Vue.registerElement('slider-item', {
+    component: {
+      name: 'ViewPagerItem',
+      processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
+        event.nativeEventName = nativeEventName;
+        event.nativeEventParams = nativeEventParams;
+        return event
+      },
+    },
+  });
+  Vue.component('slider', {
+    inheritAttrs: false,
+    props: {
+      initialPage: {
+        type: Number,
+        default: 0,
+      },
+      keyboardDismissMode: {
+        type: String,
+        default: 'none'
+      },
+      scrollEnabled: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    methods: {
+      setPageWithoutAnimation: function setPageWithoutAnimation(index) {
+        Vue.Native.callUIFunction(this.$refs[HiViewPager], 'setPageWithoutAnimation', [index]);
+      },
+      setPage: function setPage(index) {
+        Vue.Native.callUIFunction(this.$refs[HiViewPager], 'setPage', [index]);
+      },
+      onPageSelected: function onPageSelected(ref) {
+        var nativeEventParams = ref.nativeEventParams;
+
+        this.$emit('pageSelected', nativeEventParams);
+      }
+    },
+    render: function render(h) {
+      var on = getEventRedirector.call(this, [
+        ['pageSelected', 'pageSelected'] ]);
+      return h(
+        HiViewPager,
+        {
+          on: on,
+          ref: HiViewPager,
+          attrs: {
+            initialPage: this.initialPage,
+            keyboardDismissMode: this.keyboardDismissMode,
+            scrollEnabled: this.scrollEnabled,
+          }
+        },
+        this.$slots.default
+      )
+    },
+  });
+}
+
+/*
  * @Author: dali.chen
  * @Date: 2020-06-10 23:05:07
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-30 17:54:50
+ * @Last Modified time: 2020-12-05 22:19:18
  */
 
 /**
@@ -3005,6 +3084,7 @@ var HippyMtComponents = {
     mtComponentProgress(Vue);
     mtComponentSvga(Vue);
     mtComponentQrcode(Vue);
+    mtComponentSlider(Vue);
   },
 };
 
