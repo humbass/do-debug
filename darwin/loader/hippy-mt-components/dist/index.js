@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Mon Dec 07 2020 20:37:10 GMT+0800 (China Standard Time)
+ * Build at: Tue Dec 08 2020 19:45:55 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -1038,7 +1038,7 @@ function mtModuleClipBoard (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-10-08 16:59:49
+ * @Last Modified time: 2020-12-08 19:45:30
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1129,6 +1129,7 @@ Dialog.prototype.prompt = function prompt () {
       radius: 5,
       inputBorderColor: '#aaaaaa',
       inputBorderWidth: 1,
+      inputType: 'text'
     })
   } else if (arguments.length === 1 && isString_1(arguments[0])) {
     return this.Vue.Native.callNativeWithPromise(MODULE_NAME$1, 'prompt', {
@@ -1136,6 +1137,7 @@ Dialog.prototype.prompt = function prompt () {
       radius: 5,
       inputBorderColor: '#aaaaaa',
       inputBorderWidth: 1,
+      inputType: 'text',
     })
   } else if (
     arguments.length === 3 &&
@@ -1150,12 +1152,17 @@ Dialog.prototype.prompt = function prompt () {
       rBtnText: arguments[2],
       inputBorderColor: '#aaaaaa',
       inputBorderWidth: 1,
+      inputType: 'text',
     })
   } else if (arguments.length === 1 && isObject_1$1(arguments[0])) {
+    var arg = arguments[0];
+    if (!arg.inputType) {
+      arg.inputType = 'text';
+    }
     return this.Vue.Native.callNativeWithPromise(
       MODULE_NAME$1,
       'prompt',
-      arguments[0]
+      arg
     )
   } else { return throwError(("[" + MODULE_NAME$1 + "] params error.")) }
 };
