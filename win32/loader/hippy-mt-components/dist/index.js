@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Dec 08 2020 19:45:55 GMT+0800 (China Standard Time)
+ * Build at: Tue Dec 15 2020 18:41:20 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -860,7 +860,7 @@ function throwError(message) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-09 12:02:41
+ * @Last Modified time: 2020-12-15 18:40:53
  */
 
 var MODULE_NAME = 'NavigatorModule';
@@ -953,6 +953,11 @@ Navigator.prototype.setBackgroundColor = function setBackgroundColor (color) {
 Navigator.prototype.setCanNotBack = function setCanNotBack (flag) {
   if (!isBoolean_1(flag)) { return throwError(("[" + MODULE_NAME + "] params format error.")) }
   this.Vue.Native.callNative(MODULE_NAME, 'setCanNotBack', flag);
+};
+
+Navigator.prototype.setEverbright = function setEverbright (flag) {
+  if (!isBoolean_1(flag)) { return throwError(("[" + MODULE_NAME + "] params format error.")) }
+  this.Vue.Native.callNative(MODULE_NAME, 'setEverbright', flag);
 };
 
 function mtModuleNavigator (Vue) {
