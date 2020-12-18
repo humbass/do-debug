@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Tue Dec 15 2020 18:41:20 GMT+0800 (China Standard Time)
+ * Build at: Fri Dec 18 2020 14:53:02 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -786,7 +786,7 @@ function mtModuleHippyEvent (Vue) {
  * @Author: dali.chen 
  * @Date: 2020-06-11 10:04:12 
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-21 17:52:41
+ * @Last Modified time: 2020-12-18 12:08:34
  */
 
 function mtModuleContants (Vue) {
@@ -796,6 +796,7 @@ function mtModuleContants (Vue) {
   var ref$1 = Vue.Native;
   var Platform = ref$1.Platform;
   var screenIsVertical = ref$1.screenIsVertical;
+  var measureInWindow = ref$1.measureInWindow;
   // device infomations
   Vue.prototype.$platform = Platform;
   if (Platform === 'ios') {
@@ -810,6 +811,7 @@ function mtModuleContants (Vue) {
   Vue.prototype.$screenWidth = screen.width;
   Vue.prototype.$windowHeight = window.height;
   Vue.prototype.$windowWidth = window.width;
+  Vue.prototype.$measureInWindow = measureInWindow;
 }
 
 /**

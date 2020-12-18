@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue v2.0.3
  * (Using Vue v2.6.11)
- * Build at: Tue Dec 15 2020 18:41:20 GMT+0800 (China Standard Time)
+ * Build at: Fri Dec 18 2020 14:53:02 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -12912,6 +12912,13 @@ var img = {
   symbol: Image,
   component: {
     name: NATIVE_COMPONENT_NAME_MAP[Image],
+    eventNamesMap: mapEvent([
+      ['saveResult', 'onSaveResult'] ]),
+    processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
+      event.nativeEventName = nativeEventName;
+      event.nativeEventParams = nativeEventParams;
+      return event
+    },
     attributeMaps: {
       // TODO: check placeholder or defaultSource value in compile-time wll be better.
       placeholder: {
@@ -13999,6 +14006,25 @@ var ListNode = /*@__PURE__*/(function (ElementNode) {
   return ListNode;
 }(ElementNode));
 
+/**
+ * img element
+ */
+var ImgNode = /*@__PURE__*/(function (ElementNode) {
+  function ImgNode () {
+    ElementNode.apply(this, arguments);
+  }
+
+  if ( ElementNode ) ImgNode.__proto__ = ElementNode;
+  ImgNode.prototype = Object.create( ElementNode && ElementNode.prototype );
+  ImgNode.prototype.constructor = ImgNode;
+
+  ImgNode.prototype.save = function save () {
+    Native.callUIFunction(this, 'save');
+  };
+
+  return ImgNode;
+}(ElementNode));
+
 var DocumentNode = /*@__PURE__*/(function (ViewNode) {
   function DocumentNode() {
     ViewNode.call(this);
@@ -14028,6 +14054,8 @@ var DocumentNode = /*@__PURE__*/(function (ViewNode) {
         return new InputNode(tagName);
       case 'ul':
         return new ListNode(tagName);
+      case 'img':
+        return new ImgNode(tagName);
       default:
         return new ElementNode(tagName);
     }
