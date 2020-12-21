@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
- * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Fri Dec 18 2020 14:53:02 GMT+0800 (China Standard Time)
+ * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
+ * Build at: Mon Dec 21 2020 23:22:31 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -699,7 +699,7 @@ function objectToString$1(o) {
  * @Author: dali.chen
  * @Date: 2020-07-06 16:13:42
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-11-16 11:06:29
+ * @Last Modified time: 2020-12-21 15:42:09
  */
 
 var pageEvents = {
@@ -759,11 +759,6 @@ function mtModuleHippyEvent (Vue) {
     beforeCreate: function beforeCreate() {
       var this$1 = this;
 
-      if (this.$options['pageData'] && isFunction_1$1(this.$options['pageData'])) {
-        this.$nextTick(function () {
-          this$1.$options['pageData'].call(null, this$1.$superProps, this$1.$rootViewId);
-        });
-      }
       var events = [];
       pageEventsMap.forEach(function (event) {
         if (this$1.$options[event] && isFunction_1$1(this$1.$options[event])) {

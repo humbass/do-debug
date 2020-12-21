@@ -1,7 +1,7 @@
 /*!
- * @hippy/vue-css-loader v2.0.3
- * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Fri Dec 18 2020 14:53:02 GMT+0800 (China Standard Time)
+ * @hippy/vue-css-loader v2.1.2
+ * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
+ * Build at: Mon Dec 21 2020 23:22:31 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -4181,6 +4181,11 @@ var getOptions_1$1 = getOptions_1;
  */
 var GLOBAL_STYLE_NAME   = '__HIPPY_VUE_STYLES__';
 
+/**
+ * Hippy debug address
+ */
+var HIPPY_DEBUG_ADDRESS = "http://127.0.0.1:" + (process.env.PORT) + "/";
+
 /*  */
 
 var emptyObject = Object.freeze({});
@@ -4237,12 +4242,13 @@ var camelize = cached(function (str) {
 /**
  * Convert string to number as possible
  */
-var numberRegEx = new RegExp('^[+-]?\\d+(\\.\\d+)?$');
+var numberRegEx = new RegExp('^[+-]?\\d*\\.?\\d*([Ee][+-]?\\d+)?$');
+var notEmptyRegEx = new RegExp('^.+$');
 function tryConvertNumber(str) {
   if (typeof str === 'number') {
     return str;
   }
-  if (typeof str === 'string' && numberRegEx.test(str)) {
+  if (typeof str === 'string' && numberRegEx.test(str) && notEmptyRegEx.test(str)) {
     try {
       return parseFloat(str);
     } catch (err) {
@@ -4256,6 +4262,11 @@ function tryConvertNumber(str) {
 
 var PROPERTIES_MAP = {
   textDecoration: 'textDecorationLine',
+  boxShadowOffset: 'shadowOffset',
+  boxShadowOpacity: 'shadowOpacity',
+  boxShadowRadius: 'shadowRadius',
+  boxShadowSpread: 'shadowSpread',
+  boxShadowColor: 'shadowColor',
 };
 
 var commentRegexp = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
@@ -4305,7 +4316,7 @@ function convertPxUnitToPt(value) {
     return value;
   }
   // If value unit is px, change to use pt as 1:1.
-  if (value.indexOf('px') === value.length - 2) {
+  if (value.endsWith('px')) {
     var num = parseFloat(value.slice(0, value.indexOf('px')), 10);
     if (!Number.isNaN(num)) {
       value = num;
@@ -4593,11 +4604,29 @@ function parseCSS(css, options) {
       case 'fontWeight':
         // Keep string and going on.
         break;
+      case 'shadowOffset': {
+        var pos$1 = value.split(' ')
+          .filter(function (v) { return v; })
+          .map(function (v) { return convertPxUnitToPt(v); });
+        var ref = pos$1;
+        var x = ref[0];
+        var ref$1 = pos$1;
+        var y = ref$1[1];
+        if (!y) {
+          y = x;
+        }
+        // FIXME: should not be width and height, should be x and y.
+        value = {
+          width: x,
+          height: y,
+        };
+        break;
+      }
       default: {
         value = tryConvertNumber(value);
         // Convert the px to pt for specific properties
-        var sizeProperties = ['top', 'left', 'right', 'bottom', 'height', 'width', 'size', 'padding', 'margin', 'ratio', 'radius'];
-        if (sizeProperties.findIndex(function (size) { return property.toLowerCase().indexOf(size) > -1; }) > -1) {
+        var sizeProperties = ['top', 'left', 'right', 'bottom', 'height', 'width', 'size', 'padding', 'margin', 'ratio', 'radius', 'offset', 'spread'];
+        if (sizeProperties.find(function (size) { return property.toLowerCase().indexOf(size) > -1; })) {
           value = convertPxUnitToPt(value);
         }
       }

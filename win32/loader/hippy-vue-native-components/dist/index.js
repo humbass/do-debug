@@ -1,7 +1,7 @@
 /*!
- * @hippy/vue-native-components v2.0.3
- * (Using Vue v2.6.11 and Hippy-Vue v2.0.3)
- * Build at: Fri Dec 18 2020 14:53:02 GMT+0800 (China Standard Time)
+ * @hippy/vue-native-components v2.1.2
+ * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
+ * Build at: Mon Dec 21 2020 23:22:31 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -111,7 +111,17 @@ function registerAnimation(Vue) {
     var otherStyles = rest;
     var animationIds = Object.keys(otherStyles).map(function (key) { return style[key].animationId; });
     if (Array.isArray(transform) && transform.length > 0) {
-      var transformIds = Object.keys(transform[0]).map(function (key) { return transform[0][key].animationId; });
+      var transformIds = [];
+      transform.forEach(function (entity) { return Object.keys(entity)
+        .forEach(function (key) {
+          if (entity[key]) {
+            var ref = entity[key];
+            var animationId = ref.animationId;
+            if (typeof animationId === 'number' && animationId % 1 === 0) {
+              transformIds.push(animationId);
+            }
+          }
+        }); });
       animationIds = animationIds.concat( transformIds);
     }
     return animationIds;
@@ -415,7 +425,7 @@ function registerSwiper(Vue) {
       return h('hi-swiper', {
         on: on,
         ref: 'swiper',
-        props: {
+        attrs: {
           initialPage: this.$initialSlide,
         },
       }, this.$slots.default);
@@ -423,41 +433,88 @@ function registerSwiper(Vue) {
   });
 }
 
-/**
- * Register the Animation component only
- */
-var AnimationComponent = {
-  install: function install(Vue) {
-    registerAnimation(Vue);
-  },
-};
+var PULLING_EVENT = 'pulling';
+var IDLE_EVENT = 'idle';
 
-/**
- * Register the modal component only.
- */
-var DialogComponent = {
-  install: function install(Vue) {
-    registerDialog(Vue);
-  },
-};
+function registerPull(Vue) {
+  var ref = Vue.Native;
+  var callUIFunction = ref.callUIFunction;
 
-/**
- * Register the ul refresh wrapper and refresh component.
- */
-var ListRefreshComponent = {
-  install: function install(Vue) {
-    registerUlRefresh(Vue);
-  },
-};
+  [
+    ['Header', 'header'],
+    ['Footer', 'footer'] ].forEach(function (ref) {
+    var obj;
 
-/**
- * Register the swiper component.
- */
-var SwiperComponent = {
-  install: function install(Vue) {
-    registerSwiper(Vue);
-  },
-};
+    var capitalCase = ref[0];
+    var lowerCase = ref[1];
+    /**
+     * PullView native component
+     *
+     * Methods：
+     * expandPull() - Expand the PullView and display the content
+     * collapsePull() - collapse the PullView and hide the content
+     *
+     * Events：
+     * onReleased - Trigger when release the finger after pulling gap larger than the content height
+     * onPulling - Trigger when pulling, will use it to trigger idle and pulling method
+     */
+    Vue.registerElement(("hi-pull-" + lowerCase), {
+      component: {
+        name: ("Pull" + capitalCase + "View"),
+        processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
+          switch (nativeEventName) {
+            case ("on" + capitalCase + "Released"):
+            case ("on" + capitalCase + "Pulling"):
+              Object.assign(event, nativeEventParams);
+              break;
+          }
+          return event;
+        },
+      },
+    });
+
+    Vue.component(("pull-" + lowerCase), {
+      methods: ( obj = {}, obj[("expandPull" + capitalCase)] = function () {
+          callUIFunction(this.$refs.instance, ("expandPull" + capitalCase));
+        }, obj[("collapsePull" + capitalCase)] = function () {
+          callUIFunction(this.$refs.instance, ("collapsePull" + capitalCase));
+        }, obj.onLayout = function onLayout(evt) {
+          this.$contentHeight = evt.height;
+        }, obj[("on" + capitalCase + "Released")] = function (evt) {
+          this.$emit('released', evt);
+        }, obj[("on" + capitalCase + "Pulling")] = function (evt) {
+          if (evt.contentOffset > this.$contentHeight) {
+            if (this.$lastEvent !== PULLING_EVENT) {
+              this.$lastEvent = PULLING_EVENT;
+              this.$emit(PULLING_EVENT, evt);
+            }
+          } else if (this.$lastEvent !== IDLE_EVENT) {
+            this.$lastEvent = IDLE_EVENT;
+            this.$emit(IDLE_EVENT, evt);
+          }
+        }, obj ),
+      render: function render(h) {
+        var ref = this.$listeners;
+        var released = ref.released;
+        var pulling = ref.pulling;
+        var idle = ref.idle;
+        var on = {
+          layout: this.onLayout,
+        };
+        if (typeof released === 'function') {
+          on[(lowerCase + "Released")] = this[("on" + capitalCase + "Released")];
+        }
+        if (typeof pulling === 'function' || typeof idle === 'function') {
+          on[(lowerCase + "Pulling")] = this[("on" + capitalCase + "Pulling")];
+        }
+        return h(("hi-pull-" + lowerCase), {
+          on: on,
+          ref: 'instance',
+        }, this.$slots.default);
+      },
+    });
+  });
+}
 
 /**
  * Register all of native components
@@ -468,8 +525,9 @@ var HippyVueNativeComponents = {
     registerDialog(Vue);
     registerUlRefresh(Vue);
     registerSwiper(Vue);
+    registerPull(Vue);
   },
 };
 
 export default HippyVueNativeComponents;
-export { AnimationComponent, DialogComponent, ListRefreshComponent, SwiperComponent };
+export { registerAnimation as AnimationComponent, registerDialog as DialogComponent, registerUlRefresh as ListRefreshComponent, registerPull as PullsComponents, registerSwiper as SwiperComponent };

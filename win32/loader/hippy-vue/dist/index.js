@@ -1,7 +1,7 @@
 /*!
- * @hippy/vue v2.0.3
+ * @hippy/vue v2.1.4
  * (Using Vue v2.6.11)
- * Build at: Fri Dec 18 2020 14:53:02 GMT+0800 (China Standard Time)
+ * Build at: Mon Dec 21 2020 23:22:31 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -10149,11 +10149,13 @@ function updateStyle(oldVNode, vNode) {
     style = extend({}, style);
     vNode.data.style = style;
   }
+  // Remove the removed styles at first
   Object.keys(oldStyle).forEach(function (name) {
     if (style[name] === undefined) {
-      elm.setStyle(normalize(name), '');
+      elm.setStyle(normalize(name), undefined);
     }
   });
+  // Then set the new styles.
   Object.keys(style).forEach(function (name) {
     cur = style[name];
     elm.setStyle(normalize(name), cur);
@@ -10545,7 +10547,7 @@ function translateColor(color, options) {
 }
 
 /* eslint-disable prefer-destructuring */
-var HIPPY_VUE_VERSION = "2.0.3";
+var HIPPY_VUE_VERSION = "2.1.4";
 
 var _App;
 var _Vue;
@@ -10565,10 +10567,6 @@ var _beforeLoadStyle = function (decl) { return decl; };
 
 function setVue(Vue) {
   _Vue = Vue;
-}
-
-function getVue() {
-  return _Vue;
 }
 
 function setApp(app) {
@@ -10632,12 +10630,13 @@ function capitalizeFirstLetter(str) {
 /**
  * Convert string to number as possible
  */
-var numberRegEx = new RegExp('^[+-]?\\d+(\\.\\d+)?$');
+var numberRegEx = new RegExp('^[+-]?\\d*\\.?\\d*([Ee][+-]?\\d+)?$');
+var notEmptyRegEx = new RegExp('^.+$');
 function tryConvertNumber(str) {
   if (typeof str === 'number') {
     return str;
   }
-  if (typeof str === 'string' && numberRegEx.test(str)) {
+  if (typeof str === 'string' && numberRegEx.test(str) && notEmptyRegEx.test(str)) {
     try {
       return parseFloat(str);
     } catch (err) {
@@ -10705,6 +10704,17 @@ function endsWith(str, search, length) {
   return str.slice(strLen - search.length, strLen) === search;
 }
 
+/* eslint-disable no-bitwise */
+
+var PROPERTIES_MAP = {
+  textDecoration: 'textDecorationLine',
+  boxShadowOffset: 'shadowOffset',
+  boxShadowOpacity: 'shadowOpacity',
+  boxShadowRadius: 'shadowRadius',
+  boxShadowSpread: 'shadowSpread',
+  boxShadowColor: 'shadowColor',
+};
+
 var on$1 = Hippy.on;
 var off = Hippy.off;
 var emit = Hippy.emit;
@@ -10720,6 +10730,42 @@ var UIManagerModule = Hippy.document;
 var HippyRegister = Hippy.register;
 
 var CACHE = {};
+
+var measureInWindowByMethod = function measureInWindowByMethod(el, method) {
+  var empty = {
+    top: -1,
+    left: -1,
+    bottom: -1,
+    right: -1,
+    width: -1,
+    height: -1,
+  };
+  if (!el.isMounted || !el.nodeId) {
+    return empty;
+  }
+  var nodeId = el.nodeId;
+  // FIXME: callNativeWithPromise was broken in iOS, it response
+  // UIManager was called with 3 arguments, but expect 2.
+  // So wrap the function with a Promise.
+  var timeout = new Promise(function (resolve) { return setTimeout(function () {
+    resolve(empty);
+  }, 100); });
+  var measure = new Promise(function (resolve) { return callNative('UIManagerModule', method, nodeId, function (pos) {
+    // Android error handler.
+    if (!pos || pos === 'this view is null') {
+      return resolve(empty);
+    }
+    return resolve({
+      top: pos.y,
+      left: pos.x,
+      bottom: pos.y + pos.height,
+      right: pos.x + pos.width,
+      width: pos.width,
+      height: pos.height,
+    });
+  }); });
+  return Promise.race([timeout, measure]);
+};
 
 /**
  * Native communication module
@@ -10827,7 +10873,9 @@ var Native = {
       // Assume false in most cases.
       var isIPhoneX = false;
       if (Native.Platform === 'ios') {
-        isIPhoneX = Native.Dimensions.screen.statusBarHeight === 44;
+        // iOS12 - iPhone11: 48 Phone12/12 pro/12 pro max: 47 other: 44
+        var statusBarHeightList = [44, 47, 48];
+        isIPhoneX = statusBarHeightList.indexOf(Native.Dimensions.screen.statusBarHeight) > -1;
       }
       CACHE.isIPhoneX = isIPhoneX;
     }
@@ -10989,39 +11037,35 @@ var Native = {
    * Measure the component size and position.
    */
   measureInWindow: function measureInWindow(el) {
-    var empty = {
-      top: -1,
-      left: -1,
-      bottom: -1,
-      right: -1,
-      width: -1,
-      height: -1,
-    };
-    if (!el.isMounted || !el.nodeId) {
-      return empty;
+    return measureInWindowByMethod(el, 'measureInWindow');
+  },
+
+  /**
+   * Measure the component size and position.
+   */
+  measureInAppWindow: function measureInAppWindow(el) {
+    if (Native.Platform === 'android') {
+      return measureInWindowByMethod(el, 'measureInWindow');
     }
-    var nodeId = el.nodeId;
-    // FIXME: callNativeWithPromise was broken in iOS, it response
-    // UIManager was called with 3 arguments, but expect 2.
-    // So wrap the function with a Promise.
-    var timeout = new Promise(function (resolve) { return setTimeout(function () {
-      resolve(empty);
-    }, 100); });
-    var measure = new Promise(function (resolve) { return callNative('UIManagerModule', 'measureInWindow', nodeId, function (pos) {
-    // Android error handler.
-      if (!pos || pos === 'this view is null') {
-        return resolve(empty);
-      }
-      return resolve({
-        top: pos.y,
-        left: pos.x,
-        bottom: pos.y + pos.height,
-        right: pos.x + pos.width,
-        width: pos.width,
-        height: pos.height,
-      });
-    }); });
-    return Promise.race([timeout, measure]);
+    return measureInWindowByMethod(el, 'measureInAppWindow');
+  },
+
+  /**
+   * parse the color to int32Color which native can understand.
+   * @param { String | Number } color
+   * @param { {platform: "ios" | "android"} } options
+   * @returns { Number } int32Color
+   */
+  parseColor: function parseColor(color, options) {
+    if ( options === void 0 ) options = { platform: Native.Platform };
+
+    var cache = CACHE.COLOR_PARSER || (CACHE.COLOR_PARSER = Object.create(null));
+    if (!cache[color]) {
+      var int32Color = translateColor(color, options);
+      // cache the calculation result
+      cache[color] = int32Color;
+    }
+    return cache[color];
   },
 };
 
@@ -12070,8 +12114,7 @@ var GLOBAL_STYLE_NAME   = '__HIPPY_VUE_STYLES__';
 /**
  * Hippy debug address
  */
-// const HIPPY_DEBUG_ADDRESS = `http://127.0.0.1:${process.env.PORT}/`;
-var HIPPY_DEBUG_ADDRESS = '';
+var HIPPY_DEBUG_ADDRESS = "http://127.0.0.1:" + (process.env.PORT) + "/";
 
 /**
  * Hippy static resources protocol
@@ -12506,304 +12549,6 @@ function updateWithChildren(parentNode) {
   endBatch(app);
 }
 
-/* eslint-disable no-underscore-dangle */
-
-var ROOT_VIEW_ID = 0;
-var currentNodeId = 0;
-if (global.__GLOBAL__ && Number.isInteger(global.__GLOBAL__.nodeId)) {
-  currentNodeId = global.__GLOBAL__.nodeId;
-}
-function getNodeId() {
-  currentNodeId += 1;
-  if (currentNodeId % 10 === 0) {
-    currentNodeId += 1;
-  }
-  if (currentNodeId % 10 === ROOT_VIEW_ID) {
-    currentNodeId += 1;
-  }
-  return currentNodeId;
-}
-
-var ViewNode = function ViewNode() {
-  // Point to root document element.
-  this._ownerDocument = null;
-
-  // Component meta information, such as native component will use.
-  this._meta = null;
-
-  // Will change to be true after insert into Native dom.
-  this._isMounted = false;
-
-  // Virtual DOM node id, will used in native to identify.
-  this.nodeId = getNodeId();
-
-  // Index number in children, will update at traverseChildren method.
-  this.index = 0;
-
-  // Relation nodes.
-  this.childNodes = [];
-  this.parentNode = null;
-  this.prevSibling = null;
-  this.nextSibling = null;
-};
-
-var prototypeAccessors$1 = { firstChild: { configurable: true },lastChild: { configurable: true },meta: { configurable: true },ownerDocument: { configurable: true },isMounted: { configurable: true } };
-
-/* istanbul ignore next */
-ViewNode.prototype.toString = function toString () {
-  return this.constructor.name;
-};
-
-prototypeAccessors$1.firstChild.get = function () {
-  return this.childNodes.length ? this.childNodes[0] : null;
-};
-
-prototypeAccessors$1.lastChild.get = function () {
-  return this.childNodes.length
-    ? this.childNodes[this.childNodes.length - 1]
-    : null;
-};
-
-prototypeAccessors$1.meta.get = function () {
-  if (!this._meta) {
-    return {};
-  }
-  return this._meta;
-};
-
-/* istanbul ignore next */
-prototypeAccessors$1.ownerDocument.get = function () {
-  if (this._ownerDocument) {
-    return this._ownerDocument;
-  }
-
-  var el = this;
-  while (el.constructor.name !== 'DocumentNode') {
-    el = el.parentNode;
-    if (!el) {
-      break;
-    }
-  }
-  this._ownerDocument = el;
-  return el;
-};
-
-prototypeAccessors$1.isMounted.get = function () {
-  return this._isMounted;
-};
-
-prototypeAccessors$1.isMounted.set = function (isMounted) {
-  // TODO: Maybe need validation, maybe not.
-  this._isMounted = isMounted;
-};
-
-ViewNode.prototype.insertBefore = function insertBefore (childNode, referenceNode) {
-  if (!childNode) {
-    throw new Error('Can\'t insert child.');
-  }
-
-  if (!referenceNode) {
-    return this.appendChild(childNode);
-  }
-
-  if (referenceNode.parentNode !== this) {
-    throw new Error(
-      'Can\'t insert child, because the reference node has a different parent.'
-    );
-  }
-
-  if (childNode.parentNode && childNode.parentNode !== this) {
-    throw new Error(
-      'Can\'t insert child, because it already has a different parent.'
-    );
-  }
-
-  var index = this.childNodes.indexOf(referenceNode);
-
-  childNode.parentNode = this;
-  childNode.nextSibling = referenceNode;
-  childNode.prevSibling = this.childNodes[index - 1];
-
-  // update previous node's nextSibling to prevent patch bug
-  if (this.childNodes[index - 1]) {
-    this.childNodes[index - 1].nextSibling = childNode;
-  }
-
-  referenceNode.prevSibling = childNode;
-  this.childNodes.splice(index, 0, childNode);
-
-  return insertChild(this, childNode, index);
-};
-
-ViewNode.prototype.moveChild = function moveChild (childNode, referenceNode) {
-  if (!childNode) {
-    throw new Error('Can\'t mvoe child.');
-  }
-
-  if (!referenceNode) {
-    return this.appendChild(childNode);
-  }
-
-  if (referenceNode.parentNode !== this) {
-    throw new Error(
-      'Can\'t move child, because the reference node has a different parent.'
-    );
-  }
-
-  if (childNode.parentNode && childNode.parentNode !== this) {
-    throw new Error(
-      'Can\'t move child, because it already has a different parent.'
-    );
-  }
-
-  var oldIndex = this.childNodes.indexOf(childNode);
-  var newIndex = this.childNodes.indexOf(referenceNode);
-
-  // return if the moved index is the same as the previous one
-  if (newIndex === oldIndex) {
-    return childNode;
-  }
-
-  // set new siblings relations
-  childNode.nextSibling = referenceNode;
-  childNode.prevSibling = referenceNode.prevSibling;
-  referenceNode.prevSibling = childNode;
-
-  if (this.childNodes[newIndex - 1]) {
-    this.childNodes[newIndex - 1].nextSibling = childNode;
-  }
-  if (this.childNodes[newIndex + 1]) {
-    this.childNodes[newIndex + 1].prevSibling = childNode;
-  }
-  if (this.childNodes[oldIndex - 1]) {
-    this.childNodes[oldIndex - 1].nextSibling = this.childNodes[oldIndex + 1];
-  }
-  if (this.childNodes[oldIndex + 1]) {
-    this.childNodes[oldIndex + 1].prevSibling = this.childNodes[oldIndex - 1];
-  }
-
-  // remove old child node from native
-  removeChild(this, childNode);
-
-  // remove old child and insert new child, which is like moving child
-  this.childNodes.splice(newIndex, 0, childNode);
-  this.childNodes.splice(oldIndex + (newIndex < oldIndex ? 1 : 0), 1);
-
-  // should filter empty nodes before finding the index of node
-  var atIndex = this.childNodes.filter(function (ch) { return ch.index > -1; }).indexOf(childNode);
-  return insertChild(this, childNode, atIndex);
-};
-
-ViewNode.prototype.appendChild = function appendChild (childNode) {
-  if (!childNode) {
-    throw new Error('Can\'t append child.');
-  }
-
-  if (childNode.parentNode && childNode.parentNode !== this) {
-    throw new Error(
-      'Can\'t append child, because it already has a different parent.'
-    );
-  }
-
-  // remove childNode if exist
-  if (childNode.isMounted) {
-    this.removeChild(childNode);
-  }
-
-  childNode.parentNode = this;
-
-  if (this.lastChild) {
-    childNode.prevSibling = this.lastChild;
-    this.lastChild.nextSibling = childNode;
-  }
-
-  this.childNodes.push(childNode);
-
-  insertChild(this, childNode, this.childNodes.length - 1);
-};
-
-ViewNode.prototype.removeChild = function removeChild$1 (childNode) {
-  if (!childNode) {
-    throw new Error('Can\'t remove child.');
-  }
-
-  if (!childNode.parentNode) {
-    throw new Error('Can\'t remove child, because it has no parent.');
-  }
-
-  if (childNode.parentNode !== this) {
-    throw new Error('Can\'t remove child, because it has a different parent.');
-  }
-
-  if (childNode.meta.skipAddToDom) {
-    return;
-  }
-
-  removeChild(this, childNode);
-
-  // FIXME: parentNode should be null when removeChild, But it breaks add the node again.
-  //      Issue position: https://github.com/vuejs/vue/tree/master/src/core/vdom/patch.js#L250
-  // childNode.parentNode = null;
-
-  if (childNode.prevSibling) {
-    childNode.prevSibling.nextSibling = childNode.nextSibling;
-  }
-
-  if (childNode.nextSibling) {
-    childNode.nextSibling.prevSibling = childNode.prevSibling;
-  }
-
-  childNode.prevSibling = null;
-  childNode.nextSibling = null;
-  this.childNodes = this.childNodes.filter(function (node) { return node !== childNode; });
-};
-
-/**
- * Find a specific target with condition
- */
-ViewNode.prototype.findChild = function findChild (condition) {
-  var yes = condition(this);
-  if (yes) {
-    return this;
-  }
-  if (this.childNodes.length) {
-    for (var i = 0; i < this.childNodes.length; i += 1) {
-      var childNode = this.childNodes[i];
-      var targetChild = this.findChild.call(childNode, condition);
-      if (targetChild) {
-        return targetChild;
-      }
-    }
-  }
-  return null;
-};
-
-/**
- * Traverse the children and execute callback
- */
-ViewNode.prototype.traverseChildren = function traverseChildren (callback) {
-    var this$1 = this;
-
-  // Find the index and apply callback
-  var index;
-  if (this.parentNode) {
-    index = this.parentNode.childNodes.filter(function (node) { return !node.meta.skipAddToDom; }).indexOf(this);
-  } else {
-    index = 0;
-  }
-  this.index = index;
-  callback(this);
-
-  // Find the children
-  if (this.childNodes.length) {
-    this.childNodes.forEach(function (childNode) {
-      this$1.traverseChildren.call(childNode, callback);
-    });
-  }
-};
-
-Object.defineProperties( ViewNode.prototype, prototypeAccessors$1 );
-
 /**
  * All of component implemented by Native.
  */
@@ -12894,6 +12639,9 @@ var div = {
             length: 1,
           };
           break;
+        case 'onFocus':
+          event.isFocused = nativeEventName.focus;
+          break;
       }
       return event;
     },
@@ -12912,6 +12660,9 @@ var img = {
   symbol: Image,
   component: {
     name: NATIVE_COMPONENT_NAME_MAP[Image],
+    defaultNativeStyle: {
+      backgroundColor: 0,
+    },
     eventNamesMap: mapEvent([
       ['saveResult', 'onSaveResult'] ]),
     processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
@@ -12930,9 +12681,9 @@ var img = {
           return value;
         },
       },
-      // TODO: source property is working for iOS and src is just working for Android.
-      //       source property should remove as soon.
-      //       And Native renderer the workaround should remove.
+      // For Anroid, will use src property
+      // For iOS, will convert to use source property
+      // At line: hippy-vuv/renderer/native/index.js line 196.
       src: function src(value) {
         var url = value;
         if (/^assets/.test(url)) {
@@ -13267,9 +13018,9 @@ var Event = function Event(eventName) {
   this._canceled = false;
 };
 
-var prototypeAccessors$2 = { canceled: { configurable: true } };
+var prototypeAccessors$1 = { canceled: { configurable: true } };
 
-prototypeAccessors$2.canceled.get = function () {
+prototypeAccessors$1.canceled.get = function () {
   return this._canceled;
 };
 
@@ -13301,7 +13052,7 @@ Event.prototype.initEvent = function initEvent (eventName, bubbles, cancelable) 
   return this;
 };
 
-Object.defineProperties( Event.prototype, prototypeAccessors$2 );
+Object.defineProperties( Event.prototype, prototypeAccessors$1 );
 
 /* eslint-disable import/prefer-default-export */
 
@@ -13532,6 +13283,304 @@ if (global.__GLOBAL__) {
 
 /* eslint-disable no-underscore-dangle */
 
+var ROOT_VIEW_ID = 0;
+var currentNodeId = 0;
+if (global.__GLOBAL__ && Number.isInteger(global.__GLOBAL__.nodeId)) {
+  currentNodeId = global.__GLOBAL__.nodeId;
+}
+function getNodeId() {
+  currentNodeId += 1;
+  if (currentNodeId % 10 === 0) {
+    currentNodeId += 1;
+  }
+  if (currentNodeId % 10 === ROOT_VIEW_ID) {
+    currentNodeId += 1;
+  }
+  return currentNodeId;
+}
+
+var ViewNode = function ViewNode() {
+  // Point to root document element.
+  this._ownerDocument = null;
+
+  // Component meta information, such as native component will use.
+  this._meta = null;
+
+  // Will change to be true after insert into Native dom.
+  this._isMounted = false;
+
+  // Virtual DOM node id, will used in native to identify.
+  this.nodeId = getNodeId();
+
+  // Index number in children, will update at traverseChildren method.
+  this.index = 0;
+
+  // Relation nodes.
+  this.childNodes = [];
+  this.parentNode = null;
+  this.prevSibling = null;
+  this.nextSibling = null;
+};
+
+var prototypeAccessors$2 = { firstChild: { configurable: true },lastChild: { configurable: true },meta: { configurable: true },ownerDocument: { configurable: true },isMounted: { configurable: true } };
+
+/* istanbul ignore next */
+ViewNode.prototype.toString = function toString () {
+  return this.constructor.name;
+};
+
+prototypeAccessors$2.firstChild.get = function () {
+  return this.childNodes.length ? this.childNodes[0] : null;
+};
+
+prototypeAccessors$2.lastChild.get = function () {
+  return this.childNodes.length
+    ? this.childNodes[this.childNodes.length - 1]
+    : null;
+};
+
+prototypeAccessors$2.meta.get = function () {
+  if (!this._meta) {
+    return {};
+  }
+  return this._meta;
+};
+
+/* istanbul ignore next */
+prototypeAccessors$2.ownerDocument.get = function () {
+  if (this._ownerDocument) {
+    return this._ownerDocument;
+  }
+
+  var el = this;
+  while (el.constructor.name !== 'DocumentNode') {
+    el = el.parentNode;
+    if (!el) {
+      break;
+    }
+  }
+  this._ownerDocument = el;
+  return el;
+};
+
+prototypeAccessors$2.isMounted.get = function () {
+  return this._isMounted;
+};
+
+prototypeAccessors$2.isMounted.set = function (isMounted) {
+  // TODO: Maybe need validation, maybe not.
+  this._isMounted = isMounted;
+};
+
+ViewNode.prototype.insertBefore = function insertBefore (childNode, referenceNode) {
+  if (!childNode) {
+    throw new Error('Can\'t insert child.');
+  }
+
+  if (!referenceNode) {
+    return this.appendChild(childNode);
+  }
+
+  if (referenceNode.parentNode !== this) {
+    throw new Error(
+      'Can\'t insert child, because the reference node has a different parent.'
+    );
+  }
+
+  if (childNode.parentNode && childNode.parentNode !== this) {
+    throw new Error(
+      'Can\'t insert child, because it already has a different parent.'
+    );
+  }
+
+  var index = this.childNodes.indexOf(referenceNode);
+
+  childNode.parentNode = this;
+  childNode.nextSibling = referenceNode;
+  childNode.prevSibling = this.childNodes[index - 1];
+
+  // update previous node's nextSibling to prevent patch bug
+  if (this.childNodes[index - 1]) {
+    this.childNodes[index - 1].nextSibling = childNode;
+  }
+
+  referenceNode.prevSibling = childNode;
+  this.childNodes.splice(index, 0, childNode);
+
+  return insertChild(this, childNode, index);
+};
+
+ViewNode.prototype.moveChild = function moveChild (childNode, referenceNode) {
+  if (!childNode) {
+    throw new Error('Can\'t mvoe child.');
+  }
+
+  if (!referenceNode) {
+    return this.appendChild(childNode);
+  }
+
+  if (referenceNode.parentNode !== this) {
+    throw new Error(
+      'Can\'t move child, because the reference node has a different parent.'
+    );
+  }
+
+  if (childNode.parentNode && childNode.parentNode !== this) {
+    throw new Error(
+      'Can\'t move child, because it already has a different parent.'
+    );
+  }
+
+  var oldIndex = this.childNodes.indexOf(childNode);
+  var newIndex = this.childNodes.indexOf(referenceNode);
+
+  // return if the moved index is the same as the previous one
+  if (newIndex === oldIndex) {
+    return childNode;
+  }
+
+  // set new siblings relations
+  childNode.nextSibling = referenceNode;
+  childNode.prevSibling = referenceNode.prevSibling;
+  referenceNode.prevSibling = childNode;
+
+  if (this.childNodes[newIndex - 1]) {
+    this.childNodes[newIndex - 1].nextSibling = childNode;
+  }
+  if (this.childNodes[newIndex + 1]) {
+    this.childNodes[newIndex + 1].prevSibling = childNode;
+  }
+  if (this.childNodes[oldIndex - 1]) {
+    this.childNodes[oldIndex - 1].nextSibling = this.childNodes[oldIndex + 1];
+  }
+  if (this.childNodes[oldIndex + 1]) {
+    this.childNodes[oldIndex + 1].prevSibling = this.childNodes[oldIndex - 1];
+  }
+
+  // remove old child node from native
+  removeChild(this, childNode);
+
+  // remove old child and insert new child, which is like moving child
+  this.childNodes.splice(newIndex, 0, childNode);
+  this.childNodes.splice(oldIndex + (newIndex < oldIndex ? 1 : 0), 1);
+
+  // should filter empty nodes before finding the index of node
+  var atIndex = this.childNodes.filter(function (ch) { return ch.index > -1; }).indexOf(childNode);
+  return insertChild(this, childNode, atIndex);
+};
+
+ViewNode.prototype.appendChild = function appendChild (childNode) {
+  if (!childNode) {
+    throw new Error('Can\'t append child.');
+  }
+
+  if (childNode.parentNode && childNode.parentNode !== this) {
+    throw new Error(
+      'Can\'t append child, because it already has a different parent.'
+    );
+  }
+
+  // remove childNode if exist
+  if (childNode.isMounted) {
+    this.removeChild(childNode);
+  }
+
+  childNode.parentNode = this;
+
+  if (this.lastChild) {
+    childNode.prevSibling = this.lastChild;
+    this.lastChild.nextSibling = childNode;
+  }
+
+  this.childNodes.push(childNode);
+
+  insertChild(this, childNode, this.childNodes.length - 1);
+};
+
+ViewNode.prototype.removeChild = function removeChild$1 (childNode) {
+  if (!childNode) {
+    throw new Error('Can\'t remove child.');
+  }
+
+  if (!childNode.parentNode) {
+    throw new Error('Can\'t remove child, because it has no parent.');
+  }
+
+  if (childNode.parentNode !== this) {
+    throw new Error('Can\'t remove child, because it has a different parent.');
+  }
+
+  if (childNode.meta.skipAddToDom) {
+    return;
+  }
+
+  removeChild(this, childNode);
+
+  // FIXME: parentNode should be null when removeChild, But it breaks add the node again.
+  //      Issue position: https://github.com/vuejs/vue/tree/master/src/core/vdom/patch.js#L250
+  // childNode.parentNode = null;
+
+  if (childNode.prevSibling) {
+    childNode.prevSibling.nextSibling = childNode.nextSibling;
+  }
+
+  if (childNode.nextSibling) {
+    childNode.nextSibling.prevSibling = childNode.prevSibling;
+  }
+
+  childNode.prevSibling = null;
+  childNode.nextSibling = null;
+  this.childNodes = this.childNodes.filter(function (node) { return node !== childNode; });
+};
+
+/**
+ * Find a specific target with condition
+ */
+ViewNode.prototype.findChild = function findChild (condition) {
+  var yes = condition(this);
+  if (yes) {
+    return this;
+  }
+  if (this.childNodes.length) {
+    for (var i = 0; i < this.childNodes.length; i += 1) {
+      var childNode = this.childNodes[i];
+      var targetChild = this.findChild.call(childNode, condition);
+      if (targetChild) {
+        return targetChild;
+      }
+    }
+  }
+  return null;
+};
+
+/**
+ * Traverse the children and execute callback
+ */
+ViewNode.prototype.traverseChildren = function traverseChildren (callback) {
+    var this$1 = this;
+
+  // Find the index and apply callback
+  var index;
+  if (this.parentNode) {
+    index = this.parentNode.childNodes.filter(function (node) { return !node.meta.skipAddToDom; }).indexOf(this);
+  } else {
+    index = 0;
+  }
+  this.index = index;
+  callback(this);
+
+  // Find the children
+  if (this.childNodes.length) {
+    this.childNodes.forEach(function (childNode) {
+      this$1.traverseChildren.call(childNode, callback);
+    });
+  }
+};
+
+Object.defineProperties( ViewNode.prototype, prototypeAccessors$2 );
+
+/* eslint-disable no-underscore-dangle */
+
 var ElementNode = /*@__PURE__*/(function (ViewNode) {
   function ElementNode(tagName) {
     ViewNode.call(this);
@@ -13654,7 +13703,7 @@ var ElementNode = /*@__PURE__*/(function (ViewNode) {
           break;
         case 'caretColor':
         case 'caret-color':
-          this.attributes['caret-color'] = translateColor(value);
+          this.attributes['caret-color'] = Native.parseColor(value);
           break;
         default:
           this.attributes[key] = tryConvertNumber(value);
@@ -13673,39 +13722,46 @@ var ElementNode = /*@__PURE__*/(function (ViewNode) {
     delete this.attributes[key];
   };
 
-  ElementNode.prototype.setStyle = function setStyle (property_, value_) {
-    if (value_ === undefined) {
-      delete this.style[property_];
+  ElementNode.prototype.setStyle = function setStyle (property, value, isBatchUpdate) {
+    if ( isBatchUpdate === void 0 ) isBatchUpdate = false;
+
+    if (value === undefined) {
+      delete this.style[property];
       return;
     }
+
     // Preprocess the style
     var ref = this.beforeLoadStyle({
-      property: property_,
-      value: value_,
+      property: property,
+      value: value,
     });
-    var property = ref.property;
-    var value = ref.value;
-    var v = value;
+    var p = ref.property;
+    var v = ref.value;
 
     // Process the specifc style value
-    switch (property) {
+    switch (p) {
       case 'fontWeight':
         if (typeof v !== 'string') {
           v = v.toString();
         }
         break;
       case 'caretColor':
-        this.attributes['caret-color'] = translateColor(value);
+        this.attributes['caret-color'] = translateColor(v);
         break;
       default: {
+        // Convert the property to W3C standard.
+        if (Object.prototype.hasOwnProperty.call(PROPERTIES_MAP, p)) {
+          p = PROPERTIES_MAP[p];
+        }
+        // Convert the value
         if (typeof v === 'string') {
-          v = value.trim();
+          v = v.trim();
           // Convert inline color style to int
-          if (property.toLowerCase().indexOf('color') >= 0) {
+          if (p.toLowerCase().indexOf('color') >= 0) {
             v = translateColor(v, Native.Platform);
           // Convert inline length style, drop the px unit
           } else if (endsWith(v, 'px')) {
-            v = parseFloat(value.slice(0, value.length - 2));
+            v = parseFloat(v.slice(0, v.length - 2));
           } else {
             v = tryConvertNumber(v);
           }
@@ -13713,11 +13769,30 @@ var ElementNode = /*@__PURE__*/(function (ViewNode) {
       }
     }
 
-    if (v === undefined || v === null || this.style[property] === v) {
+    if (v === undefined || v === null || this.style[p] === v) {
       return;
     }
-    this.style[property] = v;
-    updateChild(this);
+    this.style[p] = v;
+    if (!isBatchUpdate) {
+      updateChild(this);
+    }
+  };
+
+  /**
+   * set native style props
+   */
+  ElementNode.prototype.setNativeProps = function setNativeProps (nativeProps) {
+    var this$1 = this;
+
+    if (nativeProps) {
+      var style = nativeProps.style;
+      if (style) {
+        Object.keys(style).forEach(function (key) {
+          this$1.setStyle(key, style[key], true);
+        });
+        updateChild(this);
+      }
+    }
   };
 
   ElementNode.prototype.setStyleScope = function setStyleScope (styleScopeId) {
@@ -14052,10 +14127,10 @@ var DocumentNode = /*@__PURE__*/(function (ViewNode) {
       case 'input':
       case 'textarea':
         return new InputNode(tagName);
+      case 'img':
+          return new ImgNode(tagName);
       case 'ul':
         return new ListNode(tagName);
-      case 'img':
-        return new ImgNode(tagName);
       default:
         return new ElementNode(tagName);
     }
@@ -14326,7 +14401,7 @@ var platformDirectives = /*#__PURE__*/Object.freeze({
 
 /* eslint-disable import/no-unresolved */
 
-var componentName$2 = ['%c[Hippy-Vue "2.0.3"]%c', 'color: #4fc08d; font-weight: bold', 'color: auto; font-weight: auto'];
+var componentName$2 = ['%c[Hippy-Vue "2.1.4"]%c', 'color: #4fc08d; font-weight: bold', 'color: auto; font-weight: auto'];
 
 // Install document
 var documentNode = new DocumentNode();
@@ -14386,7 +14461,7 @@ Vue.prototype.$mount = function $mount(el, hydrating) {
  *
  * @param {function} callback - Callback after register completed.
  */
-Vue.prototype.$start = function $start(callback) {
+Vue.prototype.$start = function $start(afterCallback, beforeCallback) {
   var this$1 = this;
 
   setApp(this);
@@ -14396,7 +14471,6 @@ Vue.prototype.$start = function $start(callback) {
   if (isFunction(this.$options.beforeLoadStyle)) {
     setBeforeLoadStyle(this.$options.beforeLoadStyle);
   }
-  var self = this;
 
   // register native components into Vue.
   getElementMap().forEach(function (entry) {
@@ -14408,37 +14482,43 @@ Vue.prototype.$start = function $start(callback) {
   // or runApplication event.
   HippyRegister.regist(this.$options.appName, function (superProps) {
     var rootViewId = superProps.__instanceId__;
-    self.$options.$superProps = superProps;
-    self.$options.rootViewId = rootViewId;
+    this$1.$options.$superProps = superProps;
+    this$1.$options.rootViewId = rootViewId;
 
     trace.apply(void 0, componentName$2.concat( ['Start'], [this$1.$options.appName], ['with rootViewId'], [rootViewId], [superProps] ));
 
     // Destroy the old instance and set the new one when restart the app
-    if (self.$el) {
-      self.$destroy();
-      var AppConstructor = Vue.extend(self.$options);
-      self = new AppConstructor(self.$options);
-      setApp(self);
+    if (this$1.$el) {
+      this$1.$destroy();
+      var AppConstructor = Vue.extend(this$1.$options);
+      var newApp = new AppConstructor(this$1.$options);
+      setApp(newApp);
+    }
+
+    // Call the callback before $mount
+    if (isFunction(beforeCallback)) {
+      beforeCallback(this$1, superProps);
     }
 
     // Draw the app.
-    self.$mount();
+    this$1.$mount();
 
     // Draw the iPhone status bar background.
+    // It should execute after $mount, otherwise this.$el will be undefined.
     if (Native.Platform === 'ios') {
       var statusBar = drawStatusBar(this$1.$options);
       if (statusBar) {
-        if (!self.$el.childNodes.length) {
-          self.$el.appendChild(statusBar);
+        if (!this$1.$el.childNodes.length) {
+          this$1.$el.appendChild(statusBar);
         } else {
-          self.$el.insertBefore(statusBar, self.$el.childNodes[0]);
+          this$1.$el.insertBefore(statusBar, this$1.$el.childNodes[0]);
         }
       }
     }
 
-    // Call the callback
-    if (isFunction(callback)) {
-      callback(self, superProps);
+    // Call the callback after $mount
+    if (isFunction(afterCallback)) {
+      afterCallback(this$1, superProps);
     }
   });
 };
@@ -14542,29 +14622,36 @@ var READY_STATE_CLOSING = 2;
 var READY_STATE_CLOSED = 3;
 
 var WEB_SOCKET_MODULE_NAME = 'websocket';
+var WEB_SOCKET_NATIVE_EVENT = 'hippyWebsocketEvents';
 
 var websocketEventHub;
 var app;
-var Vue$1;
 
+/**
+ * The WebSocket API is an advanced technology that makes it possible to open a two-way
+ * interactive communication session between the user's browser and a server. With this API,
+ * you can send messages to a server and receive event-driven responses without having to
+ * poll the server for a reply.
+ */
 var WebSocket = function WebSocket(url, protocals, extrasHeaders) {
   var this$1 = this;
 
-  app = app || getApp();
-  Vue$1 = Vue$1 || getVue();
+  if (!app) {
+    app = getApp();
+  }
 
   this.url = url;
   this.readyState = READY_STATE_CONNECTING;
   this.webSocketCallbacks = {};
   this.onWebSocketEvent = this.onWebSocketEvent.bind(this);
-  var headers = {};
+  var headers = Object.assign({}, extrasHeaders);
 
   if (!websocketEventHub) {
-    websocketEventHub = app.$on('hippyWebsocketEvents', this.onWebSocketEvent);
+    websocketEventHub = app.$on(WEB_SOCKET_NATIVE_EVENT, this.onWebSocketEvent);
   }
 
   if (!url || typeof url !== 'string') {
-    throw new TypeError('Invalid url');
+    throw new TypeError('Invalid WebSocket url');
   }
 
   if (Array.isArray(protocals) && protocals.length > 0) {
@@ -14573,18 +14660,14 @@ var WebSocket = function WebSocket(url, protocals, extrasHeaders) {
     headers['Sec-WebSocket-Protocol'] = protocals;
   }
 
-  if (typeof extrasHeaders === 'object') {
-    headers = Object.assign({}, headers, extrasHeaders);
-  }
-
   var params = {
     headers: headers,
     url: url,
   };
 
-  Vue$1.Native.callNativeWithPromise(WEB_SOCKET_MODULE_NAME, 'connect', params).then(function (resp) {
+  Native.callNativeWithPromise(WEB_SOCKET_MODULE_NAME, 'connect', params).then(function (resp) {
     if (!resp || resp.code !== 0 || typeof resp.id !== 'number') {
-      warn$3(("Fail to create websocket connection, reason: " + ((resp ? resp.reason : 'unknown error'))));
+      warn$3('Fail to create websocket connection', resp);
       return;
     }
 
@@ -14594,60 +14677,87 @@ var WebSocket = function WebSocket(url, protocals, extrasHeaders) {
 
 var prototypeAccessors$3 = { onopen: { configurable: true },onclose: { configurable: true },onerror: { configurable: true },onmessage: { configurable: true } };
 
+/**
+ * Closes the WebSocket connection or connection attempt, if any.
+ * If the connection is already CLOSED, this method does nothing.
+ *
+ * @param {number} [code] - A numeric value indicating the status code explaining
+ *                        why the connection is being closed. If this parameter
+ *                        is not specified, a default value of 1005 is assumed.
+ *                        See the list of status codes of CloseEvent for permitted values.
+ * @param {string} [reason] - A human-readable string explaining why the connection
+ *                          is closing. This string must be no longer than 123 bytes
+ *                          of UTF-8 text (not characters).
+ */
 WebSocket.prototype.close = function close (code, reason) {
   if (this.readyState !== READY_STATE_OPEN) {
     return;
   }
 
   this.readyState = READY_STATE_CLOSING;
-  Vue$1.Native.callNative(WEB_SOCKET_MODULE_NAME, 'close', {
+  Native.callNative(WEB_SOCKET_MODULE_NAME, 'close', {
     id: this.webSocketId,
     code: code,
     reason: reason,
   });
 };
 
+/**
+ * Enqueues the specified data to be transmitted to the server over the WebSocket connection.
+ *
+ * @param {string} data - The data to send to the server. Hippy supports string type only.
+ */
 WebSocket.prototype.send = function send (data) {
   if (this.readyState !== READY_STATE_OPEN) {
-    warn$3('WebSocket not connected');
+    warn$3('WebSocket is not connected');
     return;
   }
 
-  if (typeof data === 'string') {
-    Vue$1.Native.callNative(WEB_SOCKET_MODULE_NAME, 'send', {
-      id: this.webSocketId,
-      data: data,
-    });
-    return;
+  if (typeof data !== 'string') {
+    throw new TypeError(("Unsupported websocket data type: " + (typeof data)));
   }
 
-  var buf = data;
-  if (ArrayBuffer.isView(data)) {
-    buf = data.buffer;
-  }
-  if (buf instanceof ArrayBuffer) {
-    return;
-  }
-
-  throw new TypeError('Unknown data type');
+  Native.callNative(WEB_SOCKET_MODULE_NAME, 'send', {
+    id: this.webSocketId,
+    data: data,
+  });
 };
 
+/**
+ * Set an EventHandler that is called when the WebSocket connection's readyState changes to OPEN;
+ */
 prototypeAccessors$3.onopen.set = function (callback) {
   this.webSocketCallbacks.onOpen = callback;
 };
 
+/**
+ * Set an EventHandler that is called when the WebSocket connection's readyState
+ * changes to CLOSED.
+ */
 prototypeAccessors$3.onclose.set = function (callback) {
   this.webSocketCallbacks.onClose = callback;
 };
 
+/**
+ * Set an EventHandler that is called when a message is received from the server.
+ */
 prototypeAccessors$3.onerror.set = function (callback) {
   this.webSocketCallbacks.onError = callback;
 };
 
+/**
+ * Set an event handler property is a function which gets called when an error
+ * occurs on the WebSocket.
+ */
 prototypeAccessors$3.onmessage.set = function (callback) {
   this.webSocketCallbacks.onMessage = callback;
 };
 
+/**
+ * WebSocket events handler from Native.
+ *
+ * @param {Object} param - Native response.
+ */
 WebSocket.prototype.onWebSocketEvent = function onWebSocketEvent (param) {
   if (typeof param !== 'object' || param.id !== this.webSocketId) {
     return;
@@ -14662,7 +14772,7 @@ WebSocket.prototype.onWebSocketEvent = function onWebSocketEvent (param) {
     this.readyState = READY_STATE_OPEN;
   } else if (eventType === 'onClose') {
     this.readyState = READY_STATE_CLOSED;
-    app.$off('hippyWebsocketEvents');
+    app.$off(WEB_SOCKET_NATIVE_EVENT);
   }
 
   var callback = this.webSocketCallbacks[eventType];

@@ -1,57 +1,25 @@
 {
-  "_from": "@hippy/vue-css-loader@^2.0.3",
-  "_id": "@hippy/vue-css-loader@2.0.3",
-  "_inBundle": false,
-  "_integrity": "sha512-sOvPI9oJlnb2+pa0rt0JjoDcQoEAgbVVhNIGnQgjUyxF0Sb9rCrPwikNVxKqY9CTkNpi9FEApdAlambCRfjCNQ==",
-  "_location": "/hippy-cli/@hippy/vue-css-loader",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "range",
-    "registry": true,
-    "raw": "@hippy/vue-css-loader@^2.0.3",
-    "name": "@hippy/vue-css-loader",
-    "escapedName": "@hippy%2fvue-css-loader",
-    "scope": "@hippy",
-    "rawSpec": "^2.0.3",
-    "saveSpec": null,
-    "fetchSpec": "^2.0.3"
-  },
-  "_requiredBy": [
-    "/hippy-cli"
-  ],
-  "_resolved": "https://registry.npmjs.org/@hippy/vue-css-loader/-/vue-css-loader-2.0.3.tgz",
-  "_shasum": "2ef308d86aa7648daaa9f84038574d9a35fb9f1e",
-  "_spec": "@hippy/vue-css-loader@^2.0.3",
-  "_where": "/Users/dali/Documents/Develop/hippy-cli-debug",
-  "author": {
-    "name": "XQ Kuang",
-    "email": "x@kxq.io"
-  },
+  "name": "@hippy/vue-css-loader",
+  "version": "2.1.2",
+  "description": "hippy-vue style loader module for webpack",
+  "main": "dist/index.js",
+  "homepage": "http://hippyjs.org",
+  "repository": "https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-css-loader",
+  "author": "XQ Kuang <x@kxq.io>",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/Tencent/Hippy/issues"
   },
-  "bundleDependencies": false,
-  "dependencies": {
-    "loader-utils": "^1.0.2"
-  },
-  "deprecated": false,
-  "description": "hippy-vue style loader module for webpack",
-  "devDependencies": {
-    "ava": "^3.5.0"
-  },
-  "homepage": "http://hippyjs.org",
   "keywords": [
     "vue",
     "hippy-vue",
     "css-loader",
     "webpack"
   ],
-  "license": "Apache-2.0",
-  "main": "dist/index.js",
-  "name": "@hippy/vue-css-loader",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-css-loader"
+  "dependencies": {
+    "loader-utils": "^1.0.2"
   },
-  "version": "2.0.3"
+  "devDependencies": {
+    "ava": "^3.5.0"
+  }
 }
