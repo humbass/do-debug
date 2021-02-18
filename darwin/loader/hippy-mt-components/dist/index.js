@@ -1,12 +1,12 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Mon Feb 01 2021 00:48:12 GMT+0800 (China Standard Time)
+ * Build at: Mon Dec 21 2020 23:22:31 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
  *
- * Copyright (C) 2017-2021 THL A29 Limited, a Tencent company.
+ * Copyright (C) 2017-2020 THL A29 Limited, a Tencent company.
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -965,83 +965,52 @@ function mtModuleNavigator (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2021-02-01 00:46:54
+ * @Last Modified time: 2020-08-22 00:19:54
  */
 
 var Storage = function Storage(Vue) {
   this.Vue = Vue;
-  this.module = this.isIos() ? 'StorageIOSModule' : 'SpModule';
-};
-Storage.prototype.isIos = function isIos () {
-  return this.Vue.Native.Platform === 'ios'
+  this.module = Vue.Native.Platform === 'ios' ? 'StorageIOSModule' : 'StorageModule';
 };
 Storage.prototype.set = function set (key, value) {
-  if (!key || typeof key !== 'string') {
-    return throwError('[storage]  Key does not exist')
-  }
+  if (!key || typeof key !== 'string')
+    { return throwError('[storage]  Key does not exist') }
   if (!value) { return throwError('value does not exist') }
-  if (this.isIos()) {
-    return this.Vue.Native.callNativeWithPromise(this.module, 'multiSet', [
-      [key, JSON.stringify([value])] ])
-  }
-  else {
-    return this.Vue.Native.callNativeWithPromise(this.module, 'spSet', key, JSON.stringify([value]))
-  }
+  return this.Vue.Native.callNativeWithPromise(this.module, 'multiSet', [
+    [key, JSON.stringify([value])] ])
 };
 Storage.prototype.get = function get (key) {
     var this$1 = this;
 
-  if (!key || !isString_1(key)) {
-    return throwError('[storage]  Key does not exist')
-  }
+  if (!key || !isString_1(key))
+    { return throwError('[storage]  Key does not exist') }
   return new Promise(function (resolve, reject) {
-    if (this$1.isIos()) {
-      this$1.Vue.Native.callNativeWithPromise(this$1.module, 'multiGet', [key])
-        .then(function (event) {
-          var array = event.shift();
-          if (!array[1]) {
-            resolve('');
-          } else {
-            try {
-              var result = JSON.parse(array[1]);
-              resolve(result.shift());
-            }
-            catch (e) {
-              resolve('');
-            }
-          }
-        })
-        .catch(function (error) {
+    this$1.Vue.Native.callNativeWithPromise(this$1.module, 'multiGet', [key])
+      .then(function (event) {
+        var array = event.shift();
+        if (!array[1]) {
           resolve('');
-        });
-    } else {
-      this$1.Vue.Native.callNativeWithPromise(this$1.module, 'spGet', key, '')
-        .then(function (value) {
+        } else {
           try {
-            var result = JSON.parse(value);
+            var result = JSON.parse(array[1]);
             resolve(result.shift());
           }
-          catch (e) {
+          catch(e) {
             resolve('');
           }
-        })
-        .catch(function (error) {
-          resolve('');
-        });
-    }
+        }
+      })
+      .catch(function (error) {
+        resolve('');
+      });
   })
 };
 Storage.prototype.remove = function remove (key) {
-  if (!key || typeof key !== 'string') {
-    return throwError('[storage]  Key does not exist')
-  }
-  if (this.isIos()) {
-    return this.Vue.Native.callNativeWithPromise(this.module, 'multiRemove', [key])
-  } else {
-    return this.Vue.Native.callNativeWithPromise(this.module, 'spRemove', key)
-  }
+  if (!key || typeof key !== 'string')
+    { return throwError('[storage]  Key does not exist') }
+  return this.Vue.Native.callNativeWithPromise(this.module, 'multiRemove', [key])
 };
-function mtModuleLocalStorage (Vue) {
+function mtModuleLocalStorage(Vue) {
   Vue.prototype.$storage = new Storage(Vue);
 }
 
@@ -2490,11 +2459,8 @@ function mtModuleIos(Vue) {
  * @Author: dali.chen 
  * @Date: 2020-10-27 19:57:05 
  * @Last Modified by: dali.chen
- * @Last Modified time: 2021-01-09 17:56:18
+ * @Last Modified time: 2020-10-28 16:03:11
  */
-
-// import { throwError } from './utils'
-// import { isNumber, isObject, isString, isBoolean } from 'core-util-is'
 
 var MODULE_NAME$9 = 'WechatModule';
 
