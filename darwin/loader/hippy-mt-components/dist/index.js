@@ -1,12 +1,12 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Mon Dec 21 2020 23:22:31 GMT+0800 (China Standard Time)
+ * Build at: Mon Mar 01 2021 23:48:40 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
  *
- * Copyright (C) 2017-2020 THL A29 Limited, a Tencent company.
+ * Copyright (C) 2017-2021 THL A29 Limited, a Tencent company.
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -1647,12 +1647,12 @@ function mtModuleMusic(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-17 14:13:18
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-05 19:58:46
+ * @Last Modified time: 2021-03-01 23:47:57
  */
 
 var MODULE_NAME$5 = 'AgoraRtcModule';
 
-function mtModuleAgoraRtc(Vue) {
+function mtModuleAgoraRtc (Vue) {
   var instance = Vue.prototype;
   instance.$agoraRtc = {
     /**
@@ -1729,8 +1729,8 @@ function mtModuleAgoraRtc(Vue) {
       })
     },
 
-    renewToken: function renewToken() {
-      return Vue.Native.callNativeWithPromise(MODULE_NAME$5, 'renewToken')
+    renewToken: function renewToken(token) {
+      return Vue.Native.callNativeWithPromise(MODULE_NAME$5, 'renewToken', { token: token })
     },
 
     getConnectionState: function getConnectionState() {
