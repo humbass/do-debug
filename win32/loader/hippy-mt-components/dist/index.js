@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Mon Mar 01 2021 23:48:40 GMT+0800 (China Standard Time)
+ * Build at: Tue Mar 16 2021 11:54:40 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -965,52 +965,83 @@ function mtModuleNavigator (Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-22 00:19:54
+ * @Last Modified time: 2021-03-16 11:52:48
  */
 
 var Storage = function Storage(Vue) {
   this.Vue = Vue;
-  this.module = Vue.Native.Platform === 'ios' ? 'StorageIOSModule' : 'StorageModule';
+  this.module = this.isIos() ? 'StorageIOSModule' : 'SpModule';
+};
+Storage.prototype.isIos = function isIos () {
+  return this.Vue.Native.Platform === 'ios'
 };
 Storage.prototype.set = function set (key, value) {
-  if (!key || typeof key !== 'string')
-    { return throwError('[storage]  Key does not exist') }
+  if (!key || typeof key !== 'string') {
+    return throwError('[storage]  Key does not exist')
+  }
   if (!value) { return throwError('value does not exist') }
-  return this.Vue.Native.callNativeWithPromise(this.module, 'multiSet', [
-    [key, JSON.stringify([value])] ])
+  if (this.isIos()) {
+    return this.Vue.Native.callNativeWithPromise(this.module, 'multiSet', [
+      [key, JSON.stringify([value])] ])
+  }
+  else {
+    return this.Vue.Native.callNativeWithPromise(this.module, 'spSet', key, JSON.stringify([value]))
+  }
 };
 Storage.prototype.get = function get (key) {
     var this$1 = this;
 
-  if (!key || !isString_1(key))
-    { return throwError('[storage]  Key does not exist') }
+  if (!key || !isString_1(key)) {
+    return throwError('[storage]  Key does not exist')
+  }
   return new Promise(function (resolve, reject) {
-    this$1.Vue.Native.callNativeWithPromise(this$1.module, 'multiGet', [key])
-      .then(function (event) {
-        var array = event.shift();
-        if (!array[1]) {
+    if (this$1.isIos()) {
+      this$1.Vue.Native.callNativeWithPromise(this$1.module, 'multiGet', [key])
+        .then(function (event) {
+          var array = event.shift();
+          if (!array[1]) {
+            resolve('');
+          } else {
+            try {
+              var result = JSON.parse(array[1]);
+              resolve(result.shift());
+            }
+            catch (e) {
+              resolve('');
+            }
+          }
+        })
+        .catch(function (error) {
           resolve('');
-        } else {
+        });
+    } else {
+      this$1.Vue.Native.callNativeWithPromise(this$1.module, 'spGet', key, '')
+        .then(function (value) {
           try {
-            var result = JSON.parse(array[1]);
+            var result = JSON.parse(value);
             resolve(result.shift());
           }
-          catch(e) {
+          catch (e) {
             resolve('');
           }
-        }
-      })
-      .catch(function (error) {
-        resolve('');
-      });
+        })
+        .catch(function (error) {
+          resolve('');
+        });
+    }
   })
 };
 Storage.prototype.remove = function remove (key) {
-  if (!key || typeof key !== 'string')
-    { return throwError('[storage]  Key does not exist') }
-  return this.Vue.Native.callNativeWithPromise(this.module, 'multiRemove', [key])
+  if (!key || typeof key !== 'string') {
+    return throwError('[storage]  Key does not exist')
+  }
+  if (this.isIos()) {
+    return this.Vue.Native.callNativeWithPromise(this.module, 'multiRemove', [key])
+  } else {
+    return this.Vue.Native.callNativeWithPromise(this.module, 'spRemove', key)
+  }
 };
-function mtModuleLocalStorage(Vue) {
+function mtModuleLocalStorage (Vue) {
   Vue.prototype.$storage = new Storage(Vue);
 }
 
@@ -1355,7 +1386,7 @@ function mtModuleMedia(Vue) {
  * @Author: dali.chen
  * @Date: 2020-06-16 18:03:28
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-07 11:07:53
+ * @Last Modified time: 2021-03-12 14:55:43
  */
 
 var QOSS = [0, 1, 2];
