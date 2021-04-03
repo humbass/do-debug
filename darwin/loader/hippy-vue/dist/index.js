@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue v2.1.4
  * (Using Vue v2.6.11)
- * Build at: Sat Apr 03 2021 18:05:47 GMT+0800 (China Standard Time)
+ * Build at: Sat Apr 03 2021 21:01:44 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -12584,12 +12584,12 @@ function mapEvent() {
       var vueEventName = ref[0];
       var nativeEventName = ref[1];
 
-      map[map[vueEventName] = nativeEventName]  = vueEventName;
+      map[map[vueEventName] = nativeEventName] = vueEventName;
     });
   } else {
     var vueEventName = args[0];
     var nativeEventName = args[1];
-    map[map[vueEventName] = nativeEventName]  = vueEventName;
+    map[map[vueEventName] = nativeEventName] = vueEventName;
   }
   return map;
 }
@@ -12712,15 +12712,17 @@ var ul = {
         return arrayCount(node.childNodes, function (childNode) { return !childNode.meta.skipAddToDom; });
       },
     },
-    // eventNamesMap: mapEvent('listReady', 'initialListReady'),
-    eventNamesMap: mapEvent([
-      ['listReady', 'initialListReady'],
-      ['endReached', 'onLoadMore'] ]),
+    eventNamesMap: mapEvent('listReady', 'initialListReady'),
     processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
       switch (nativeEventName) {
         case 'onScroll':
           event.offsetX = nativeEventParams.contentOffset.x;
           event.offsetY = nativeEventParams.contentOffset.y;
+          break;
+        case 'onLoadMore':
+        case 'endReached':
+          event.nativeEventName = 'endReached';
+          event.nativeEventParams = nativeEventParams;
           break;
       }
       return event;
