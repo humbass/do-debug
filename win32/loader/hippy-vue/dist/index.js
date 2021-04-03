@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue v2.1.4
  * (Using Vue v2.6.11)
- * Build at: Tue Mar 23 2021 19:15:00 GMT+0800 (China Standard Time)
+ * Build at: Sat Apr 03 2021 18:05:47 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -12712,7 +12712,10 @@ var ul = {
         return arrayCount(node.childNodes, function (childNode) { return !childNode.meta.skipAddToDom; });
       },
     },
-    eventNamesMap: mapEvent('listReady', 'initialListReady'),
+    // eventNamesMap: mapEvent('listReady', 'initialListReady'),
+    eventNamesMap: mapEvent([
+      ['listReady', 'initialListReady'],
+      ['endReached', 'onLoadMore'] ]),
     processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
       switch (nativeEventName) {
         case 'onScroll':
