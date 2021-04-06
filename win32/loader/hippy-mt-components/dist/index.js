@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Sat Apr 03 2021 21:01:44 GMT+0800 (China Standard Time)
+ * Build at: Tue Apr 06 2021 17:33:38 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -3084,10 +3084,74 @@ function mtComponentSlider (Vue) {
 }
 
 /*
+ * @Author: dali.chen 
+ * @Date: 2021-04-06 16:55:05 
+ * @Last Modified by: dali.chen
+ * @Last Modified time: 2021-04-06 17:33:23
+ */
+
+var HiChartView = 'hi-chartview';
+
+function mtComponentChart (Vue) {
+  Vue.registerElement(HiChartView, {
+    component: {
+      name: 'ChartView',
+      processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
+        event.nativeEventName = nativeEventName;
+        event.nativeEventParams = nativeEventParams;
+        return event
+      },
+    },
+  });
+  Vue.component('chart', {
+    inheritAttrs: false,
+    props: {
+      width: {
+        type: Number,
+        default: 0,
+      },
+      height: {
+        type: Number,
+        default: 0,
+      },
+      mode: {
+        type: String,
+        default: 'line',
+      },
+    },
+    methods: {
+      setOption: function setOption(data) {
+        Vue.Native.callUIFunction(this.$refs[HiChartView], 'setOption', data);
+      },
+    },
+    render: function render(h) {
+      var style = {};
+      if (this.width && this.height) {
+        style.width = this.width;
+        style.height = this.height;
+      } else {
+        style.flex = 1;
+      }
+      return h(
+        HiChartView,
+        {
+          on: {},
+          ref: HiChartView,
+          attrs: {
+            mode: this.mode,
+          },
+        },
+        this.$slots.default
+      )
+    },
+  });
+}
+
+/*
  * @Author: dali.chen
  * @Date: 2020-06-10 23:05:07
  * @Last Modified by: dali.chen
- * @Last Modified time: 2020-12-05 22:19:18
+ * @Last Modified time: 2021-04-06 17:00:23
  */
 
 /**
@@ -3125,6 +3189,7 @@ var HippyMtComponents = {
     mtComponentSvga(Vue);
     mtComponentQrcode(Vue);
     mtComponentSlider(Vue);
+    mtComponentChart(Vue);
   },
 };
 
