@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Tue Apr 06 2021 17:33:38 GMT+0800 (China Standard Time)
+ * Build at: Fri Oct 22 2021 18:04:49 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -698,8 +698,8 @@ function objectToString$1(o) {
 /*
  * @Author: dali.chen
  * @Date: 2020-07-06 16:13:42
- * @Last Modified by: dali.chen
- * @Last Modified time: 2020-12-21 15:42:09
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2021-10-22 17:46:06
  */
 
 var pageEvents = {
@@ -745,11 +745,12 @@ EventsMaker.prototype.doListener = function doListener (event) {
   var instance = this.instance.prototype;
   instance.$nextTick(function () {
     instance.$app.$on(pageEvents[event], function (options) {
-      isArray_1(GLOBAL_EVENTS[event]) &&
+      if (isArray_1(GLOBAL_EVENTS[event])) {
         GLOBAL_EVENTS[event].map(function (item) {
           item(options);
           this$1.doDisListener(instance, event);
         });
+      }
     });
   });
 };
@@ -773,6 +774,12 @@ function mtModuleHippyEvent (Vue) {
         }
       });
       new EventsMaker(Vue, events);
+      this.$nextTick(function () {
+        var func = this$1.$options['pageData'];
+        if (func && isFunction_1$1(func)) {
+          func(this$1.$superProps);
+        }
+      });
     },
   });
 }
@@ -1293,8 +1300,8 @@ function mtModuleDialog(Vue) {
 /*
  * @Author: dali.chen
  * @Date: 2020-06-11 22:52:23
- * @Last Modified by: dali.chen
- * @Last Modified time: 2020-09-19 11:47:55
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2021-10-19 00:08:32
  */
 
 var MODULE_NAME$2 = 'MediaModule';
@@ -1373,7 +1380,6 @@ Media.prototype.album = function album (params) {
       camera: params.camera
     };
   }
-  console.log('options => ', options);
   if (!options) { return throwError('params error') }
   return this.Vue.Native.callNativeWithPromise(MODULE_NAME$2, 'album', options)
 };
@@ -2284,8 +2290,8 @@ function MtDataBaseModule(Vue) {
 /*
  * @Author: dali.chen 
  * @Date: 2020-07-01 11:43:46 
- * @Last Modified by: dali.chen
- * @Last Modified time: 2020-08-27 13:21:42
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2021-10-19 00:08:44
  */
 
 var BroadcastChannelModule = function BroadcastChannelModule(Vue) {
@@ -3087,7 +3093,7 @@ function mtComponentSlider (Vue) {
  * @Author: dali.chen 
  * @Date: 2021-04-06 16:55:05 
  * @Last Modified by: dali.chen
- * @Last Modified time: 2021-04-06 17:33:23
+ * @Last Modified time: 2021-04-06 17:40:34
  */
 
 var HiChartView = 'hi-chartview';
@@ -3125,13 +3131,6 @@ function mtComponentChart (Vue) {
       },
     },
     render: function render(h) {
-      var style = {};
-      if (this.width && this.height) {
-        style.width = this.width;
-        style.height = this.height;
-      } else {
-        style.flex = 1;
-      }
       return h(
         HiChartView,
         {
