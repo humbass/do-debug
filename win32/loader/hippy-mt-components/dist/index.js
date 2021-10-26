@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Fri Oct 22 2021 18:04:49 GMT+0800 (China Standard Time)
+ * Build at: Tue Oct 26 2021 16:17:44 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -699,7 +699,7 @@ function objectToString$1(o) {
  * @Author: dali.chen
  * @Date: 2020-07-06 16:13:42
  * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2021-10-22 17:46:06
+ * @Last Modified time: 2021-10-26 16:16:36
  */
 
 var pageEvents = {
@@ -712,12 +712,15 @@ var pageEvents = {
   pageDestroy: 'onViewDidDestroy',
   pageTouchBack: 'onPageWillClose',
   unMounted: 'onViewDidDestroy',
+  pageData: 'pageData',
+  pagePopData: 'pagePopData',
 };
 
 var pageEventsMap = Object.keys(pageEvents);
 
 var GLOBAL_EVENTS = Object.create(null);
 var EventsMakerInstance = null;
+var pageName = null;
 
 var EventsMaker = function EventsMaker(Vue, events) {
   var this$1 = this;
@@ -744,14 +747,30 @@ EventsMaker.prototype.doListener = function doListener (event) {
 
   var instance = this.instance.prototype;
   instance.$nextTick(function () {
-    instance.$app.$on(pageEvents[event], function (options) {
-      if (isArray_1(GLOBAL_EVENTS[event])) {
+    if (event == 'pageData' && isArray_1(GLOBAL_EVENTS[event])) {
+      GLOBAL_EVENTS[event].map(function (item) {
+        item(instance.$superProps);
+        this$1.doDisListener(instance, event);
+      });
+    }
+    else if (event == 'pagePopData' && isArray_1(GLOBAL_EVENTS[event])) {
+      instance.$broadcast.on(pageName, function (data) {
         GLOBAL_EVENTS[event].map(function (item) {
-          item(options);
+          item(data);
           this$1.doDisListener(instance, event);
         });
-      }
-    });
+      });
+    }
+    else {
+      instance.$app.$on(pageEvents[event], function (options) {
+        if (isArray_1(GLOBAL_EVENTS[event])) {
+          GLOBAL_EVENTS[event].map(function (item) {
+            item(options);
+            this$1.doDisListener(instance, event);
+          });
+        }
+      });
+    }
   });
 };
 
@@ -771,15 +790,12 @@ function mtModuleHippyEvent (Vue) {
             GLOBAL_EVENTS[event].push(this$1.$options[event].bind(this$1));
             events.push(event);
           }
+          if (event == 'pagePopData') {
+            pageName = this$1.$options.parent.$options.appName;
+          }
         }
       });
       new EventsMaker(Vue, events);
-      this.$nextTick(function () {
-        var func = this$1.$options['pageData'];
-        if (func && isFunction_1$1(func)) {
-          func(this$1.$superProps);
-        }
-      });
     },
   });
 }
@@ -863,8 +879,8 @@ function throwError(message) {
 /*
  * @Author: dali.chen
  * @Date: 2020-06-10 22:32:03
- * @Last Modified by: dali.chen
- * @Last Modified time: 2020-12-15 18:40:53
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2021-10-26 16:15:05
  */
 
 var MODULE_NAME = 'NavigatorModule';
@@ -938,6 +954,16 @@ Navigator.prototype.pop = function pop (value) {
   }
   else if (isString_1(value)) {
     this.Vue.Native.callNative(MODULE_NAME, 'popTo', value);
+  }
+  else { return throwError(("[" + MODULE_NAME + "] params error.")) }
+};
+
+Navigator.prototype.popData = function popData (pageName, data) {
+    var this$1 = this;
+
+  if (isString_1(pageName) && (isNumber_1(data) || isString_1(data) || isObject_1$1(data))) {
+    this.Vue.prototype.$broadcast.emit(pageName, data);
+    this.Vue.prototype.$nextTick(function () { return this$1.Vue.Native.callNative(MODULE_NAME, 'popTo', pageName); });
   }
   else { return throwError(("[" + MODULE_NAME + "] params error.")) }
 };
@@ -2291,7 +2317,7 @@ function MtDataBaseModule(Vue) {
  * @Author: dali.chen 
  * @Date: 2020-07-01 11:43:46 
  * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2021-10-19 00:08:44
+ * @Last Modified time: 2021-10-25 23:13:05
  */
 
 var BroadcastChannelModule = function BroadcastChannelModule(Vue) {
@@ -2311,7 +2337,7 @@ BroadcastChannelModule.prototype.on = function on (channel, callback) {
 
   var instance = this.Vue.prototype;
   instance.$nextTick(function () { return instance.$app.$on('onNotify', function (options) {
-    if (options.channel && options.channel === channel) {
+    if (options.channel && options.channel === channel && isFunction_1$1(callback)) {
       callback(options.message);
     }
   }); });
