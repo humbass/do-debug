@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Tue Oct 26 2021 16:17:44 GMT+0800 (China Standard Time)
+ * Build at: Tue Dec 07 2021 16:37:15 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -803,8 +803,8 @@ function mtModuleHippyEvent (Vue) {
 /*
  * @Author: dali.chen 
  * @Date: 2020-06-11 10:04:12 
- * @Last Modified by: dali.chen
- * @Last Modified time: 2020-12-18 12:08:34
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2021-12-07 16:33:29
  */
 
 function mtModuleContants (Vue) {
@@ -815,6 +815,8 @@ function mtModuleContants (Vue) {
   var Platform = ref$1.Platform;
   var screenIsVertical = ref$1.screenIsVertical;
   var measureInWindow = ref$1.measureInWindow;
+  var PixelRatio = ref$1.PixelRatio;
+  var OnePixel = ref$1.OnePixel;
   // device infomations
   Vue.prototype.$platform = Platform;
   if (Platform === 'ios') {
@@ -830,6 +832,9 @@ function mtModuleContants (Vue) {
   Vue.prototype.$windowHeight = window.height;
   Vue.prototype.$windowWidth = window.width;
   Vue.prototype.$measureInWindow = measureInWindow;
+  Vue.prototype.$pixelRatio = PixelRatio;
+  Vue.prototype.$onePixel = OnePixel;
+  Vue.prototype.$native = Vue.Native;
 }
 
 /**
@@ -1103,8 +1108,8 @@ function mtModuleClipBoard (Vue) {
 /*
  * @Author: dali.chen
  * @Date: 2020-06-11 20:52:03
- * @Last Modified by: dali.chen
- * @Last Modified time: 2020-12-08 19:45:30
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2021-10-28 19:42:42
  */
 
 var MODULE_NAME$1 = 'DialogModule';
@@ -1709,8 +1714,8 @@ function mtModuleMusic(Vue) {
 /*
  * @Author: dali.chen
  * @Date: 2020-06-17 14:13:18
- * @Last Modified by: dali.chen
- * @Last Modified time: 2021-03-01 23:47:57
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2021-12-07 16:35:52
  */
 
 var MODULE_NAME$5 = 'AgoraRtcModule';
@@ -2521,8 +2526,8 @@ function mtModuleIos(Vue) {
 /*
  * @Author: dali.chen 
  * @Date: 2020-10-27 19:57:05 
- * @Last Modified by: dali.chen
- * @Last Modified time: 2020-10-28 16:03:11
+ * @Last Modified by: mikey.zhaopeng
+ * @Last Modified time: 2021-12-07 16:35:37
  */
 
 var MODULE_NAME$9 = 'WechatModule';

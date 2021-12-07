@@ -1,6 +1,6 @@
 {
  "name": "hippy-cli",
- "version": "2.6.6",
+ "version": "2.6.7",
  "description": "",
  "bin": {
   "hippy": "./bin/index.js"
