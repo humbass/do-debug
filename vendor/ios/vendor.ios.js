@@ -2,12 +2,12 @@ var hippyVueBase=function(t){var e={};function n(r){if(e[r])return e[r].exports;
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Tue Dec 07 2021 16:37:15 GMT+0800 (China Standard Time)
+ * Build at: Sun Jan 02 2022 17:27:12 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
  *
- * Copyright (C) 2017-2021 THL A29 Limited, a Tencent company.
+ * Copyright (C) 2017-2022 THL A29 Limited, a Tencent company.
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,12 +25,12 @@ var hippyVueBase=function(t){var e={};function n(r){if(e[r])return e[r].exports;
 /*!
  * @hippy/vue-native-components v2.1.2
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Tue Dec 07 2021 16:37:15 GMT+0800 (China Standard Time)
+ * Build at: Sun Jan 02 2022 17:27:12 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
  *
- * Copyright (C) 2017-2021 THL A29 Limited, a Tencent company.
+ * Copyright (C) 2017-2022 THL A29 Limited, a Tencent company.
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,12 +49,12 @@ function r(t,e){var n={};for(var r in t)Object.prototype.hasOwnProperty.call(t,r
 /*!
  * @hippy/vue v2.1.4
  * (Using Vue v2.6.11)
- * Build at: Tue Dec 07 2021 16:37:15 GMT+0800 (China Standard Time)
+ * Build at: Sun Jan 02 2022 17:27:12 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
  *
- * Copyright (C) 2017-2021 THL A29 Limited, a Tencent company.
+ * Copyright (C) 2017-2022 THL A29 Limited, a Tencent company.
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
