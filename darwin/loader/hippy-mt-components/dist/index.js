@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Sun Jan 02 2022 18:29:19 GMT+0800 (China Standard Time)
+ * Build at: Tue Jan 04 2022 21:33:05 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2944,8 +2944,8 @@ function mtComponentSvga (Vue) {
 /*
  * @Author: dali.chen 
  * @Date: 2020-06-17 21:57:49 
- * @Last Modified by: mikey.zhaopeng
- * @Last Modified time: 2021-12-07 17:40:45
+ * @Last Modified by: dali.chen
+ * @Last Modified time: 2020-10-28 19:56:33
  */
 
 var HiQrcodeView = 'hi-qrcode-view';
