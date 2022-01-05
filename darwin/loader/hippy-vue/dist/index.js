@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue v2.1.4
  * (Using Vue v2.6.11)
- * Build at: Tue Jan 04 2022 21:33:05 GMT+0800 (China Standard Time)
+ * Build at: Wed Jan 05 2022 15:07:18 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.

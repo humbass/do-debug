@@ -1,9 +1,0 @@
-
-[ module ] storage
-
-
-
-get(key)              -> promise(value)
-set(key, value)       -> promise()
-remove(key)           -> promise()
-
