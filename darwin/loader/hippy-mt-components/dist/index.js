@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Wed Jan 05 2022 15:07:18 GMT+0800 (China Standard Time)
+ * Build at: Thu Jan 06 2022 21:57:23 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -2654,6 +2654,10 @@ SystemModule.prototype.vibrate = function vibrate (flag) {
     if ( flag === void 0 ) flag = 0;
 
   return this.Vue.Native.callNative('SystemModule', 'vibrate', flag)
+};
+SystemModule.prototype.getBase64 = function getBase64 (url) {
+  if (!isString_1(url))
+  { return this.Vue.Native.callNative('SystemModule', 'getBase64', url) }
 };
 
 function mtModuleSystem (Vue) {
