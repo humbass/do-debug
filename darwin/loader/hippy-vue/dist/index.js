@@ -1,7 +1,7 @@
 /*!
- * @hippy/vue v2.2.1
+ * @hippy/vue v2.12.0
  * (Using Vue v2.6.11)
- * Build at: Mon Jan 10 2022 15:49:18 GMT+0800 (China Standard Time)
+ * Build at: Mon Jan 10 2022 18:27:09 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -9139,7 +9139,7 @@ var HIPPY_STATIC_PROTOCOL = 'hpfile://';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var HIPPY_VUE_VERSION = "2.2.1";
+var HIPPY_VUE_VERSION = "2.12.0";
 
 var _App;
 var _Vue;
@@ -14094,6 +14094,25 @@ var ListNode = /*@__PURE__*/(function (ElementNode) {
   return ListNode;
 }(ElementNode));
 
+/**
+ * img element
+ */
+var ImgNode = /*@__PURE__*/(function (ElementNode) {
+  function ImgNode () {
+    ElementNode.apply(this, arguments);
+  }
+
+  if ( ElementNode ) ImgNode.__proto__ = ElementNode;
+  ImgNode.prototype = Object.create( ElementNode && ElementNode.prototype );
+  ImgNode.prototype.constructor = ImgNode;
+
+  ImgNode.prototype.save = function save () {
+    Native.callUIFunction(this, 'save');
+  };
+
+  return ImgNode;
+}(ElementNode));
+
 /*
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -14142,25 +14161,6 @@ var ListItemNode = /*@__PURE__*/(function (ElementNode) {
   };
 
   return ListItemNode;
-}(ElementNode));
-
-/**
- * img element
- */
-var ImgNode = /*@__PURE__*/(function (ElementNode) {
-  function ImgNode () {
-    ElementNode.apply(this, arguments);
-  }
-
-  if ( ElementNode ) ImgNode.__proto__ = ElementNode;
-  ImgNode.prototype = Object.create( ElementNode && ElementNode.prototype );
-  ImgNode.prototype.constructor = ImgNode;
-
-  ImgNode.prototype.save = function save () {
-    Native.callUIFunction(this, 'save');
-  };
-
-  return ImgNode;
 }(ElementNode));
 
 /*
@@ -14212,7 +14212,7 @@ var DocumentNode = /*@__PURE__*/(function (ViewNode) {
       case 'li':
         return new ListItemNode(tagName);
       case 'img':
-          return new ImgNode(tagName);
+        return new ImgNode(tagName);
       default:
         return new ElementNode(tagName);
     }
@@ -15819,7 +15819,7 @@ var platformDirectives = /*#__PURE__*/Object.freeze({
  * limitations under the License.
  */
 
-var componentName$2 = ['%c[Hippy-Vue "2.2.1"]%c', 'color: #4fc08d; font-weight: bold', 'color: auto; font-weight: auto'];
+var componentName$2 = ['%c[Hippy-Vue "2.12.0"]%c', 'color: #4fc08d; font-weight: bold', 'color: auto; font-weight: auto'];
 
 // Install document
 var documentNode = new DocumentNode();

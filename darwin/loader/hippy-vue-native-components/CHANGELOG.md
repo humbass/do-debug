@@ -3,6 +3,318 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.12.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.11.6...2.12.0) (2022-01-04)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.11.6](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.11.5...2.11.6) (2021-12-23)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.11.5](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.11.4...2.11.5) (2021-12-15)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.11.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.11.3...2.11.4) (2021-12-10)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.11.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.11.2...2.11.3) (2021-12-08)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.11.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.11.1...2.11.2) (2021-12-06)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.11.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.11.0...2.11.1) (2021-11-24)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+# [2.11.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.10.3...2.11.0) (2021-11-18)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.10.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.10.2...2.10.3) (2021-11-16)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.10.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.10.1...2.10.2) (2021-11-02)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.10.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.10.0...2.10.1) (2021-10-27)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+# [2.10.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.9.2...2.10.0) (2021-10-12)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.9.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.9.1...2.9.2) (2021-10-12)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.9.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.9.0...2.9.1) (2021-09-24)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+# [2.9.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.8.4...2.9.0) (2021-09-10)
+
+
+### Features
+
+* **react,vue,ios,android:** add waterfall component for hippy ([#933](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/issues/933)) ([909cf79](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/commit/909cf793af5fb70f54f001a2ddb1c43702ca2352)), closes [#1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/issues/1)
+
+
+
+
+
+## [2.8.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.8.3...2.8.4) (2021-08-13)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.8.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.8.2...2.8.3) (2021-08-12)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.8.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.8.1...2.8.2) (2021-08-09)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.8.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.8.0...2.8.1) (2021-08-09)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+# [2.8.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.7.6...2.8.0) (2021-08-04)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.7.6](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.7.5...2.7.6) (2021-07-22)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.7.5](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.7.4...2.7.5) (2021-07-16)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.7.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.7.3...2.7.4) (2021-07-08)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.7.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.7.2...2.7.3) (2021-07-08)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.7.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.7.1...2.7.2) (2021-06-18)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.7.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.7.0...2.7.1) (2021-06-10)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+# [2.7.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.6.4...2.7.0) (2021-06-07)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.6.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.6.3...2.6.4) (2021-05-19)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.6.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.6.2...2.6.3) (2021-05-17)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.6.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.6.1...2.6.2) (2021-04-26)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.6.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.6.0...2.6.1) (2021-04-22)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+# [2.6.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.5.5...2.6.0) (2021-04-19)
+
+
+### Features
+
+* **hippy-react:** perf pullHeader example ([3d01ae4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/commit/3d01ae40dc24fdd0e4941d18a543e438dc766ac3))
+* **hippy-react,hippy-vue:** support color animation ([6c191a0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/commit/6c191a08e203f45e8dd28e8e2e2f492bee20de8d))
+
+
+
+
+
+## [2.5.5](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.5.4...2.5.5) (2021-03-26)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.5.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.5.3...2.5.4) (2021-03-17)
+
+
+### Bug Fixes
+
+* **hippy-vue:** add child animation destroy logic ([e0404fa](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/commit/e0404fa8cb31612309c39c16d8fe8a967fac5300))
+
+
+
+
+
+## [2.5.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.5.2...2.5.3) (2021-03-10)
+
+**Note:** Version bump only for package @hippy/vue-native-components
+
+
+
+
+
+## [2.5.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.5.1...2.5.2) (2021-03-08)
+
+
+### Features
+
+* **hippy-vue:** add animation event & method ([4018df8](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/commit/4018df8d8873e5830182b7d567e837c9bc5a0ef1))
+
+
+
+
+
+## [2.5.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.5.0...2.5.1) (2021-03-02)
+
+
+### Bug Fixes
+
+* **hippy-vue:** fixed repeatCount error in animationSet ([c16f306](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/commit/c16f3069d1361d69d872acf9476f345c0f886364))
+
+
+
+
+
 ## [2.1.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue-native-components/compare/2.1.1...2.1.2) (2020-11-23)
 
 **Note:** Version bump only for package @hippy/vue-native-components

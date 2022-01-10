@@ -1,7 +1,7 @@
 /*!
- * @hippy/vue-native-components v2.1.2
- * (Using Vue v2.6.11 and Hippy-Vue v2.2.1)
- * Build at: Mon Jan 10 2022 15:49:18 GMT+0800 (China Standard Time)
+ * @hippy/vue-native-components v2.12.0
+ * (Using Vue v2.6.11 and Hippy-Vue v2.12.0)
+ * Build at: Mon Jan 10 2022 18:27:09 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.

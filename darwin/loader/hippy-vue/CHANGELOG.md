@@ -3,6 +3,480 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.12.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.11.6...2.12.0) (2022-01-04)
+
+
+### Bug Fixes
+
+* **build script:** fix debug-server build script ([bee4513](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/bee45135acd59c6a4b462d80b3428e43985c6edd))
+* **hippy-vue:** websocket $on event could not receive ([6ad478e](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/6ad478e360388a749069c223262c15bdfe04cb2f))
+
+
+### Features
+
+* **hippy-react:** add bind_event boolean value ([bc32a94](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/bc32a948acce814e6f34c8a34f811744a5080ad0))
+* **vue, react, debug-server, vue-loader, vue-css-loader:** support HMR ([ff9f763](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/ff9f763a4578d41a4ff657a577ced7f3675ba8e3))
+
+
+
+
+
+## [2.11.6](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.11.5...2.11.6) (2021-12-23)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.11.5](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.11.4...2.11.5) (2021-12-15)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.11.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.11.3...2.11.4) (2021-12-10)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.11.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.11.2...2.11.3) (2021-12-08)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.11.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.11.1...2.11.2) (2021-12-06)
+
+
+### Bug Fixes
+
+* **react,vue:** fixed timeRemaining judge ([8dd993f](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/8dd993f16d83be509019b2d890ed6a9d3095462e))
+
+
+### Features
+
+* **react,vue:** add js node cache to improve event performance ([b72e42c](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/b72e42ca1419891019f937942d45c9a26f9c92e2))
+* **react,vue:** perf node traversing process ([8102057](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/8102057db4743989fc996ec7455226f08b58c81b))
+
+
+
+
+
+## [2.11.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.11.0...2.11.1) (2021-11-24)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+# [2.11.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.10.3...2.11.0) (2021-11-18)
+
+
+### Bug Fixes
+
+* **hippy-vue:** fixed measureInAppWindow issue ([57a2523](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/57a252364d161d3c22a2089ba809dd45d625fa08))
+
+
+### Features
+
+* **react,vue:** improve managing node performance ([8b35ba6](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/8b35ba6bdbe4bfaf2f3ac866ed05ebfed2df3d8e))
+* **vue:** add vue jsi ([368874d](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/368874dda6d3ef6ba7c65d693b0722132edb6aee))
+
+
+
+
+
+## [2.10.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.10.2...2.10.3) (2021-11-16)
+
+
+### Bug Fixes
+
+* **hippy-vue:** remove vue other attributes converted to number ([8ce311a](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/8ce311a175ea1616168e3621e1c43a3eef9a1b30))
+
+
+
+
+
+## [2.10.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.10.1...2.10.2) (2021-11-02)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.10.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.10.0...2.10.1) (2021-10-27)
+
+
+### Features
+
+* **hippy-vue:** add getElemCss function ([32101dc](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/32101dcad1bce6bde43f4253d4e0f785ce114d35))
+
+
+
+
+
+# [2.10.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.9.2...2.10.0) (2021-10-12)
+
+
+### Features
+
+* **core:** seperate console & ConsoleModule ([dd9d80a](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/dd9d80a4e5bdf9048bf61f31866c59266e1aeaf6))
+* **hippy-vue,hippy-react:** add text shadow ([a891690](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/a8916904cca88f09bdee55511dce670bf09571fa))
+
+
+
+
+
+## [2.9.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.9.1...2.9.2) (2021-10-12)
+
+
+### Bug Fixes
+
+* **hippy-vue:** update ava package to safe ver ([e9752b4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/e9752b494c66a49938575fd32e9f9234ef643d1f))
+
+
+
+
+
+## [2.9.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.9.0...2.9.1) (2021-09-24)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+# [2.9.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.8.4...2.9.0) (2021-09-10)
+
+
+### Bug Fixes
+
+* **hippy-react:** add callUIFunction default options ([24c3d9c](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/24c3d9c7732c558251d99eb77725b03a3c951373))
+
+
+### Features
+
+* **ios:** enable swipe to delete in UITableView ([#935](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/issues/935)) ([ebcf138](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/ebcf138c7167e4b4a42244ec00a2c28390af695b))
+* **react,vue,ios,android:** add waterfall component for hippy ([#933](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/issues/933)) ([909cf79](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/909cf793af5fb70f54f001a2ddb1c43702ca2352)), closes [#1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/issues/1)
+
+
+
+
+
+## [2.8.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.8.3...2.8.4) (2021-08-13)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.8.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.8.2...2.8.3) (2021-08-12)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.8.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.8.1...2.8.2) (2021-08-09)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.8.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.8.0...2.8.1) (2021-08-09)
+
+
+### Bug Fixes
+
+* **react,vue:** fix rgb format for linear-gradient parser ([1ae803c](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/1ae803c9aa7eb77601d7f995b73c451e0a6971bc))
+
+
+
+
+
+# [2.8.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.7.6...2.8.0) (2021-08-04)
+
+
+### Features
+
+* **android,react,vue:** support RTL layout ([#893](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/issues/893)) ([149ec04](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/149ec0458e82676d16c0728a6feba486bfb2aace))
+* **hippy-react,hippy-vue:** add linear-gradient ([02b5b82](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/02b5b8256995a5fa6a70fcfd0f67ed1c383569ae))
+
+
+
+
+
+## [2.7.6](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.7.5...2.7.6) (2021-07-22)
+
+
+### Bug Fixes
+
+* **hippy-vue:** add onScrollBeginDrag & onScrollEndDrag param ([bc27f40](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/bc27f40eede5ab20ab2b43380ca288777c5397c4))
+
+
+### Features
+
+* **hippy-vue:** add nativeNode attributes info for debugging ([#869](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/issues/869)) ([28a9a58](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/28a9a58899106539cbbce48a195f8b3b230d54a3))
+
+
+
+
+
+## [2.7.5](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.7.4...2.7.5) (2021-07-16)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.7.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.7.3...2.7.4) (2021-07-08)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.7.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.7.2...2.7.3) (2021-07-08)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.7.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.7.1...2.7.2) (2021-06-18)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.7.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.7.0...2.7.1) (2021-06-10)
+
+
+### Bug Fixes
+
+* **hippy-vue:** update package to safe version ([0cb5d94](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/0cb5d944788eac1b576a36366fcdbada991dd80d))
+
+
+
+
+
+# [2.7.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.6.4...2.7.0) (2021-06-07)
+
+
+### Bug Fixes
+
+* **hippy-vue,hippy-react:** add task polyfill for batch render ([7cdf026](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/7cdf026e345a187202a0f7ae91171c2804cb4562))
+
+
+### Features
+
+* **hippy-vue:** add some native modules ([e960c01](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/e960c01d98aa09db5ea443b14c16e427d7023fcd))
+
+
+
+
+
+## [2.6.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.6.3...2.6.4) (2021-05-19)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.6.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.6.2...2.6.3) (2021-05-17)
+
+
+### Features
+
+* **hippy-vue:** add local path support for placeholder & bgImg ([f0c56e6](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/f0c56e61e22bb14ec6b0f100c03b93ec8491fae5))
+
+
+
+
+
+## [2.6.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.6.1...2.6.2) (2021-04-26)
+
+
+### Bug Fixes
+
+* **hippy-vue:** fix registerElement elem name and comp name problem ([abec3bd](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/abec3bdef337bf2b238fd7fef4159194a313abba))
+
+
+### Features
+
+* **hippy-vue:** add txt/span/img/a/label/p touch event ([391bafd](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/391bafd21f2a0fd0c0f8ec3c514fed8f08a2f531))
+
+
+
+
+
+## [2.6.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.6.0...2.6.1) (2021-04-22)
+
+
+### Features
+
+* **hippy-react,hippy-vue:** support to load local img ([4331fd5](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/4331fd5c3a0ae0ae6700973e3399d520cf3d1d00))
+
+
+
+
+
+# [2.6.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.5.5...2.6.0) (2021-04-19)
+
+
+### Bug Fixes
+
+* **hippy-vue:** fix measureInWindowByMethod return value ([f5ca629](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/f5ca6294227330db7855305ac61a09928f06fd40))
+* **hippy-vue:** update y18n to safe ver ([9708117](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/9708117a459345893f433a11a0f214be56443a09))
+
+
+
+
+
+## [2.5.5](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.5.4...2.5.5) (2021-03-26)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.5.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.5.3...2.5.4) (2021-03-17)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.5.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.5.2...2.5.3) (2021-03-10)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.5.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.5.1...2.5.2) (2021-03-08)
+
+
+### Features
+
+* **hippy-vue:** add animation event & method ([4018df8](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/4018df8d8873e5830182b7d567e837c9bc5a0ef1))
+
+
+
+
+
+## [2.5.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.5.0...2.5.1) (2021-03-02)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+# [2.5.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.4.0...2.5.0) (2021-02-25)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+# [2.4.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.3.4...2.4.0) (2021-02-25)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.3.4](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.3.3...2.3.4) (2021-01-25)
+
+
+### Features
+
+* **hippy-core:** add navigatorBarHeight ([71b5470](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/71b5470475d71564275001f67600218d0569348b))
+
+
+
+
+
+## [2.3.3](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.3.2...2.3.3) (2021-01-20)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+## [2.3.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.3.1...2.3.2) (2021-01-18)
+
+
+### Features
+
+* **hippy-react:** added demo key ([bd2201b](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/bd2201b525c33642a67f11b9cd4e95c0c51159bc))
+
+
+
+
+
+## [2.3.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.3.0...2.3.1) (2021-01-13)
+
+**Note:** Version bump only for package @hippy/vue
+
+
+
+
+
+# [2.3.0](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.2.2...2.3.0) (2021-01-11)
+
+
+### Bug Fixes
+
+* **hippy-vue,hippy-react:** fixed listview appear & disappear event ([86c02fd](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/86c02fde0e47ff8862e92a4892c768da78a63674))
+
+
+### Features
+
+* **hippy-vue,hippy-react:** added willAppear & willDisappear event ([d0eb0f1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/d0eb0f1aac4a13886fed6682ac08e2c082bd8448))
+
+
+
+
+
+## [2.2.2](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.2.1...2.2.2) (2021-01-04)
+
+
+### Bug Fixes
+
+* **hippy-vue:** fix css rulesets concat error ([d0c900c](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/commit/d0c900c44be8c7759db8539a3c57be845471d227))
+
+
+
+
+
 ## [2.2.1](https://github.com/Tencent/Hippy/tree/master/packages/hippy-vue/compare/2.2.0...2.2.1) (2020-12-28)
 
 **Note:** Version bump only for package @hippy/vue
