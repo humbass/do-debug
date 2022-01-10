@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.12.0)
- * Build at: Mon Jan 10 2022 18:27:09 GMT+0800 (China Standard Time)
+ * Build at: Mon Jan 10 2022 23:14:53 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -1017,7 +1017,6 @@ Storage.prototype.set = function set (key, value) {
   if (!key || typeof key !== 'string') {
     return throwError('[storage]  Key does not exist')
   }
-  if (!value) { return throwError('value does not exist') }
   if (this.isIos()) {
     return this.Vue.Native.callNativeWithPromise(this.module, 'multiSet', [
       [key, JSON.stringify([value])] ])
