@@ -1,7 +1,7 @@
 /*!
- * @hippy/vue v2.1.4
+ * @hippy/vue v2.2.1
  * (Using Vue v2.6.11)
- * Build at: Thu Jan 06 2022 21:57:23 GMT+0800 (China Standard Time)
+ * Build at: Mon Jan 10 2022 15:49:18 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -6085,8 +6085,28 @@ var style = {
   genData: genData$1
 };
 
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 function decode(html) {
-  // todo?
+  // TODO: decode html
   return html;
 }
 
@@ -9061,6 +9081,5158 @@ var createCompiler = createCompilerCreator(function baseCompile (
 var ref = createCompiler(baseOptions);
 var compileToFunctions = ref.compileToFunctions;
 
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * hippy-vue-css-loader will translate the CSS texts to be AST
+ * and attached at global[GLOBAL_STYLE_NAME].
+ * when use HMR, the outdated chunk style will be attached at
+ * global[GLOBAL_DISPOSE_STYLE_NAME].
+ */
+var GLOBAL_STYLE_NAME = '__HIPPY_VUE_STYLES__';
+var GLOBAL_DISPOSE_STYLE_NAME = '__HIPPY_VUE_DISPOSE_STYLES__';
+
+/**
+ * Hippy debug address
+ */
+var HIPPY_DEBUG_ADDRESS = "http://127.0.0.1:" + (process.env.PORT) + "/";
+
+/**
+ * Hippy static resources protocol
+ */
+var HIPPY_STATIC_PROTOCOL = 'hpfile://';
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+var HIPPY_VUE_VERSION = "2.2.1";
+
+var _App;
+var _Vue;
+
+/**
+ * Style pre-process hook
+ *
+ * Use for hack the style processing, update the property
+ * or value mannuly.
+ *
+ * @param {Object} decl - Style declaration.
+ * @param {string} decl.property - Style property name.
+ * @param {string|number} decl.value - Style property value.
+ * @returns {Object} decl - Processed declaration, original declaration by default.
+ */
+var _beforeLoadStyle = function (decl) { return decl; };
+
+function setVue(Vue) {
+  _Vue = Vue;
+}
+
+function setApp(app) {
+  _App = app;
+}
+
+function getApp() {
+  return _App;
+}
+
+function setBeforeLoadStyle(beforeLoadStyle) {
+  _beforeLoadStyle = beforeLoadStyle;
+}
+
+function getBeforeLoadStyle() {
+  return _beforeLoadStyle;
+}
+
+var infoTrace = once(function () {
+  console.log('Hippy-Vue has "Vue.config.silent" set to true, to see output logs set it to false.');
+});
+
+function trace() {
+  var context = [], len = arguments.length;
+  while ( len-- ) context[ len ] = arguments[ len ];
+
+  // In production build
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
+
+  // Not in debugger mode or running in NodeJS
+  if (process && process.release) {
+    return;
+  }
+
+  // Print message while keeps silent
+  if (_Vue && _Vue.config.silent) {
+    infoTrace();
+    return;
+  }
+  // console.log(...context);
+}
+
+function warn$3() {
+  var context = [], len = arguments.length;
+  while ( len-- ) context[ len ] = arguments[ len ];
+
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
+  return console.warn.apply(console, context);
+}
+
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * Convert string to number as possible
+ */
+var numberRegEx = new RegExp('^(?=.+)[+-]?\\d*\\.?\\d*([Ee][+-]?\\d+)?$');
+function tryConvertNumber(str) {
+  if (typeof str === 'number') {
+    return str;
+  }
+  if (typeof str === 'string' && numberRegEx.test(str)) {
+    try {
+      return parseFloat(str);
+    } catch (err) {
+      // pass
+    }
+  }
+  return str;
+}
+
+function unicodeToChar(text) {
+  return text.replace(/\\u[\dA-F]{4}|\\x[\dA-F]{2}/gi, function (match) { return String.fromCharCode(parseInt(match.replace(/\\u|\\x/g, ''), 16)); });
+}
+
+function arrayCount(arr, iterator) {
+  var count = 0;
+  for (var i = 0; i < arr.length; i += 1) {
+    if (iterator(arr[i])) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+/**
+ * Better function checking
+ */
+function isFunction(func) {
+  return Object.prototype.toString.call(func) === '[object Function]';
+}
+
+/**
+ * Compare two sets
+ */
+function setsAreEqual(as, bs) {
+  if (as.size !== bs.size) { return false; }
+  var values = as.values();
+  var a = values.next().value;
+  while (a) {
+    if (!bs.has(a)) {
+      return false;
+    }
+    a = values.next().value;
+  }
+  return true;
+}
+
+/**
+ * endsWith polyfill for iOS 8 compatibility
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith#Polyfill
+ *
+ * @param {string} str - The characters with specified string.
+ * @param {string} search - The characters to be searched for at the end of str.
+ * @param {number} length - If provided, it is used as the length of str. Defaults to str.length.
+ * @return {boolean}
+ */
+function endsWith(str, search, length) {
+  if (String.prototype.endsWith) {
+    return str.endsWith(search, length);
+  }
+  var strLen = length;
+  if (strLen === undefined || strLen > str.length) {
+    strLen = str.length;
+  }
+  return str.slice(strLen - search.length, strLen) === search;
+}
+
+/**
+ * convert local image path to native specific schema
+ * @param {string} originalUrl
+ * @returns {string}
+ */
+function convertImageLocalPath(originalUrl) {
+  var url = originalUrl;
+  if (/^assets/.test(url)) {
+    if (process.env.NODE_ENV !== 'production') {
+      url = "" + HIPPY_DEBUG_ADDRESS + url;
+    } else {
+      url = HIPPY_STATIC_PROTOCOL + "./" + url;
+    }
+  }
+  return url;
+}
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * All of component implemented by Native.
+ */
+
+var View = Symbol.for('View');
+var Image = Symbol.for('Image');
+var ListView = Symbol.for('ListView');
+var ListViewItem = Symbol.for('ListViewItem');
+var Text = Symbol.for('Text');
+var TextInput = Symbol.for('TextInput');
+var WebView = Symbol.for('WebView');
+var VideoPlayer = Symbol.for('VideoPlayer');
+
+var NATIVE_COMPONENT_NAME_MAP = {};
+NATIVE_COMPONENT_NAME_MAP[View] = 'View';
+NATIVE_COMPONENT_NAME_MAP[Image] = 'Image';
+NATIVE_COMPONENT_NAME_MAP[ListView] = 'ListView';
+NATIVE_COMPONENT_NAME_MAP[ListViewItem] = 'ListViewItem';
+NATIVE_COMPONENT_NAME_MAP[Text] = 'Text';
+NATIVE_COMPONENT_NAME_MAP[TextInput] = 'TextInput';
+NATIVE_COMPONENT_NAME_MAP[WebView] = 'WebView';
+NATIVE_COMPONENT_NAME_MAP[VideoPlayer] = 'VideoPlayer';
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* eslint-disable no-mixed-operators */
+
+var names = {
+  transparent: 0x00000000,
+  aliceblue: 0xf0f8ffff,
+  antiquewhite: 0xfaebd7ff,
+  aqua: 0x00ffffff,
+  aquamarine: 0x7fffd4ff,
+  azure: 0xf0ffffff,
+  beige: 0xf5f5dcff,
+  bisque: 0xffe4c4ff,
+  black: 0x000000ff,
+  blanchedalmond: 0xffebcdff,
+  blue: 0x0000ffff,
+  blueviolet: 0x8a2be2ff,
+  brown: 0xa52a2aff,
+  burlywood: 0xdeb887ff,
+  burntsienna: 0xea7e5dff,
+  cadetblue: 0x5f9ea0ff,
+  chartreuse: 0x7fff00ff,
+  chocolate: 0xd2691eff,
+  coral: 0xff7f50ff,
+  cornflowerblue: 0x6495edff,
+  cornsilk: 0xfff8dcff,
+  crimson: 0xdc143cff,
+  cyan: 0x00ffffff,
+  darkblue: 0x00008bff,
+  darkcyan: 0x008b8bff,
+  darkgoldenrod: 0xb8860bff,
+  darkgray: 0xa9a9a9ff,
+  darkgreen: 0x006400ff,
+  darkgrey: 0xa9a9a9ff,
+  darkkhaki: 0xbdb76bff,
+  darkmagenta: 0x8b008bff,
+  darkolivegreen: 0x556b2fff,
+  darkorange: 0xff8c00ff,
+  darkorchid: 0x9932ccff,
+  darkred: 0x8b0000ff,
+  darksalmon: 0xe9967aff,
+  darkseagreen: 0x8fbc8fff,
+  darkslateblue: 0x483d8bff,
+  darkslategray: 0x2f4f4fff,
+  darkslategrey: 0x2f4f4fff,
+  darkturquoise: 0x00ced1ff,
+  darkviolet: 0x9400d3ff,
+  deeppink: 0xff1493ff,
+  deepskyblue: 0x00bfffff,
+  dimgray: 0x696969ff,
+  dimgrey: 0x696969ff,
+  dodgerblue: 0x1e90ffff,
+  firebrick: 0xb22222ff,
+  floralwhite: 0xfffaf0ff,
+  forestgreen: 0x228b22ff,
+  fuchsia: 0xff00ffff,
+  gainsboro: 0xdcdcdcff,
+  ghostwhite: 0xf8f8ffff,
+  gold: 0xffd700ff,
+  goldenrod: 0xdaa520ff,
+  gray: 0x808080ff,
+  green: 0x008000ff,
+  greenyellow: 0xadff2fff,
+  grey: 0x808080ff,
+  honeydew: 0xf0fff0ff,
+  hotpink: 0xff69b4ff,
+  indianred: 0xcd5c5cff,
+  indigo: 0x4b0082ff,
+  ivory: 0xfffff0ff,
+  khaki: 0xf0e68cff,
+  lavender: 0xe6e6faff,
+  lavenderblush: 0xfff0f5ff,
+  lawngreen: 0x7cfc00ff,
+  lemonchiffon: 0xfffacdff,
+  lightblue: 0xadd8e6ff,
+  lightcoral: 0xf08080ff,
+  lightcyan: 0xe0ffffff,
+  lightgoldenrodyellow: 0xfafad2ff,
+  lightgray: 0xd3d3d3ff,
+  lightgreen: 0x90ee90ff,
+  lightgrey: 0xd3d3d3ff,
+  lightpink: 0xffb6c1ff,
+  lightsalmon: 0xffa07aff,
+  lightseagreen: 0x20b2aaff,
+  lightskyblue: 0x87cefaff,
+  lightslategray: 0x778899ff,
+  lightslategrey: 0x778899ff,
+  lightsteelblue: 0xb0c4deff,
+  lightyellow: 0xffffe0ff,
+  lime: 0x00ff00ff,
+  limegreen: 0x32cd32ff,
+  linen: 0xfaf0e6ff,
+  magenta: 0xff00ffff,
+  maroon: 0x800000ff,
+  mediumaquamarine: 0x66cdaaff,
+  mediumblue: 0x0000cdff,
+  mediumorchid: 0xba55d3ff,
+  mediumpurple: 0x9370dbff,
+  mediumseagreen: 0x3cb371ff,
+  mediumslateblue: 0x7b68eeff,
+  mediumspringgreen: 0x00fa9aff,
+  mediumturquoise: 0x48d1ccff,
+  mediumvioletred: 0xc71585ff,
+  midnightblue: 0x191970ff,
+  mintcream: 0xf5fffaff,
+  mistyrose: 0xffe4e1ff,
+  moccasin: 0xffe4b5ff,
+  navajowhite: 0xffdeadff,
+  navy: 0x000080ff,
+  oldlace: 0xfdf5e6ff,
+  olive: 0x808000ff,
+  olivedrab: 0x6b8e23ff,
+  orange: 0xffa500ff,
+  orangered: 0xff4500ff,
+  orchid: 0xda70d6ff,
+  palegoldenrod: 0xeee8aaff,
+  palegreen: 0x98fb98ff,
+  paleturquoise: 0xafeeeeff,
+  palevioletred: 0xdb7093ff,
+  papayawhip: 0xffefd5ff,
+  peachpuff: 0xffdab9ff,
+  peru: 0xcd853fff,
+  pink: 0xffc0cbff,
+  plum: 0xdda0ddff,
+  powderblue: 0xb0e0e6ff,
+  purple: 0x800080ff,
+  rebeccapurple: 0x663399ff,
+  red: 0xff0000ff,
+  rosybrown: 0xbc8f8fff,
+  royalblue: 0x4169e1ff,
+  saddlebrown: 0x8b4513ff,
+  salmon: 0xfa8072ff,
+  sandybrown: 0xf4a460ff,
+  seagreen: 0x2e8b57ff,
+  seashell: 0xfff5eeff,
+  sienna: 0xa0522dff,
+  silver: 0xc0c0c0ff,
+  skyblue: 0x87ceebff,
+  slateblue: 0x6a5acdff,
+  slategray: 0x708090ff,
+  slategrey: 0x708090ff,
+  snow: 0xfffafaff,
+  springgreen: 0x00ff7fff,
+  steelblue: 0x4682b4ff,
+  tan: 0xd2b48cff,
+  teal: 0x008080ff,
+  thistle: 0xd8bfd8ff,
+  tomato: 0xff6347ff,
+  turquoise: 0x40e0d0ff,
+  violet: 0xee82eeff,
+  wheat: 0xf5deb3ff,
+  white: 0xffffffff,
+  whitesmoke: 0xf5f5f5ff,
+  yellow: 0xffff00ff,
+  yellowgreen: 0x9acd32ff,
+};
+
+var call = function () {
+  var args = [], len = arguments.length;
+  while ( len-- ) args[ len ] = arguments[ len ];
+
+  return ("\\(\\s*(" + (args.join(')\\s*,\\s*(')) + ")\\s*\\)");
+};
+
+var NUMBER = '[-+]?\\d*\\.?\\d+';
+var PERCENTAGE = NUMBER + "%";
+
+var matchers = {
+  rgb: new RegExp(("rgb" + (call(NUMBER, NUMBER, NUMBER)))),
+  rgba: new RegExp(("rgba" + (call(NUMBER, NUMBER, NUMBER, NUMBER)))),
+  hsl: new RegExp(("hsl" + (call(NUMBER, PERCENTAGE, PERCENTAGE)))),
+  hsla: new RegExp(("hsla" + (call(NUMBER, PERCENTAGE, PERCENTAGE, NUMBER)))),
+  hex3: /^#([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
+  hex4: /^#([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
+  hex6: /^#([0-9a-fA-F]{6})$/,
+  hex8: /^#([0-9a-fA-F]{8})$/,
+};
+
+var parse255 = function (str) {
+  var int = parseInt(str, 10);
+  if (int < 0) {
+    return 0;
+  }
+  if (int > 255) {
+    return 255;
+  }
+  return int;
+};
+
+var parse1 = function (str) {
+  var num = parseFloat(str);
+  if (num < 0) {
+    return 0;
+  }
+  if (num > 1) {
+    return 255;
+  }
+  return Math.round(num * 255);
+};
+
+var hue2rgb = function (p, q, tx) {
+  var t = tx;
+  if (t < 0) {
+    t += 1;
+  }
+  if (t > 1) {
+    t -= 1;
+  }
+  if (t < 1 / 6) {
+    return p + (q - p) * 6 * t;
+  }
+  if (t < 1 / 2) {
+    return q;
+  }
+  if (t < 2 / 3) {
+    return p + (q - p) * (2 / 3 - t) * 6;
+  }
+  return p;
+};
+
+var hslToRgb = function (h, s, l) {
+  var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  var p = 2 * l - q;
+  var r = hue2rgb(p, q, h + 1 / 3);
+  var g = hue2rgb(p, q, h);
+  var b = hue2rgb(p, q, h - 1 / 3);
+  return (
+    (Math.round(r * 255) << 24)
+    | (Math.round(g * 255) << 16)
+    | (Math.round(b * 255) << 8)
+  );
+};
+
+var parse360 = function (str) {
+  var int = parseFloat(str);
+  return (((int % 360) + 360) % 360) / 360;
+};
+
+var parsePercentage = function (str) {
+  var int = parseFloat(str, 10);
+  if (int < 0) {
+    return 0;
+  }
+  if (int > 100) {
+    return 1;
+  }
+  return int / 100;
+};
+
+function baseColor(color) {
+  var match;
+  if (typeof color === 'number') {
+    if (color >>> 0 === color && color >= 0 && color <= 0xffffffff) {
+      return color;
+    }
+    return null;
+  }
+  match = matchers.hex6.exec(color);
+  if (Array.isArray(match)) {
+    return parseInt(((match[1]) + "ff"), 16) >>> 0;
+  }
+  if (Object.hasOwnProperty.call(names, color)) {
+    return names[color];
+  }
+  match = matchers.rgb.exec(color);
+  if (Array.isArray(match)) {
+    return (
+      (parse255(match[1]) << 24) // r
+      | (parse255(match[2]) << 16) // g
+      | (parse255(match[3]) << 8) // b
+      | 0x000000ff // a
+    ) >>> 0;
+  }
+  match = matchers.rgba.exec(color);
+  if (match) {
+    return (
+      (parse255(match[1]) << 24) // r
+      | (parse255(match[2]) << 16) // g
+      | (parse255(match[3]) << 8) // b
+      | parse1(match[4]) // a
+    ) >>> 0;
+  }
+  match = matchers.hex3.exec(color);
+  if (match) {
+    return parseInt(
+      ((match[1] + match[1] // r
+      + match[2] + match[2] // g
+      + match[3] + match[3]) + "ff"), // a
+      16
+    ) >>> 0;
+  }
+  match = matchers.hex8.exec(color);
+  if (match) {
+    return parseInt(match[1], 16) >>> 0;
+  }
+  match = matchers.hex4.exec(color);
+  if (match) {
+    return parseInt(
+      match[1] + match[1] // r
+      + match[2] + match[2] // g
+      + match[3] + match[3] // b
+      + match[4] + match[4], // a
+      16
+    ) >>> 0;
+  }
+  match = matchers.hsl.exec(color);
+  if (match) {
+    return (
+      hslToRgb(
+        parse360(match[1]), // h
+        parsePercentage(match[2]), // s
+        parsePercentage(match[3]) // l
+      )
+      | 0x000000ff // a
+    ) >>> 0;
+  }
+  match = matchers.hsla.exec(color);
+  if (match) {
+    return (
+      hslToRgb(
+        parse360(match[1]), // h
+        parsePercentage(match[2]), // s
+        parsePercentage(match[3]) // l
+      )
+      | parse1(match[4]) // a
+    ) >>> 0;
+  }
+  return null;
+}
+
+/**
+ * Translate the color to make sure native understood.
+ */
+function translateColor(color, options) {
+  if ( options === void 0 ) options = {};
+
+  var int32Color = baseColor(color);
+  if (int32Color === null) {
+    throw new Error(("Bad color value: " + color));
+  }
+  int32Color = (int32Color << 24 | int32Color >>> 8) >>> 0;
+  if (options && options.platform === 'android') {
+    int32Color |= 0;
+  }
+  return int32Color;
+}
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * is right to left display
+ * @returns {boolean}
+ */
+function isRTL() {
+  var localization = Native.Localization;
+  if (localization) {
+    return localization.direction === 1;
+  }
+  return false;
+}
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var nodeCache = new Map();
+
+/**
+ * preCacheNode - cache ViewNode
+ * @param {ViewNode} targetNode
+ * @param {number} nodeId
+ */
+function preCacheNode(targetNode, nodeId) {
+  nodeCache.set(nodeId, targetNode);
+}
+
+/**
+ * unCacheNode - delete ViewNode from cache
+ * @param {number} nodeId
+ */
+function unCacheNode(nodeId) {
+  nodeCache.delete(nodeId);
+}
+
+/**
+ * getNodeById - get ViewNode by nodeId
+ * @param {number} nodeId
+ */
+function getNodeById(nodeId) {
+  return nodeCache.get(nodeId) || null;
+}
+
+/**
+ * unCacheViewNodeOnIdle - recursively delete ViewNode cache on idle
+ * @param {ViewNode|number} node
+ */
+function unCacheNodeOnIdle(node) {
+  requestIdleCallback(function (deadline) {
+    // if idle time exists or callback invoked when timeout
+    if (deadline.timeRemaining() > 0 || deadline.didTimeout) {
+      recursivelyUnCacheNode(node);
+    }
+  }, { timeout: 50 });  // 50ms to avoid blocking user operation
+}
+
+/**
+ * recursivelyUnCacheNode - delete ViewNode cache recursively
+ * @param {ViewNode|number} node
+ */
+function recursivelyUnCacheNode(node) {
+  if (typeof node === 'number') {
+    // if leaf node (e.g. text node)
+    unCacheNode(node);
+  } else if (node) {
+    unCacheNode(node.nodeId);
+    node.childNodes && node.childNodes.forEach(function (node) { return recursivelyUnCacheNode(node); });
+  }
+}
+
+/**
+ * requestIdleCallback polyfill
+ * @param {Function} cb
+ * @param {{timeout: number}} [options]
+ */
+function requestIdleCallback(cb, options) {
+  if (!global.requestIdleCallback) {
+    return setTimeout(function () {
+      cb({
+        didTimeout: false,
+        timeRemaining: function timeRemaining() {
+          return Infinity;
+        },
+      });
+    }, 1);
+  }
+  return global.requestIdleCallback(cb, options);
+}
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* eslint-disable no-param-reassign */
+
+// Check the Regexp is support sticky flag.
+var REGEXP_SUPPORTING_STICKY_FLAG = (function () {
+  try {
+    return !!new RegExp('foo', 'y');
+  } catch (err) {
+    return false;
+  }
+})();
+
+
+// Regexp strings
+var REGEXP_STRINGS = {
+  whiteSpaceRegEx: '\\s*',
+  universalSelectorRegEx: '\\*',
+  simpleIdentifierSelectorRegEx: '(#|\\.|:|\\b)([_-\\w][_-\\w\\d]*)',
+  attributeSelectorRegEx: '\\[\\s*([_-\\w][_-\\w\\d]*)\\s*(?:(=|\\^=|\\$=|\\*=|\\~=|\\|=)\\s*(?:([_-\\w][_-\\w\\d]*)|"((?:[^\\\\"]|\\\\(?:"|n|r|f|\\\\|0-9a-f))*)"|\'((?:[^\\\\\']|\\\\(?:\'|n|r|f|\\\\|0-9a-f))*)\')\\s*)?\\]',
+  combinatorRegEx: '\\s*(\\+|~|>)?\\s*',
+};
+
+// RegExp instance cache
+var REGEXPS = {};
+
+// Execute the RegExp
+function execRegExp(regexpKey, text, start) {
+  var flags = '';
+  // Check the sticky flag supporting, and cache the RegExp instance.
+  if (REGEXP_SUPPORTING_STICKY_FLAG) {
+    flags = 'gy';
+  }
+  if (!REGEXPS[regexpKey]) {
+    REGEXPS[regexpKey] = new RegExp(REGEXP_STRINGS[regexpKey], flags);
+  }
+  var regexp = REGEXPS[regexpKey];
+  var result;
+  // Fallback to split the text if sticky is not supported.
+  if (REGEXP_SUPPORTING_STICKY_FLAG) {
+    regexp.lastIndex = start;
+    result = regexp.exec(text);
+  } else {
+    text = text.slice(start, text.length);
+    result = regexp.exec(text);
+    if (!result) {
+      return {
+        result: null,
+        regexp: regexp,
+      };
+    }
+    // add start index to prevent infinite loop caused by class name like .aa_bb.aa
+    regexp.lastIndex = start + result[0].length;
+  }
+  return {
+    result: result,
+    regexp: regexp,
+  };
+}
+
+function parseUniversalSelector(text, start) {
+  var ref = execRegExp('universalSelectorRegEx', text, start);
+  var result = ref.result;
+  var regexp = ref.regexp;
+  if (!result) {
+    return null;
+  }
+  var end = regexp.lastIndex;
+  return {
+    value: {
+      type: '*',
+    },
+    start: start,
+    end: end,
+  };
+}
+
+function parseSimpleIdentifierSelector(text, start) {
+  var ref = execRegExp('simpleIdentifierSelectorRegEx', text, start);
+  var result = ref.result;
+  var regexp = ref.regexp;
+  if (!result) {
+    return null;
+  }
+  var end = regexp.lastIndex;
+  var type = result[1];
+  var identifier = result[2];
+  var value = { type: type, identifier: identifier };
+  return {
+    value: value,
+    start: start,
+    end: end,
+  };
+}
+
+function parseAttributeSelector(text, start) {
+  var ref = execRegExp('attributeSelectorRegEx', text, start);
+  var result = ref.result;
+  var regexp = ref.regexp;
+  if (!result) {
+    return null;
+  }
+  var end = regexp.lastIndex;
+  var property = result[1];
+  if (result[2]) {
+    var test = result[2];
+    var value = result[3] || result[4] || result[5];
+    return {
+      value: {
+        type: '[]',
+        property: property,
+        test: test,
+        value: value,
+      },
+      start: start,
+      end: end,
+    };
+  }
+  return {
+    value: {
+      type: '[]',
+      property: property,
+    },
+    start: start,
+    end: end,
+  };
+}
+
+function parseSimpleSelector(text, start) {
+  return parseUniversalSelector(text, start)
+    || parseSimpleIdentifierSelector(text, start)
+    || parseAttributeSelector(text, start);
+}
+
+function parseSimpleSelectorSequence(text, start) {
+  var assign;
+
+  var simpleSelector = parseSimpleSelector(text, start);
+  if (!simpleSelector) {
+    return null;
+  }
+  var end = simpleSelector.end;
+  var value = [];
+  while (simpleSelector) {
+    value.push(simpleSelector.value);
+    ((assign = simpleSelector, end = assign.end));
+    simpleSelector = parseSimpleSelector(text, end);
+  }
+  return {
+    start: start,
+    end: end,
+    value: value,
+  };
+}
+
+function parseCombinator(text, start) {
+  var ref = execRegExp('combinatorRegEx', text, start);
+  var result = ref.result;
+  var regexp = ref.regexp;
+  if (!result) {
+    return null;
+  }
+  var end;
+  if (REGEXP_SUPPORTING_STICKY_FLAG) {
+    end = regexp.lastIndex;
+  } else {
+    end = start;
+  }
+  var value = result[1] || ' ';
+  return {
+    start: start,
+    end: end,
+    value: value,
+  };
+}
+
+function parseSelector(text, start) {
+  var end = start;
+  var ref = execRegExp('whiteSpaceRegEx', text, start);
+  var result = ref.result;
+  var regexp = ref.regexp;
+  if (result) {
+    end = regexp.lastIndex;
+  }
+  var value = [];
+  var combinator;
+  var expectSimpleSelector = true;
+  var pair = [];
+  var cssText;
+  if (REGEXP_SUPPORTING_STICKY_FLAG) {
+    cssText = [text];
+  } else {
+    cssText = text.split(' ');
+  }
+  cssText.forEach(function (text) {
+    var assign, assign$1;
+
+    if (!REGEXP_SUPPORTING_STICKY_FLAG) {
+      if (text === '') {
+        return;
+      }
+      end = 0;
+    }
+    do {
+      var simpleSelectorSequence = parseSimpleSelectorSequence(text, end);
+      if (!simpleSelectorSequence) {
+        if (expectSimpleSelector) {
+          return null;
+        }
+        break;
+      }
+      ((assign = simpleSelectorSequence, end = assign.end));
+      if (combinator) {
+        pair[1] = combinator.value;
+      }
+      pair = [simpleSelectorSequence.value, undefined];
+      value.push(pair);
+
+      combinator = parseCombinator(text, end);
+      if (combinator) {
+        ((assign$1 = combinator, end = assign$1.end));
+      }
+      expectSimpleSelector = combinator && combinator.value !== ' ';
+    } while (combinator);
+  });
+  return {
+    start: start,
+    end: end,
+    value: value,
+  };
+}
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-cond-assign */
+/* eslint-disable no-useless-escape */
+/* eslint-disable no-param-reassign */
+
+/**
+ * Base classes
+ */
+var SelectorCore = function SelectorCore () {};
+
+SelectorCore.prototype.lookupSort = function lookupSort (sorter, base) {
+  sorter.sortAsUniversal(base || this);
+};
+
+SelectorCore.prototype.removeSort = function removeSort (sorter, base) {
+  sorter.removeAsUniversal(base || this);
+};
+
+var SimpleSelector = /*@__PURE__*/(function (SelectorCore) {
+  function SimpleSelector () {
+    SelectorCore.apply(this, arguments);
+  }
+
+  if ( SelectorCore ) SimpleSelector.__proto__ = SelectorCore;
+  SimpleSelector.prototype = Object.create( SelectorCore && SelectorCore.prototype );
+  SimpleSelector.prototype.constructor = SimpleSelector;
+
+  SimpleSelector.prototype.accumulateChanges = function accumulateChanges (node, map) {
+    if (!this.dynamic) {
+      return this.match(node);
+    }
+    if (this.mayMatch(node)) {
+      this.trackChanges(node, map);
+      return true;
+    }
+    return false;
+  };
+
+  SimpleSelector.prototype.mayMatch = function mayMatch (node) {
+    return this.match(node);
+  };
+
+  SimpleSelector.prototype.trackChanges = function trackChanges () {
+    return null;
+  };
+
+  return SimpleSelector;
+}(SelectorCore));
+
+var SimpleSelectorSequence = /*@__PURE__*/(function (SimpleSelector) {
+  function SimpleSelectorSequence(selectors) {
+    SimpleSelector.call(this);
+    this.specificity = selectors.reduce(function (sum, sel) { return sel.specificity + sum; }, 0);
+    this.head = selectors.reduce(function (prev, curr) { return (!prev || (curr.rarity > prev.rarity) ? curr : prev); }, null);
+    this.dynamic = selectors.some(function (sel) { return sel.dynamic; });
+    this.selectors = selectors;
+  }
+
+  if ( SimpleSelector ) SimpleSelectorSequence.__proto__ = SimpleSelector;
+  SimpleSelectorSequence.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
+  SimpleSelectorSequence.prototype.constructor = SimpleSelectorSequence;
+
+  SimpleSelectorSequence.prototype.toString = function toString () {
+    return ("" + (this.selectors.join('')) + (this.combinator));
+  };
+
+  SimpleSelectorSequence.prototype.match = function match (node) {
+    return this.selectors.every(function (sel) { return sel.match(node); });
+  };
+
+  SimpleSelectorSequence.prototype.mayMatch = function mayMatch (node) {
+    return this.selectors.every(function (sel) { return sel.mayMatch(node); });
+  };
+
+  SimpleSelectorSequence.prototype.trackChanges = function trackChanges (node, map) {
+    this.selectors.forEach(function (sel) { return sel.trackChanges(node, map); });
+  };
+
+  SimpleSelectorSequence.prototype.lookupSort = function lookupSort (sorter, base) {
+    this.head.lookupSort(sorter, base || this);
+  };
+
+  SimpleSelectorSequence.prototype.removeSort = function removeSort (sorter, base) {
+    this.head.removeSort(sorter, base || this);
+  };
+
+  return SimpleSelectorSequence;
+}(SimpleSelector));
+
+/**
+ * Universal Selector
+ */
+var UniversalSelector = /*@__PURE__*/(function (SimpleSelector) {
+  function UniversalSelector() {
+    SimpleSelector.call(this);
+    this.specificity = 0x00000000;
+    this.rarity = 0;
+    this.dynamic = false;
+  }
+
+  if ( SimpleSelector ) UniversalSelector.__proto__ = SimpleSelector;
+  UniversalSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
+  UniversalSelector.prototype.constructor = UniversalSelector;
+
+  UniversalSelector.prototype.toString = function toString () {
+    return ("*" + (this.combinator));
+  };
+
+  UniversalSelector.prototype.match = function match () {
+    return true;
+  };
+
+  return UniversalSelector;
+}(SimpleSelector));
+
+/**
+ * Id Selector
+ */
+var IdSelector = /*@__PURE__*/(function (SimpleSelector) {
+  function IdSelector(id) {
+    SimpleSelector.call(this);
+    this.specificity = 0x00010000;
+    this.rarity = 3;
+    this.dynamic = false;
+    this.id = id;
+  }
+
+  if ( SimpleSelector ) IdSelector.__proto__ = SimpleSelector;
+  IdSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
+  IdSelector.prototype.constructor = IdSelector;
+
+  IdSelector.prototype.toString = function toString () {
+    return ("#" + (this.id) + (this.combinator));
+  };
+
+  IdSelector.prototype.match = function match (node) {
+    return node.id === this.id;
+  };
+
+  IdSelector.prototype.lookupSort = function lookupSort (sorter, base) {
+    sorter.sortById(this.id, base || this);
+  };
+
+  IdSelector.prototype.removeSort = function removeSort (sorter, base) {
+    sorter.removeById(this.id, base || this);
+  };
+
+  return IdSelector;
+}(SimpleSelector));
+
+
+/**
+ * Type Selector
+ */
+var TypeSelector = /*@__PURE__*/(function (SimpleSelector) {
+  function TypeSelector(cssType) {
+    SimpleSelector.call(this);
+    this.specificity = 0x00000001;
+    this.rarity = 1;
+    this.dynamic = false;
+    this.cssType = cssType;
+  }
+
+  if ( SimpleSelector ) TypeSelector.__proto__ = SimpleSelector;
+  TypeSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
+  TypeSelector.prototype.constructor = TypeSelector;
+
+  TypeSelector.prototype.toString = function toString () {
+    return ("" + (this.cssType) + (this.combinator));
+  };
+
+  TypeSelector.prototype.match = function match (node) {
+    return node.tagName === this.cssType;
+  };
+
+  TypeSelector.prototype.lookupSort = function lookupSort (sorter, base) {
+    sorter.sortByType(this.cssType, base || this);
+  };
+
+  TypeSelector.prototype.removeSort = function removeSort (sorter, base) {
+    sorter.removeByType(this.cssType, base || this);
+  };
+
+  return TypeSelector;
+}(SimpleSelector));
+
+/**
+ * Class Selector
+ */
+var ClassSelector = /*@__PURE__*/(function (SimpleSelector) {
+  function ClassSelector(className) {
+    SimpleSelector.call(this);
+    this.specificity = 0x00000100;
+    this.rarity = 2;
+    this.dynamic = false;
+    this.className = className;
+  }
+
+  if ( SimpleSelector ) ClassSelector.__proto__ = SimpleSelector;
+  ClassSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
+  ClassSelector.prototype.constructor = ClassSelector;
+
+  ClassSelector.prototype.toString = function toString () {
+    return ("." + (this.className) + (this.combinator));
+  };
+
+  ClassSelector.prototype.match = function match (node) {
+    return node.classList.size && node.classList.has(this.className);
+  };
+
+  ClassSelector.prototype.lookupSort = function lookupSort (sorter, base) {
+    sorter.sortByClass(this.className, base || this);
+  };
+
+  ClassSelector.prototype.removeSort = function removeSort (sorter, base) {
+    sorter.removeByClass(this.className, base || this);
+  };
+
+  return ClassSelector;
+}(SimpleSelector));
+
+/**
+ * Pseudo Class Selector
+ */
+var PseudoClassSelector = /*@__PURE__*/(function (SimpleSelector) {
+  function PseudoClassSelector(cssPseudoClass) {
+    SimpleSelector.call(this);
+    this.specificity = 0x00000100;
+    this.rarity = 0;
+    this.dynamic = true;
+    this.cssPseudoClass = cssPseudoClass;
+  }
+
+  if ( SimpleSelector ) PseudoClassSelector.__proto__ = SimpleSelector;
+  PseudoClassSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
+  PseudoClassSelector.prototype.constructor = PseudoClassSelector;
+
+  PseudoClassSelector.prototype.toString = function toString () {
+    return (":" + (this.cssPseudoClass) + (this.combinator));
+  };
+
+  PseudoClassSelector.prototype.match = function match (node) {
+    return node.cssPseudoClasses && node.cssPseudoClasses.has(this.cssPseudoClass);
+  };
+
+  PseudoClassSelector.prototype.mayMatch = function mayMatch () {
+    return true;
+  };
+
+  PseudoClassSelector.prototype.trackChanges = function trackChanges (node, map) {
+    map.addPseudoClass(node, this.cssPseudoClass);
+  };
+
+  return PseudoClassSelector;
+}(SimpleSelector));
+
+/**
+ * Attribute Selector
+ */
+
+var AttributeSelector = /*@__PURE__*/(function (SimpleSelector) {
+  function AttributeSelector(attribute, test, value) {
+    SimpleSelector.call(this);
+    this.specificity = 0x00000100;
+    this.rarity = 0;
+    this.dynamic = true;
+    this.attribute = attribute;
+    this.test = test;
+    this.value = value;
+
+    if (!test) {
+      // HasAttribute
+      this.match = function (node) { return !!node[attribute]; };
+      return;
+    }
+
+    if (!value) {
+      this.match = function () { return false; };
+    }
+
+    var escapedValue = value.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+    var regexp = null;
+    switch (test) {
+      case '^=': // PrefixMatch
+        regexp = new RegExp(("^" + escapedValue));
+        break;
+      case '$=': // SuffixMatch
+        regexp = new RegExp((escapedValue + "$"));
+        break;
+      case '*=': // SubstringMatch
+        regexp = new RegExp(escapedValue);
+        break;
+      case '=': // Equals
+        regexp = new RegExp(("^" + escapedValue + "$"));
+        break;
+      case '~=': // Includes
+        if (/\s/.test(value)) {
+          this.match = function () { return false; };
+          return;
+        }
+        regexp = new RegExp(("(^|\\s)" + escapedValue + "(\\s|$)"));
+        break;
+      case '|=': // DashMatch
+        regexp = new RegExp(("^" + escapedValue + "(-|$)"));
+        break;
+    }
+
+    if (regexp) {
+      this.match = function (node) { return regexp.test(("" + (node[attribute]))); };
+      return;
+    }
+    this.match = function () { return false; };
+  }
+
+  if ( SimpleSelector ) AttributeSelector.__proto__ = SimpleSelector;
+  AttributeSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
+  AttributeSelector.prototype.constructor = AttributeSelector;
+
+  AttributeSelector.prototype.toString = function toString () {
+    return ("[" + (this.attribute) + (this.test) + ((this.test && this.value) || '') + "]" + (this.combinator));
+  };
+
+  AttributeSelector.prototype.match = function match () {
+    return false;
+  };
+
+  AttributeSelector.prototype.mayMatch = function mayMatch () {
+    return true;
+  };
+
+  AttributeSelector.prototype.trackChanges = function trackChanges (node, map) {
+    map.addAttribute(node, this.attribute);
+  };
+
+  return AttributeSelector;
+}(SimpleSelector));
+
+/**
+ * Invalid Selector
+ */
+var InvalidSelector = /*@__PURE__*/(function (SimpleSelector) {
+  function InvalidSelector(err) {
+    SimpleSelector.call(this);
+    this.specificity = 0x00000000;
+    this.rarity = 4;
+    this.dynamic = false;
+    this.combinator = undefined;
+    this.err = err;
+  }
+
+  if ( SimpleSelector ) InvalidSelector.__proto__ = SimpleSelector;
+  InvalidSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
+  InvalidSelector.prototype.constructor = InvalidSelector;
+
+  InvalidSelector.prototype.toString = function toString () {
+    return ("<error: " + (this.err) + ">");
+  };
+
+  InvalidSelector.prototype.match = function match () {
+    return false;
+  };
+
+  InvalidSelector.prototype.lookupSort = function lookupSort () {
+    return null;
+  };
+
+  InvalidSelector.prototype.removeSort = function removeSort () {
+    return null;
+  };
+
+  return InvalidSelector;
+}(SimpleSelector));
+
+var ChildGroup = function ChildGroup(selectors) {
+  this.selectors = selectors;
+  this.dynamic = selectors.some(function (sel) { return sel.dynamic; });
+};
+
+ChildGroup.prototype.match = function match (node) {
+  var pass = this.selectors.every(function (sel, i) {
+    if (i !== 0) {
+      node = node.parentNode;
+    }
+    return !!node && !!sel.match(node);
+  });
+  return pass ? node : null;
+};
+
+ChildGroup.prototype.mayMatch = function mayMatch (node) {
+  var pass = this.selectors.every(function (sel, i) {
+    if (i !== 0) {
+      node = node.parentNode;
+    }
+    return !!node && !!sel.mayMatch(node);
+  });
+  return pass ? node : null;
+};
+
+ChildGroup.prototype.trackChanges = function trackChanges (node, map) {
+  this.selectors.forEach(function (sel, i) {
+    if (i !== 0) {
+      node = node.parentNode;
+    }
+    if (!node) {
+      return;
+    }
+    sel.trackChanges(node, map);
+  });
+};
+
+var SiblingGroup = function SiblingGroup(selectors) {
+  this.selectors = selectors;
+  this.dynamic = selectors.some(function (sel) { return sel.dynamic; });
+};
+
+SiblingGroup.prototype.match = function match (node) {
+  var pass = this.selectors.every(function (sel, i) {
+    if (i !== 0) {
+      node = node.nextSibling;
+    }
+    return !!node && !!sel.match(node);
+  });
+  return pass ? node : null;
+};
+
+SiblingGroup.prototype.mayMatch = function mayMatch (node) {
+  var pass = this.selectors.every(function (sel, i) {
+    if (i !== 0) {
+      node = node.nextSibling;
+    }
+    return !!node && !!sel.mayMatch(node);
+  });
+  return pass ? node : null;
+};
+
+SiblingGroup.prototype.trackChanges = function trackChanges (node, map) {
+  this.selectors.forEach(function (sel, i) {
+    if (i !== 0) {
+      node = node.nextSibling;
+    }
+    if (!node) {
+      return;
+    }
+    sel.trackChanges(node, map);
+  });
+};
+
+/**
+ * Big  Selector
+ */
+var Selector = /*@__PURE__*/(function (SelectorCore) {
+  function Selector(selectors) {
+    SelectorCore.call(this);
+    var supportedCombinator = [undefined, ' ', '>', '+'];
+    var siblingGroup;
+    var lastGroup;
+    var groups = [];
+    selectors.reverse().forEach(function (sel) {
+      if (supportedCombinator.indexOf(sel.combinator) === -1) {
+        throw new Error(("Unsupported combinator \"" + (sel.combinator) + "\"."));
+      }
+      if (sel.combinator === undefined || sel.combinator === ' ') {
+        groups.push(lastGroup = [siblingGroup = []]);
+      }
+      if (sel.combinator === '>') {
+        lastGroup.push(siblingGroup = []);
+      }
+      siblingGroup.push(sel);
+    });
+    this.groups = groups.map(function (g) { return new Selector.ChildGroup(g.map(function (sg) { return new Selector.SiblingGroup(sg); })); });
+    this.last = selectors[0];
+    this.specificity = selectors.reduce(function (sum, sel) { return sel.specificity + sum; }, 0);
+    this.dynamic = selectors.some(function (sel) { return sel.dynamic; });
+  }
+
+  if ( SelectorCore ) Selector.__proto__ = SelectorCore;
+  Selector.prototype = Object.create( SelectorCore && SelectorCore.prototype );
+  Selector.prototype.constructor = Selector;
+
+  Selector.prototype.toString = function toString () {
+    return this.selectors.join('');
+  };
+
+  Selector.prototype.match = function match (node) {
+    return this.groups.every(function (group, i) {
+      if (i === 0) {
+        node = group.match(node);
+        return !!node;
+      }
+      var ancestor = node;
+      while (ancestor = ancestor.parentNode) {
+        if (node = group.match(ancestor)) {
+          return true;
+        }
+      }
+      return false;
+    });
+  };
+
+  Selector.prototype.lookupSort = function lookupSort (sorter) {
+    this.last.lookupSort(sorter, this);
+  };
+
+  Selector.prototype.removeSort = function removeSort (sorter) {
+    this.last.removeSort(sorter, this);
+  };
+
+  Selector.prototype.accumulateChanges = function accumulateChanges (node, map) {
+    if (!this.dynamic) {
+      return this.match(node);
+    }
+
+    var bounds = [];
+    var mayMatch = this.groups.every(function (group, i) {
+      if (i === 0) {
+        var nextNode = group.mayMatch(node);
+        bounds.push({ left: node, right: node });
+        node = nextNode;
+        return !!node;
+      }
+      var ancestor = node;
+      while (ancestor = ancestor.parentNode) {
+        var nextNode$1 = group.mayMatch(ancestor);
+        if (nextNode$1) {
+          bounds.push({ left: ancestor, right: null });
+          node = nextNode$1;
+          return true;
+        }
+      }
+      return false;
+    });
+
+    // Calculating the right bounds for each selectors won't save much
+    if (!mayMatch) {
+      return false;
+    }
+
+    if (!map) {
+      return mayMatch;
+    }
+
+    for (var i = 0; i < this.groups.length; i += 1) {
+      var group = this.groups[i];
+      if (!group.dynamic) {
+        continue;
+      }
+      var bound = bounds[i];
+      var leftBound = bound.left;
+      do {
+        if (group.mayMatch(leftBound)) {
+          group.trackChanges(leftBound, map);
+        }
+      } while ((leftBound !== bound.right) && (leftBound = node.parentNode));
+    }
+
+    return mayMatch;
+  };
+
+  return Selector;
+}(SelectorCore));
+Selector.ChildGroup = ChildGroup;
+Selector.SiblingGroup = SiblingGroup;
+
+/**
+ * Rule Set
+ */
+var RuleSet = function RuleSet(selectors, declarations, hash) {
+  var this$1 = this;
+
+  selectors.forEach(function (sel) {
+    sel.ruleSet = this$1; // FIXME: It makes circular dependency
+    return null;
+  });
+  this.hash = hash;
+  this.selectors = selectors;
+  this.declarations = declarations;
+};
+
+RuleSet.prototype.toString = function toString () {
+  return ((this.selectors.join(', ')) + " {" + (this.declarations.map(function (d, i) { return ("" + (i === 0 ? ' ' : '') + (d.property) + ": " + (d.value)); }).join('; ')) + "}");
+};
+
+RuleSet.prototype.lookupSort = function lookupSort (sorter) {
+  this.selectors.forEach(function (sel) { return sel.lookupSort(sorter); });
+};
+
+RuleSet.prototype.removeSort = function removeSort (sorter) {
+  this.selectors.forEach(function (sel) { return sel.removeSort(sorter); });
+};
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* eslint-disable no-param-reassign */
+
+/**
+ * Selector Map
+ */
+var SelectorsMatch = function SelectorsMatch() {
+  this.changeMap = new Map();
+};
+
+SelectorsMatch.prototype.addAttribute = function addAttribute (node, attribute) {
+  var deps = this.properties(node);
+  if (!deps.attributes) {
+    deps.attributes = new Set();
+  }
+  deps.attributes.add(attribute);
+};
+
+SelectorsMatch.prototype.addPseudoClass = function addPseudoClass (node, pseudoClass) {
+  var deps = this.properties(node);
+  if (!deps.pseudoClasses) {
+    deps.pseudoClasses = new Set();
+  }
+  deps.pseudoClasses.add(pseudoClass);
+};
+
+SelectorsMatch.prototype.properties = function properties (node) {
+  var set = this.changeMap.get(node);
+  if (!set) {
+    this.changeMap.set(node, set = {});
+  }
+  return set;
+};
+
+var SelectorsMap = function SelectorsMap(ruleSets) {
+  var this$1 = this;
+
+  this.id = {};
+  this.class = {};
+  this.type = {};
+  this.universal = [];
+  this.position = 0;
+  this.ruleSets = ruleSets;
+  ruleSets.forEach(function (rule) { return rule.lookupSort(this$1); });
+};
+
+SelectorsMap.prototype.append = function append (appendRules) {
+    var this$1 = this;
+
+  this.ruleSets = this.ruleSets.concat(appendRules);
+  appendRules.forEach(function (rule) { return rule.lookupSort(this$1); });
+};
+
+SelectorsMap.prototype.delete = function delete$1 (hash) {
+    var this$1 = this;
+
+  var removedRuleSets = [];
+  this.ruleSets = this.ruleSets.filter(function (rule) {
+    if (rule.hash !== hash) { return true; }
+    removedRuleSets.push(rule);
+    return false;
+  });
+  removedRuleSets.forEach(function (rule) { return rule.removeSort(this$1); });
+};
+
+SelectorsMap.prototype.query = function query (node) {
+    var this$1 = this;
+
+  var tagName = node.tagName;
+    var id = node.id;
+    var classList = node.classList;
+  var selectorClasses = [
+    this.universal,
+    this.id[id],
+    this.type[tagName] ];
+  if (classList.size) {
+    classList.forEach(function (c) { return selectorClasses.push(this$1.class[c]); });
+  }
+  var selectors = selectorClasses
+    .filter(function (arr) { return !!arr; })
+    .reduce(function (cur, next) { return cur.concat(next); }, []);
+
+  var selectorsMatch = new SelectorsMatch();
+
+  selectorsMatch.selectors = selectors
+    .filter(function (sel) { return sel.sel.accumulateChanges(node, selectorsMatch); })
+    .sort(function (a, b) { return a.sel.specificity - b.sel.specificity || a.pos - b.pos; })
+    .map(function (docSel) { return docSel.sel; });
+
+  return selectorsMatch;
+};
+
+SelectorsMap.prototype.sortById = function sortById (id, sel) {
+  this.addToMap(this.id, id, sel);
+};
+
+SelectorsMap.prototype.sortByClass = function sortByClass (cssClass, sel) {
+  this.addToMap(this.class, cssClass, sel);
+};
+
+SelectorsMap.prototype.sortByType = function sortByType (cssType, sel) {
+  this.addToMap(this.type, cssType, sel);
+};
+
+SelectorsMap.prototype.removeById = function removeById (id, sel) {
+  this.removeFromMap(this.id, id, sel);
+};
+
+SelectorsMap.prototype.removeByClass = function removeByClass (cssClass, sel) {
+  this.removeFromMap(this.class, cssClass, sel);
+};
+
+SelectorsMap.prototype.removeByType = function removeByType (cssType, sel) {
+  this.removeFromMap(this.type, cssType, sel);
+};
+
+SelectorsMap.prototype.sortAsUniversal = function sortAsUniversal (sel) {
+  this.universal.push(this.makeDocSelector(sel));
+};
+
+SelectorsMap.prototype.removeAsUniversal = function removeAsUniversal (sel) {
+  var index = this.universal.findIndex(function (item) { return item.sel.ruleSet.hash === sel.ruleSet.hash; });
+  if (index !== -1) {
+    this.universal.splice(index);
+  }
+};
+
+SelectorsMap.prototype.addToMap = function addToMap (map, head, sel) {
+  this.position += 1;
+  var list = map[head];
+  if (list) {
+    list.push(this.makeDocSelector(sel));
+  } else {
+    map[head] = [this.makeDocSelector(sel)];
+  }
+};
+
+SelectorsMap.prototype.removeFromMap = function removeFromMap (map, head, sel) {
+  var list = map[head];
+  var index = list.findIndex(function (item) { return item.sel.ruleSet.hash === sel.ruleSet.hash; });
+  if (index !== -1) {
+    list.splice(index, 1);
+  }
+};
+
+SelectorsMap.prototype.makeDocSelector = function makeDocSelector (sel) {
+  this.position += 1;
+  return { sel: sel, pos: this.position };
+};
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function isDeclaration(node) {
+  return node.type === 'declaration';
+}
+
+function createDeclaration(beforeLoadStyle) {
+  return function (decl) {
+    var newDecl = beforeLoadStyle(decl);
+    if (process.env.NODE_ENV !== 'production') {
+      if (!newDecl) {
+        throw new Error('beforeLoadStyle hook must returns the processed style object');
+      }
+    }
+    return newDecl;
+  };
+}
+
+function createSimpleSelectorFromAst(ast) {
+  switch (ast.type) {
+    case '*': return new UniversalSelector();
+    case '#': return new IdSelector(ast.identifier);
+    case '': return new TypeSelector(ast.identifier.replace(/-/, '').toLowerCase());
+    case '.': return new ClassSelector(ast.identifier);
+    case ':': return new PseudoClassSelector(ast.identifier);
+    case '[]': return ast.test ? new AttributeSelector(ast.property, ast.test, ast.value) : new AttributeSelector(ast.property);
+    default: return null;
+  }
+}
+
+function createSimpleSelectorSequenceFromAst(ast) {
+  if (ast.length === 0) {
+    return new InvalidSelector(new Error('Empty simple selector sequence.'));
+  }
+  if (ast.length === 1) {
+    return createSimpleSelectorFromAst(ast[0]);
+  }
+
+  return new SimpleSelectorSequence(ast.map(createSimpleSelectorFromAst));
+}
+
+function createSelectorFromAst(ast) {
+  if (ast.length === 0) {
+    return new InvalidSelector(new Error('Empty selector.'));
+  }
+  if (ast.length === 1) {
+    return createSimpleSelectorSequenceFromAst(ast[0][0]);
+  }
+  var simpleSelectorSequences = [];
+  for (var i = 0; i < ast.length; i += 1) {
+    var simpleSelectorSequence = createSimpleSelectorSequenceFromAst(ast[i][0]);
+    var combinator = ast[i][1];
+    if (combinator) {
+      simpleSelectorSequence.combinator = combinator;
+    }
+    simpleSelectorSequences.push(simpleSelectorSequence);
+  }
+  return new Selector(simpleSelectorSequences);
+}
+
+function createSelector(sel) {
+  try {
+    var parsedSelector = parseSelector(sel);
+    if (!parsedSelector) {
+      return new InvalidSelector(new Error('Empty selector'));
+    }
+    return createSelectorFromAst(parsedSelector.value);
+  } catch (e) {
+    return new InvalidSelector(e);
+  }
+}
+
+function fromAstNodes(astRules) {
+  if ( astRules === void 0 ) astRules = [];
+
+  var beforeLoadStyle = getBeforeLoadStyle();
+
+  return astRules.map(function (rule) {
+    var declarations = rule.declarations
+      .filter(isDeclaration)
+      .map(createDeclaration(beforeLoadStyle));
+    var selectors = rule.selectors.map(createSelector);
+    return new RuleSet(selectors, declarations, rule.hash);
+  });
+}
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var componentName = ['%c[native]%c', 'color: red', 'color: auto'];
+
+if (typeof global.Symbol !== 'function') {
+  global.Symbol = function (str) { return str; };
+}
+
+/**
+ * UI Operations
+ */
+var NODE_OPERATION_TYPES = {
+  createNode: Symbol('createNode'),
+  updateNode: Symbol('updateNode'),
+  deleteNode: Symbol('deleteNode'),
+};
+var __batchIdle = true;
+var __batchNodes = [];
+
+/**
+ * Convert an ordered node array into multiple fragments
+ */
+function chunkNodes(batchNodes) {
+  var result = [];
+  for (var i = 0; i < batchNodes.length; i += 1) {
+    var chunk = batchNodes[i];
+    var type = chunk.type;
+    var nodes = chunk.nodes;
+    var _chunk = result[result.length - 1];
+    if (!_chunk || _chunk.type !== type) {
+      result.push({
+        type: type,
+        nodes: nodes,
+      });
+    } else {
+      _chunk.nodes = _chunk.nodes.concat(nodes);
+    }
+  }
+  return result;
+}
+
+/**
+ * Initial CSS Map;
+ */
+var __cssMap;
+
+function startBatch() {
+  if (__batchIdle) {
+    UIManagerModule.startBatch();
+  }
+}
+
+function endBatch(app) {
+  if (!__batchIdle) {
+    return;
+  }
+  __batchIdle = false;
+  var $nextTick = app.$nextTick;
+  var rootViewId = app.$options.rootViewId;
+
+  $nextTick(function () {
+    var chunks = chunkNodes(__batchNodes);
+    chunks.forEach(function (chunk) {
+      switch (chunk.type) {
+        case NODE_OPERATION_TYPES.createNode:
+          trace.apply(void 0, componentName.concat( ['createNode'], [chunk.nodes] ));
+          UIManagerModule.createNode(rootViewId, chunk.nodes);
+          break;
+        case NODE_OPERATION_TYPES.updateNode:
+          trace.apply(void 0, componentName.concat( ['updateNode'], [chunk.nodes] ));
+          // FIXME: iOS should be able to update multiple nodes at once.
+          if (__PLATFORM__ === 'ios' || Native.Platform === 'ios') {
+            chunk.nodes.forEach(function (node) { return (
+              UIManagerModule.updateNode(rootViewId, [node])
+            ); });
+          } else {
+            UIManagerModule.updateNode(rootViewId, chunk.nodes);
+          }
+          break;
+        case NODE_OPERATION_TYPES.deleteNode:
+          trace.apply(void 0, componentName.concat( ['deleteNode'], [chunk.nodes] ));
+          // FIXME: iOS should be able to delete mutiple nodes at once.
+          if (__PLATFORM__ === 'ios' || Native.Platform === 'ios') {
+            chunk.nodes.forEach(function (node) { return (
+              UIManagerModule.deleteNode(rootViewId, [node])
+            ); });
+          } else {
+            UIManagerModule.deleteNode(rootViewId, chunk.nodes);
+          }
+          break;
+          // pass
+      }
+    });
+    UIManagerModule.endBatch();
+    __batchIdle = true;
+    __batchNodes = [];
+  });
+}
+
+function getCssMap() {
+  /**
+   * To support dynamic import, __cssMap can be loaded from different js file.
+   * __cssMap should be create/append if global[GLOBAL_STYLE_NAME] exists;
+   */
+  if (!__cssMap || global[GLOBAL_STYLE_NAME]) {
+    /**
+     *  Here is a secret startup option: beforeStyleLoadHook.
+     *  Usage for process the styles while styles loading.
+     */
+    var cssRules = fromAstNodes(global[GLOBAL_STYLE_NAME]);
+    if (__cssMap) {
+      __cssMap.append(cssRules);
+    } else {
+      __cssMap = new SelectorsMap(cssRules);
+    }
+    global[GLOBAL_STYLE_NAME] = undefined;
+  }
+
+  if (global[GLOBAL_DISPOSE_STYLE_NAME]) {
+    global[GLOBAL_DISPOSE_STYLE_NAME].forEach(function (id) {
+      __cssMap.delete(id);
+    });
+    global[GLOBAL_DISPOSE_STYLE_NAME] = undefined;
+  }
+
+  return __cssMap;
+}
+
+/**
+ * Translate to native props from attributes and meta
+ */
+function getNativeProps(node) {
+  // Initial the props with empty
+  var props = {};
+  // Get the default native props from meta
+  if (node.meta.component.defaultNativeProps) {
+    Object.keys(node.meta.component.defaultNativeProps).forEach(function (key) {
+      // Skip the defined attribute
+      if (node.getAttribute(key) !== undefined) {
+        return;
+      }
+      // Get the default props
+      var defaultNativeProps = node.meta.component.defaultNativeProps[key];
+      if (isFunction(defaultNativeProps)) {
+        props[key] = defaultNativeProps(node);
+      } else {
+        props[key] = defaultNativeProps;
+      }
+    });
+  }
+  // Get the proceed props from node attributes
+  Object.keys(node.attributes).forEach(function (key) {
+    var obj;
+
+    var value = node.getAttribute(key);
+    // No defined map
+    if (!node.meta.component.attributeMaps || !node.meta.component.attributeMaps[key]) {
+      props[key] = value;
+      return;
+    }
+    // Defined mapped props.
+    var map = node.meta.component.attributeMaps[key];
+    if (typeof map === 'string') {
+      props[map] = value;
+      return;
+    }
+    // Define mapped props is a function.
+    if (isFunction(map)) {
+      props[key] = map(value);
+      return;
+    }
+    // Defined object map with value
+    var propsKey = map.name;
+    var propsValue = map.propsValue;
+    var jointKey = map.jointKey;
+    if (isFunction(propsValue)) {
+      value = propsValue(value);
+    }
+    // if jointKey set, multi attributes will be assigned to the same jointKey object.
+    if (jointKey) {
+      props[jointKey] = props[jointKey] || {};
+      Object.assign(props[jointKey], ( obj = {}, obj[propsKey] = value, obj ));
+    } else {
+      props[propsKey] = value;
+    }
+  });
+
+  // Get the force props from meta, it's can't be override
+  if (node.meta.component.nativeProps) {
+    Object.assign(props, node.meta.component.nativeProps);
+  }
+
+  // FIXME: Workaround for Image src props, should unify to use src.
+  if (node.tagName === 'img' && (__PLATFORM__ === 'ios' || Native.Platform === 'ios')) {
+    props.source = [{
+      uri: props.src,
+    }];
+    props.src = undefined;
+  }
+
+  return props;
+}
+
+/**
+ * parse TextInput component on special condition
+ * @param targetNode
+ * @param style
+ */
+function parseTextInputComponent(targetNode, style) {
+  if (targetNode.meta.component.name === 'TextInput') {
+    // Change textAlign to right if display direction is right to left.
+    if (isRTL()) {
+      if (!style.textAlign) {
+        style.textAlign = 'right';
+      }
+    }
+  }
+}
+
+/**
+ * parse view component on special condition
+ * @param targetNode
+ * @param nativeNode
+ * @param style
+ */
+function parseViewComponent(targetNode, nativeNode, style) {
+  if (targetNode.meta.component.name === 'View') {
+    // Change View to ScrollView when meet overflow=scroll style.
+    if (style.overflowX === 'scroll' && style.overflowY === 'scroll') {
+      warn$3('overflow-x and overflow-y for View can not work together');
+    }
+    if (style.overflowY === 'scroll') {
+      nativeNode.name = 'ScrollView';
+    } else if (style.overflowX === 'scroll') {
+      nativeNode.name = 'ScrollView';
+      // Necessary for horizontal scrolling
+      nativeNode.props.horizontal = true;
+      // Change flexDirection to row-reverse if display direction is right to left.
+      style.flexDirection = isRTL() ? 'row-reverse' : 'row';
+    }
+    // Change the ScrollView child collapsable attribute
+    if (nativeNode.name === 'ScrollView') {
+      if (targetNode.childNodes.length !== 1) {
+        warn$3('Only one child node is acceptable for View with overflow');
+      }
+      if (targetNode.childNodes.length) {
+        targetNode.childNodes[0].setStyle('collapsable', false);
+      }
+    }
+    // TODO backgroundImage would use local path if webpack file-loader active, which needs native support
+    if (style.backgroundImage) {
+      style.backgroundImage = convertImageLocalPath(style.backgroundImage);
+    }
+  }
+}
+
+/**
+ * Get target node attributes, use to chrome devTool tag attribute show while debugging
+ * @param targetNode
+ * @returns attributes|{}
+ */
+function getTargetNodeAttributes(targetNode) {
+  try {
+    var targetNodeAttributes = JSON.parse(JSON.stringify(targetNode.attributes));
+    var classInfo = Array.from(targetNode.classList || []).join(' ');
+    var attributes = Object.assign({}, {id: targetNode.id,
+      class: classInfo},
+      targetNodeAttributes);
+    // delete special __bind__event attribute, which is used in C DOM
+    Object.keys(attributes).forEach(function (key) {
+      if (key.indexOf('__bind__') === 0 && typeof attributes[key] === 'boolean') {
+        delete attributes[key];
+      }
+    });
+    delete attributes.text;
+    delete attributes.value;
+    return attributes;
+  } catch (e) {
+    warn$3('getTargetNodeAttributes error:', e);
+    return {};
+  }
+}
+
+/**
+ * Render Element to native
+ */
+function renderToNative(rootViewId, targetNode) {
+  if (targetNode.meta.skipAddToDom) {
+    return null;
+  }
+  if (!targetNode.meta.component) {
+    throw new Error(("Specific tag is not supported yet: " + (targetNode.tagName)));
+  }
+  var style = {};
+  // Apply styles when the targetNode attach to document at first time.
+  if (targetNode.meta.component.defaultNativeStyle) {
+    style = Object.assign({}, targetNode.meta.component.defaultNativeStyle);
+  }
+  // Apply styles from CSS
+  var matchedSelectors = getCssMap().query(targetNode);
+  matchedSelectors.selectors.forEach(function (matchedSelector) {
+    matchedSelector.ruleSet.declarations.forEach(function (cssStyle) {
+      style[cssStyle.property] = cssStyle.value;
+    });
+  });
+  // Apply style from style attribute.
+  style = Object.assign({}, style, targetNode.style);
+  // Convert to real native event
+  var events = {};
+  // FIXME: Bad accessing the private property.
+  if (targetNode._emitter) {
+    var vueEventNames = Object.keys(targetNode._emitter.getEventListeners());
+    var ref = targetNode.meta.component;
+    var eventNamesMap = ref.eventNamesMap;
+    if (eventNamesMap) {
+      vueEventNames.forEach(function (vueEventName) {
+        var nativeEventName = eventNamesMap[vueEventName];
+        if (nativeEventName) {
+          events[nativeEventName] = true;
+          events[("__bind__" + nativeEventName)] = true;
+        } else {
+          var name = "on" + (capitalizeFirstLetter(vueEventName));
+          events[name] = true;
+          events[("__bind__" + name)] = true;
+        }
+      });
+    } else {
+      vueEventNames.forEach(function (vueEventName) {
+        var name = "on" + (capitalizeFirstLetter(vueEventName));
+        events[name] = true;
+        events[("__bind__" + name)] = true;
+      });
+    }
+  }
+  // Translate to native node
+  var nativeNode = {
+    id: targetNode.nodeId,
+    pId: (targetNode.parentNode && targetNode.parentNode.nodeId) || rootViewId,
+    index: targetNode.index,
+    name: targetNode.meta.component.name,
+    props: Object.assign({}, getNativeProps(targetNode),
+      events,
+      {style: style}),
+  };
+  // Add nativeNode attributes info for Element debugging
+  if (process.env.NODE_ENV !== 'production') {
+    nativeNode.tagName = targetNode.tagName;
+    nativeNode.props.attributes = getTargetNodeAttributes(targetNode);
+  }
+  parseViewComponent(targetNode, nativeNode, style);
+  parseTextInputComponent(targetNode, style);
+  return nativeNode;
+}
+
+/**
+ * Render Element with children to native
+ * @param {number} rootViewId - root view id
+ * @param {ViewNode} node - target node to be traversed
+ * @param {Function} [callback] - function called on each traversing process
+ * @returns {[]}
+ */
+function renderToNativeWithChildren(rootViewId, node, callback) {
+  var nativeLanguages = [];
+  node.traverseChildren(function (targetNode) {
+    var nativeNode = renderToNative(rootViewId, targetNode);
+    if (nativeNode) {
+      nativeLanguages.push(nativeNode);
+    }
+    if (typeof callback === 'function') {
+      callback(targetNode);
+    }
+  });
+  return nativeLanguages;
+}
+
+function isLayout(node, rootView) {
+  // First time init rootViewId always be 3.
+  if (node.nodeId === 3) {
+    return true;
+  }
+  // Check the id is specific for rootView.
+  if (process.env.NODE_ENV !== 'production') {
+    if (!rootView) {
+      warn$3('rootView option is necessary for new HippyVue()');
+    }
+    if (rootView.charAt(0) !== '#') {
+      warn$3('rootView option must be unique ID selector start with # ');
+    }
+  }
+  return node.id === rootView.slice(1 - rootView.length);
+}
+
+function insertChild(parentNode, childNode, atIndex) {
+  if ( atIndex === void 0 ) atIndex = -1;
+
+  if (!parentNode || !childNode) {
+    return;
+  }
+  if (parentNode.meta && isFunction(parentNode.meta.insertChild)) {
+    parentNode.meta.insertChild(parentNode, childNode, atIndex);
+  }
+  if (childNode.meta.skipAddToDom) {
+    return;
+  }
+  var app = getApp();
+  if (!app) {
+    return;
+  }
+  var app_$options = app.$options;
+  var rootViewId = app_$options.rootViewId;
+  var rootView = app_$options.rootView;
+  // Render the root node
+  if (isLayout(parentNode, rootView) && !parentNode.isMounted) {
+    // Start real native work.
+    var translated = renderToNativeWithChildren(rootViewId, parentNode, function (node) {
+      if (!node.isMounted) {
+        node.isMounted = true;
+      }
+      preCacheNode(node, node.nodeId);
+    });
+    startBatch();
+    __batchNodes.push({
+      type: NODE_OPERATION_TYPES.createNode,
+      nodes: translated,
+    });
+    endBatch(app);
+  // Render others child nodes.
+  } else if (parentNode.isMounted && !childNode.isMounted) {
+    var translated$1 = renderToNativeWithChildren(rootViewId, childNode, function (node) {
+      if (!node.isMounted) {
+        node.isMounted = true;
+      }
+      preCacheNode(node, node.nodeId);
+    });
+    startBatch();
+    __batchNodes.push({
+      type: NODE_OPERATION_TYPES.createNode,
+      nodes: translated$1,
+    });
+    endBatch(app);
+  }
+}
+
+function removeChild(parentNode, childNode, index) {
+  if (parentNode && parentNode.meta && isFunction(parentNode.meta.removeChild)) {
+    parentNode.meta.removeChild(parentNode, childNode);
+  }
+  if (!childNode || childNode.meta.skipAddToDom) {
+    return;
+  }
+  childNode.isMounted = false;
+  childNode.index = index;
+  var app = getApp();
+  var rootViewId = app.$options.rootViewId;
+  var deleteNodeIds = [{
+    id: childNode.nodeId,
+    pId: childNode.parentNode ? childNode.parentNode.nodeId : rootViewId,
+    index: childNode.index,
+  }];
+  startBatch();
+  __batchNodes.push({
+    type: NODE_OPERATION_TYPES.deleteNode,
+    nodes: deleteNodeIds,
+  });
+  endBatch(app);
+}
+
+function updateChild(parentNode) {
+  if (!parentNode.isMounted) {
+    return;
+  }
+  var app = getApp();
+  var rootViewId = app.$options.rootViewId;
+  var translated = renderToNative(rootViewId, parentNode);
+  if (translated) {
+    startBatch();
+    __batchNodes.push({
+      type: NODE_OPERATION_TYPES.updateNode,
+      nodes: [translated],
+    });
+    endBatch(app);
+  }
+}
+
+function updateWithChildren(parentNode) {
+  if (!parentNode.isMounted) {
+    return;
+  }
+  var app = getApp();
+  var rootViewId = app.$options.rootViewId;
+  var translated = renderToNativeWithChildren(rootViewId, parentNode);
+  startBatch();
+  __batchNodes.push({
+    type: NODE_OPERATION_TYPES.updateNode,
+    nodes: translated,
+  });
+  endBatch(app);
+}
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var backPressSubscriptions = new Set();
+var app;
+var hasInitialized = false;
+/**
+ * Android hardware back button event listener.
+ */
+var realBackAndroid = {
+  exitApp: function exitApp() {
+    Native.callNative('DeviceEventModule', 'invokeDefaultBackPressHandler');
+  },
+  /**
+   * addBackPressListener
+   * @param handler
+   * @returns {{remove(): void}}
+   */
+  addListener: function addListener(handler) {
+    if (!hasInitialized) {
+      hasInitialized = true;
+      realBackAndroid.initEventListener();
+    }
+    Native.callNative('DeviceEventModule', 'setListenBackPress', true);
+    backPressSubscriptions.add(handler);
+    return {
+      remove: function remove() {
+        realBackAndroid.removeListener(handler);
+      },
+    };
+  },
+
+  /**
+   * removeBackPressListener
+   * @param handler
+   */
+  removeListener: function removeListener(handler) {
+    backPressSubscriptions.delete(handler);
+    if (backPressSubscriptions.size === 0) {
+      Native.callNative('DeviceEventModule', 'setListenBackPress', false);
+    }
+  },
+
+  initEventListener: function initEventListener() {
+    if (!app) {
+      app = getApp();
+    }
+    app.$on('hardwareBackPress', function () {
+      var invokeDefault = true;
+      var subscriptions = Array.from(backPressSubscriptions).reverse();
+      subscriptions.every(function (subscription) {
+        if (typeof subscription === 'function' && subscription()) {
+          invokeDefault = false;
+          return false;
+        }
+        return true;
+      });
+      if (invokeDefault) {
+        realBackAndroid.exitApp();
+      }
+    });
+  },
+};
+
+/**
+ * Fake BackAndroid for iOS
+ */
+var fakeBackAndroid = {
+  exitApp: function exitApp() {
+    // noop
+  },
+  addListener: function addListener() {
+    return {
+      remove: function remove() {
+        // noop
+      },
+    };
+  },
+  removeListener: function removeListener() {
+    // noop
+  },
+  initEventListener: function initEventListener() {
+    // noop
+  },
+};
+
+var BackAndroid = (function () {
+  if (Hippy.device.platform.OS === 'android') {
+    return realBackAndroid;
+  }
+  return fakeBackAndroid;
+})();
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+var app$1;
+
+var DEVICE_CONNECTIVITY_EVENT = 'networkStatusDidChange';
+var subscriptions = new Map();
+
+var NetInfoRevoker = function NetInfoRevoker(eventName, listener) {
+  this.eventName = eventName;
+  this.listener = listener;
+};
+NetInfoRevoker.prototype.remove = function remove () {
+  if (!this.eventName || !this.listener) {
+    return;
+  }
+  removeEventListener(this.eventName, this.listener);
+  this.listener = undefined;
+};
+
+/**
+ * Add a network status event listener
+ *
+ * @param {string} eventName - Event name will listen for NetInfo module,
+ *                             use `change` for listen network change.
+ * @param {function} listener - Event status event callback
+ * @returns {object} NetInfoRevoker - The event revoker for destroy the network info event listener.
+ */
+function addEventListener(eventName, listener) {
+  if (typeof listener !== 'function') {
+    warn$3('NetInfo listener is not a function');
+    return;
+  }
+  var event = eventName;
+  if (event === 'change') {
+    event = DEVICE_CONNECTIVITY_EVENT;
+  }
+  if (subscriptions.size === 0) {
+    Native.callNative('NetInfo', 'addListener', event);
+  }
+  if (!app$1) {
+    app$1 = getApp();
+  }
+  app$1.$on(
+    event,
+    listener
+  );
+  subscriptions.set(listener, listener);
+  return new NetInfoRevoker(event, listener);
+}
+
+/**
+ * Remove network status event event listener
+ *
+ * @param {string} eventName - Event name will listen for NetInfo module,
+ *                             use `change` for listen network change.
+ * @param {NetInfoRevoker} [listener] - The specific event listener will remove.
+ */
+function removeEventListener(eventName, listener) {
+  if (listener instanceof NetInfoRevoker) {
+    listener.remove();
+    return;
+  }
+  var event = eventName;
+  if (eventName === 'change') {
+    event = DEVICE_CONNECTIVITY_EVENT;
+  }
+  if (subscriptions.size <= 1) {
+    Native.callNative('NetInfo', 'removeListener', event);
+  }
+  var handler = subscriptions.get(listener);
+  if (!handler) {
+    return;
+  }
+  if (!app$1) {
+    app$1 = getApp();
+  }
+  app$1.$off(
+    event,
+    handler
+  );
+  subscriptions.delete(listener);
+}
+
+/**
+ * Get the current network status
+ */
+function fetch() {
+  return Native
+    .callNativeWithPromise('NetInfo', 'getCurrentConnectivity')
+    .then(function (resp) { return resp.network_info; });
+}
+
+var NetInfo = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  addEventListener: addEventListener,
+  removeEventListener: removeEventListener,
+  fetch: fetch,
+  NetInfoRevoker: NetInfoRevoker
+});
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var on$1 = Hippy.on;
+var off = Hippy.off;
+var emit = Hippy.emit;
+var Hippy_bridge = Hippy.bridge;
+var callNative = Hippy_bridge.callNative;
+var callNativeWithPromise = Hippy_bridge.callNativeWithPromise;
+var callNativeWithCallbackId = Hippy_bridge.callNativeWithCallbackId;
+var Hippy_device = Hippy.device;
+var Hippy_device_platform = Hippy_device.platform;
+var Platform = Hippy_device_platform.OS;
+var Localization = Hippy_device_platform.Localization; if ( Localization === void 0 ) Localization = {};
+var PixelRatio = Hippy_device.screen.scale;
+var Dimensions = Hippy.device;
+var UIManagerModule = Hippy.document;
+var HippyRegister = Hippy.register;
+
+var CACHE = {};
+
+var measureInWindowByMethod = function measureInWindowByMethod(el, method) {
+  var this$1 = this;
+
+  var empty = {
+    top: -1,
+    left: -1,
+    bottom: -1,
+    right: -1,
+    width: -1,
+    height: -1,
+  };
+  if (!el.isMounted || !el.nodeId) {
+    return Promise.resolve(empty);
+  }
+  var nodeId = el.nodeId;
+  return new Promise(function (resolve) { return callNative.call(this$1, 'UIManagerModule', method, nodeId, function (pos) {
+    // Android error handler.
+    if (!pos || pos === 'this view is null' || typeof nodeId === 'undefined') {
+      return resolve(empty);
+    }
+    return resolve({
+      top: pos.y,
+      left: pos.x,
+      bottom: pos.y + pos.height,
+      right: pos.x + pos.width,
+      width: pos.width,
+      height: pos.height,
+    });
+  }); });
+};
+
+/**
+ * getElemCss
+ * @param {ElementNode} element
+ * @returns {{}}
+ */
+var getElemCss = function getElemCss(element) {
+  var style = Object.create(null);
+  try {
+    getCssMap().query(element).selectors.forEach(function (matchedSelector) {
+      matchedSelector.ruleSet.declarations.forEach(function (cssStyle) {
+        style[cssStyle.property] = cssStyle.value;
+      });
+    });
+  } catch (err) {
+    console.error('getDomCss Error:', err);
+  }
+  return style;
+};
+
+/**
+ * Native communication module
+ */
+var Native = {
+  /**
+   * Class native methods
+   */
+  callNative: callNative,
+
+  /**
+   * Call native methods with a promise response.
+   */
+  callNativeWithPromise: callNativeWithPromise,
+
+  /**
+   * Call native with callId returns
+   */
+  callNativeWithCallbackId: callNativeWithCallbackId,
+
+  /**
+   * Draw UI with native language.
+   */
+  UIManagerModule: UIManagerModule,
+
+  /**
+   * Global device event listener
+   */
+  on: on$1,
+  off: off,
+  emit: emit,
+
+  /**
+   * Get the device pixel ratio
+   */
+  PixelRatio: PixelRatio,
+
+  /**
+   * Get the running operating system.
+   */
+  Platform: Platform,
+
+  /**
+   * Get the localization of country, language and direction
+   */
+  Localization: Localization,
+
+  /**
+   * Hippy-Vue version
+   */
+  version: HIPPY_VUE_VERSION,
+
+  /**
+   * Cookie Module
+   */
+  Cookie: {
+    /**
+     * Get all of cookies by string
+     * @param {string} url - Get the cookies by specific url.
+     * @return {Promise<string>} - Cookie string, like `name=someone;gender=female`.
+     */
+    getAll: function getAll(url) {
+      if (!url) {
+        throw new TypeError('Vue.Native.Cookie.getAll() must have url argument');
+      }
+      return callNativeWithPromise.call(this, 'network', 'getCookie', url);
+    },
+    /**
+     * Set cookie key and value
+     * @param {string} url - Set the cookie to specific url.
+     * @param {string} keyValue - Full of key values, like `name=someone;gender=female`.
+     * @param {Date} expireDate - Specific date of expiration.
+     */
+    set: function set(url, keyValue, expireDate) {
+      if (!url) {
+        throw new TypeError('Vue.Native.Cookie.getAll() must have url argument');
+      }
+      if (typeof keyValue !== 'string') {
+        throw new TypeError('Vue.Native.Cookie.getAll() only receive string type of keyValue');
+      }
+      var expireStr = '';
+      if (expireDate) {
+        if (expireDate instanceof Date) {
+          expireStr = expireDate.toUTCString();
+        } else {
+          throw new TypeError('Vue.Native.Cookie.getAll() only receive Date type of expires');
+        }
+      }
+      callNative.call(this, 'network', 'setCookie', url, keyValue, expireStr);
+    },
+  },
+
+  /**
+   * Clipboard Module
+   */
+  Clipboard: {
+    getString: function getString() {
+      return callNativeWithPromise.call(this, 'ClipboardModule', 'getString');
+    },
+    setString: function setString(content) {
+      callNative.call(this, 'ClipboardModule', 'setString', content);
+    },
+  },
+
+  /**
+   * Determine the device is iPhone X
+   */
+  get isIPhoneX() {
+    if (!isDef(CACHE.isIPhoneX)) {
+      // Assume false in most cases.
+      var isIPhoneX = false;
+      if (Native.Platform === 'ios') {
+        // iOS12 - iPhone11: 48 Phone12/12 pro/12 pro max: 47 other: 44
+        isIPhoneX = Native.Dimensions.screen.statusBarHeight !== 20;
+      }
+      CACHE.isIPhoneX = isIPhoneX;
+    }
+    return CACHE.isIPhoneX;
+  },
+
+  /**
+   * Determine the screen is vertical orientation.
+   * Should always retrieve from scratch.
+   */
+  get screenIsVertical() {
+    return Native.Dimensions.window.width < Native.Dimensions.window.height;
+  },
+
+  /**
+   * Get the device information
+   */
+  get Device() {
+    if (!isDef(CACHE.Device)) {
+      if (Platform === 'ios') {
+        if (global.__HIPPYNATIVEGLOBAL__ && global.__HIPPYNATIVEGLOBAL__.Device) {
+          CACHE.Device = global.__HIPPYNATIVEGLOBAL__.Device;
+        } else {
+          CACHE.Device = 'iPhone';
+        }
+      } else if (Platform === 'android') {
+        // TODO: Need android native fill the information
+        CACHE.Device = 'Android device';
+      } else {
+        CACHE.Device = 'Unknown device';
+      }
+    }
+    return CACHE.Device;
+  },
+
+  /**
+   * Get the OS version
+   * TODO: the API is iOS only so far.
+   */
+  get OSVersion() {
+    if (Platform !== 'ios') {
+      warn$3('Vue.Native.OSVersion is available in iOS only');
+      return null;
+    }
+    if (!global.__HIPPYNATIVEGLOBAL__ || !global.__HIPPYNATIVEGLOBAL__.OSVersion) {
+      warn$3('Vue.Native.OSVersion is only available for iOS SDK > 0.2.0');
+      return null;
+    }
+    return global.__HIPPYNATIVEGLOBAL__.OSVersion;
+  },
+
+  /**
+   * Get the SDK version
+   * TODO: the API is iOS only so far.
+   */
+  get SDKVersion() {
+    if (Platform !== 'ios') {
+      warn$3('Vue.Native.SDKVersion is available in iOS only');
+      return null;
+    }
+    if (!global.__HIPPYNATIVEGLOBAL__ || !global.__HIPPYNATIVEGLOBAL__.OSVersion) {
+      warn$3('Vue.Native.SDKVersion is only available for iOS SDK > 0.2.0');
+      return null;
+    }
+    return global.__HIPPYNATIVEGLOBAL__.SDKVersion;
+  },
+
+  /**
+   * Get the API version
+   * TODO: the API is Android only so far.
+   */
+  get APILevel() {
+    if (Platform !== 'android') {
+      warn$3('Vue.Native.APIVersion is available in Android only');
+      return null;
+    }
+    if (!global.__HIPPYNATIVEGLOBAL__ || !global.__HIPPYNATIVEGLOBAL__.Platform.APILevel) {
+      warn$3('Vue.Native.APILevel needs higher Android SDK version to retrieve');
+      return null;
+    }
+    return global.__HIPPYNATIVEGLOBAL__.Platform.APILevel;
+  },
+
+  /**
+   * Get the screen or view size.
+   */
+  get Dimensions() {
+    var screen = Dimensions.screen;
+    // Convert statusBarHeight to dp unit for android platform
+    // Here's a base issue: statusBarHeight for iOS is dp, but for statusBarHeight is pixel.
+    // So make them be same to hippy-vue.
+    var statusBarHeight = screen.statusBarHeight;
+    if (Native.Platform === 'android') {
+      statusBarHeight /= Native.PixelRatio;
+    }
+    return {
+      window: Dimensions.window,
+      screen: Object.assign({}, screen,
+        {statusBarHeight: statusBarHeight}),
+    };
+  },
+
+  /**
+   * Get the one pixel size of device
+   */
+  get OnePixel() {
+    if (!isDef(CACHE.OnePixel)) {
+      var ratio = Native.PixelRatio;
+      var onePixel = Math.round(0.4 * ratio) / ratio;
+      if (!onePixel) { // Assume 0 is false
+        onePixel = 1 / ratio;
+      }
+      CACHE.OnePixel = onePixel;
+    }
+    return CACHE.OnePixel;
+  },
+
+  /**
+   * Call native UI methods.
+   */
+  callUIFunction: function callUIFunction() {
+    var args = [], len = arguments.length;
+    while ( len-- ) args[ len ] = arguments[ len ];
+
+    var el = args[0];
+    var funcName = args[1];
+    var options = args.slice(2);
+    var nodeId = el.nodeId;
+    var params = options[0]; if ( params === void 0 ) params = [];
+    var callback = options[1];
+    if (typeof params === 'function') {
+      callback = params;
+      params = [];
+    }
+    trace('callUIFunction', { nodeId: nodeId, funcName: funcName, params: params });
+    if (Native.Platform === 'android') {
+      if (isFunction(callback)) {
+        callNative('UIManagerModule', 'callUIFunction', [nodeId, funcName, params], callback);
+      } else {
+        callNative('UIManagerModule', 'callUIFunction', [nodeId, funcName, params]);
+      }
+    } else if (Native.Platform === 'ios' && el.meta.component.name) {
+      var ref = el.meta.component;
+      var componentName = ref.name;
+      // FIXME: iOS callNative method need the real component name,
+      //        but there's no a module named View in __GLOBAL__.NativeModules.
+      //        Because only ScrollView use the method so far, so just a workaround here.
+      if (componentName === 'View') {
+        componentName = 'ScrollView';
+      }
+      if (isFunction(callback) && Array.isArray(params)) {
+        params.push(callback);
+      }
+      callNative('UIManagerModule', 'callUIFunction', [componentName, nodeId, funcName, params]);
+    }
+  },
+
+  /**
+   * Measure the component size and position.
+   */
+  measureInWindow: function measureInWindow(el) {
+    return measureInWindowByMethod(el, 'measureInWindow');
+  },
+
+  /**
+   * Measure the component size and position.
+   */
+  measureInAppWindow: function measureInAppWindow(el) {
+    if (Native.Platform === 'android') {
+      return measureInWindowByMethod(el, 'measureInWindow');
+    }
+    return measureInWindowByMethod(el, 'measureInAppWindow');
+  },
+
+  /**
+   * parse the color to int32Color which native can understand.
+   * @param { String | Number } color
+   * @param { {platform: "ios" | "android"} } options
+   * @returns { Number } int32Color
+   */
+  parseColor: function parseColor(color, options) {
+    if ( options === void 0 ) options = { platform: Native.Platform };
+
+    var cache = CACHE.COLOR_PARSER || (CACHE.COLOR_PARSER = Object.create(null));
+    if (!cache[color]) {
+      // cache the calculation result
+      cache[color] = translateColor(color, options);
+    }
+    return cache[color];
+  },
+
+  /**
+   * Key-Value storage system
+   */
+  AsyncStorage: global.localStorage,
+  /**
+   * Android hardware back button event listener.
+   */
+  BackAndroid: BackAndroid,
+  /**
+   * operations for img
+   */
+  ImageLoader: {
+    /**
+     * Get the image size before rendering.
+     *
+     * @param {string} url - Get image url.
+     */
+    getSize: function getSize(url) {
+      return callNativeWithPromise.call(this, 'ImageLoaderModule', 'getSize', url);
+    },
+
+    /**
+     * Prefetch image, to make rendering in next more faster.
+     *
+     * @param {string} url - Prefetch image url.
+     */
+    prefetch: function prefetch(url) {
+      callNative.call(this, 'ImageLoaderModule', 'prefetch', url);
+    },
+  },
+  /**
+   * Network operations
+   */
+  NetInfo: NetInfo,
+  /**
+   * console log to native
+   */
+  ConsoleModule: global.ConsoleModule || global.console,
+  getElemCss: getElemCss,
+};
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function mapEvent() {
+  var args = [], len = arguments.length;
+  while ( len-- ) args[ len ] = arguments[ len ];
+
+  var map = {};
+  if (Array.isArray(args[0])) {
+    args[0].forEach(function (ref) {
+      var vueEventName = ref[0];
+      var nativeEventName = ref[1];
+
+      map[map[vueEventName] = nativeEventName] = vueEventName;
+    });
+  } else {
+    var vueEventName = args[0];
+    var nativeEventName = args[1];
+    map[map[vueEventName] = nativeEventName] = vueEventName;
+  }
+  return map;
+}
+
+var INPUT_VALUE_MAP = {
+  number: 'numeric',
+  text: 'default',
+  search: 'web-search',
+};
+
+var accessibilityAttrMaps = {
+  role: 'accessibilityRole',
+  'aria-label': 'accessibilityLabel',
+  'aria-disabled': {
+    jointKey: 'accessibilityState',
+    name: 'disabled',
+  },
+  'aria-selected': {
+    jointKey: 'accessibilityState',
+    name: 'selected',
+  },
+  'aria-checked': {
+    jointKey: 'accessibilityState',
+    name: 'checked',
+  },
+  'aria-busy': {
+    jointKey: 'accessibilityState',
+    name: 'busy',
+  },
+  'aria-expanded': {
+    jointKey: 'accessibilityState',
+    name: 'expanded',
+  },
+  'aria-valuemin': {
+    jointKey: 'accessibilityValue',
+    name: 'min',
+  },
+  'aria-valuemax': {
+    jointKey: 'accessibilityValue',
+    name: 'max',
+  },
+  'aria-valuenow': {
+    jointKey: 'accessibilityValue',
+    name: 'now',
+  },
+  'aria-valuetext': {
+    jointKey: 'accessibilityValue',
+    name: 'text',
+  },
+};
+
+// View area
+var div = {
+  symbol: View,
+  component: {
+    name: NATIVE_COMPONENT_NAME_MAP[View],
+    eventNamesMap: mapEvent([
+      ['touchStart', 'onTouchDown'], // TODO: Back compatible, will remove soon
+      ['touchstart', 'onTouchDown'],
+      ['touchmove', 'onTouchMove'],
+      ['touchend', 'onTouchEnd'],
+      ['touchcancel', 'onTouchCancel'] ]),
+    attributeMaps: Object.assign({}, accessibilityAttrMaps),
+    processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
+      switch (nativeEventName) {
+        case 'onScroll':
+        case 'onScrollBeginDrag':
+        case 'onScrollEndDrag':
+          event.offsetX = nativeEventParams.contentOffset && nativeEventParams.contentOffset.x;
+          event.offsetY = nativeEventParams.contentOffset && nativeEventParams.contentOffset.y;
+          break;
+        case 'onTouchDown':
+        case 'onTouchMove':
+        case 'onTouchEnd':
+        case 'onTouchCancel':
+          event.touches = {
+            0: {
+              clientX: nativeEventParams.page_x,
+              clientY: nativeEventParams.page_y,
+            },
+            length: 1,
+          };
+          break;
+        case 'onFocus':
+          event.isFocused = nativeEventName.focus;
+          break;
+      }
+      return event;
+    },
+  },
+};
+
+var button = {
+  symbol: View,
+  component: Object.assign({}, div.component,
+    {name: NATIVE_COMPONENT_NAME_MAP[View],
+    defaultNativeStyle: {}}),
+};
+
+var form = {
+  symbol: View,
+  component: {
+    name: NATIVE_COMPONENT_NAME_MAP[View],
+  },
+};
+
+// Image area
+var img = {
+  symbol: Image,
+  component: Object.assign({}, div.component,
+    {name: NATIVE_COMPONENT_NAME_MAP[Image],
+    defaultNativeStyle: {
+      backgroundColor: 0,
+    },
+    eventNamesMap: mapEvent([
+      ['saveResult', 'onSaveResult'] ]),
+    attributeMaps: Object.assign({}, {placeholder: {
+        name: 'defaultSource',
+        propsValue: function propsValue(value) {
+          var url = convertImageLocalPath(value);
+          if (url
+              && url.indexOf(HIPPY_DEBUG_ADDRESS) < 0
+              && ['https://', 'http://'].some(function (schema) { return url.indexOf(schema) === 0; })) {
+            warn$3(("img placeholder " + url + " recommend to use base64 image or local path image"));
+          }
+          return url;
+        },
+      },
+      /**
+       * For Android, will use src property
+       * For iOS, will convert to use source property
+       */
+      src: function src(value) {
+        return convertImageLocalPath(value);
+      }},
+      accessibilityAttrMaps)}),
+};
+
+// ListView area
+var ul = {
+  symbol: ListView,
+  component: {
+    name: NATIVE_COMPONENT_NAME_MAP[ListView],
+    defaultNativeStyle: {
+      flex: 1, // Necessary by iOS
+    },
+    defaultNativeProps: {
+      numberOfRows: function numberOfRows(node) {
+        return arrayCount(node.childNodes, function (childNode) { return !childNode.meta.skipAddToDom; });
+      },
+    },
+    attributeMaps: Object.assign({}, accessibilityAttrMaps),
+    eventNamesMap: mapEvent('listReady', 'initialListReady'),
+    processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
+      switch (nativeEventName) {
+        case 'onScroll':
+          event.offsetX = nativeEventParams.contentOffset.x;
+          event.offsetY = nativeEventParams.contentOffset.y;
+          break;
+        case 'onDelete':
+          event.index = nativeEventParams.index;
+          break;
+      }
+      return event;
+    },
+  },
+};
+
+var li = {
+  symbol: ListViewItem,
+  component: {
+    name: NATIVE_COMPONENT_NAME_MAP[ListViewItem],
+    attributeMaps: Object.assign({}, accessibilityAttrMaps),
+  },
+  eventNamesMap: mapEvent([
+    ['disappear', (__PLATFORM__ === 'android' || Native.Platform === 'android') ? 'onDisAppear' : 'onDisappear'] ]),
+};
+
+// Text area
+var span = {
+  symbol: View, // IMPORTANT: Can't be Text.
+  component: Object.assign({}, div.component,
+    {name: NATIVE_COMPONENT_NAME_MAP[Text],
+    defaultNativeProps: {
+      text: '',
+    },
+    defaultNativeStyle: {
+      color: 4278190080, // Black color(#000), necessary for Android
+    }}),
+};
+
+var label = span;
+
+var p$1 = span;
+
+var a = {
+  component: Object.assign({}, span.component,
+    {defaultNativeStyle: {
+      color: 4278190318, // Blue color(rgb(0, 0, 238), necessary for android
+    },
+    attributeMaps: {
+      href: {
+        name: 'href',
+        propsValue: function propsValue(value) {
+          if (['//', 'http://', 'https://'].filter(function (url) { return value.indexOf(url) === 0; }).length) {
+            warn$3(("href attribute can't apply effect in native with url: " + value));
+            return '';
+          }
+          return value;
+        },
+      },
+    }}),
+};
+
+// TextInput area
+var input = {
+  symbol: TextInput,
+  component: {
+    name: NATIVE_COMPONENT_NAME_MAP[TextInput],
+    attributeMaps: Object.assign({}, {type: {
+        name: 'keyboardType',
+        propsValue: function propsValue(value) {
+          var newValue = INPUT_VALUE_MAP[value];
+          if (!newValue) {
+            return value;
+          }
+          return newValue;
+        },
+      },
+      disabled: {
+        name: 'editable',
+        propsValue: function propsValue(value) {
+          return !value;
+        },
+      },
+      value: 'defaultValue',
+      maxlength: 'maxLength'},
+      accessibilityAttrMaps),
+    nativeProps: {
+      numberOfLines: 1,
+      multiline: false,
+    },
+    defaultNativeProps: {
+      underlineColorAndroid: 0, // Remove the android underline
+    },
+    defaultNativeStyle: {
+      padding: 0, // Remove the android underline
+      color: 4278190080, // Black color(#000), necessary for Android
+    },
+    eventNamesMap: mapEvent([
+      ['change', 'onChangeText'],
+      ['select', 'onSelectionChange'] ]),
+    processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
+      switch (nativeEventName) {
+        case 'onChangeText':
+        case 'onEndEditing':
+          event.value = nativeEventParams.text;
+          break;
+        case 'onSelectionChange':
+          // The event in web not response meaningful things.
+          // But in hippy we can response the selection start & end position.
+          event.start = nativeEventParams.selection.start;
+          event.end = nativeEventParams.selection.end;
+          break;
+        case 'onKeyboardWillShow':
+          event.keyboardHeight = nativeEventParams.keyboardHeight;
+          if (__PLATFORM__ === 'android' || Native.Platform === 'android') {
+            event.keyboardHeight /= Native.PixelRatio;
+          }
+          break;
+        case 'onContentSizeChange':
+          event.width = nativeEventParams.contentSize.width;
+          event.height = nativeEventParams.contentSize.height;
+          break;
+      }
+      return event;
+    },
+  },
+};
+
+var textarea = {
+  symbol: TextInput,
+  component: {
+    name: NATIVE_COMPONENT_NAME_MAP[TextInput],
+    defaultNativeProps: Object.assign({}, input.component.defaultNativeProps,
+      {numberOfLines: 5}),
+    attributeMaps: Object.assign({}, input.component.attributeMaps,
+      {rows: 'numberOfLines'}),
+    nativeProps: {
+      multiline: true,
+    },
+    defaultNativeStyle: input.component.defaultNativeStyle,
+    eventNamesMap: input.component.eventNamesMap,
+    processEventData: input.component.processEventData,
+  },
+};
+
+// Iframe area
+var iframe = {
+  symbol: WebView,
+  component: {
+    name: NATIVE_COMPONENT_NAME_MAP[WebView],
+    defaultNativeProps: {
+      method: 'get',
+      userAgent: '',
+    },
+    attributeMaps: {
+      src: {
+        name: 'source',
+        propsValue: function propsValue(value) {
+          return {
+            uri: value,
+          };
+        },
+      },
+    },
+    processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
+      switch (nativeEventName) {
+        case 'onLoad':
+        case 'onLoadStart':
+        case 'onLoadEnd':
+          event.url = nativeEventParams.url;
+          break;
+      }
+      return event;
+    },
+  },
+};
+
+var BUILT_IN_ELEMENTS = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  button: button,
+  div: div,
+  form: form,
+  img: img,
+  input: input,
+  label: label,
+  li: li,
+  p: p$1,
+  span: span,
+  a: a,
+  textarea: textarea,
+  ul: ul,
+  iframe: iframe
+});
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var isReservedTag$1 = makeMap(
+  'template,script,style,element,content,slot,'
+  + 'button,div,form,img,input,label,li,p,span,textarea,ul',
+  true
+);
+
+var elementMap = new Map();
+
+var defaultViewMeta = {
+  skipAddToDom: false, // The tag will not add to native DOM.
+  isUnaryTag: false, // Single tag, such as img, input...
+  tagNamespace: '', // Tag space, such as svg or math, not in using so far.
+  canBeLeftOpenTag: false, // Able to no close.
+  mustUseProp: false, // Tag must have attribute, such as src with img.
+  model: null,
+  component: null,
+};
+
+function getDefaultComponent(elementName, meta, normalizedName) {
+  return {
+    name: elementName,
+    functional: true,
+    model: meta.model,
+    render: function render(h, ref) {
+      var data = ref.data;
+      var children = ref.children;
+
+      return h(normalizedName, data, children);
+    },
+  };
+}
+
+function normalizeElementName(elementName) {
+  return elementName.toLowerCase();
+}
+
+function registerElement(elementName, oldMeta) {
+  if (!elementName) {
+    throw new Error('RegisterElement cannot set empty name');
+  }
+  var normalizedName = normalizeElementName(elementName);
+  var meta = Object.assign({}, defaultViewMeta, oldMeta);
+  if (elementMap.has(normalizedName)) {
+    throw new Error(("Element for " + elementName + " already registered."));
+  }
+  meta.component = Object.assign({}, getDefaultComponent(elementName, meta, normalizedName),
+    meta.component);
+  if (meta.component.name && meta.component.name === capitalizeFirstLetter(camelize(elementName))) {
+    warn$3(("Cannot registerElement with kebab-case name " + elementName + ", which converted to camelCase is the same with component.name " + (meta.component.name) + ", please make them different"));
+  }
+  var entry = {
+    meta: meta,
+  };
+  elementMap.set(normalizedName, entry);
+  return entry;
+}
+
+function getElementMap() {
+  return elementMap;
+}
+
+function getViewMeta(elementName) {
+  var normalizedName = normalizeElementName(elementName);
+  var viewMeta = defaultViewMeta;
+  var entry = elementMap.get(normalizedName);
+  if (entry && entry.meta) {
+    viewMeta = entry.meta;
+  }
+  return viewMeta;
+}
+
+function isKnownView(elementName) {
+  return elementMap.has(normalizeElementName(elementName));
+}
+
+function mustUseProp$1(el, type, attr) {
+  var viewMeta = getViewMeta(el);
+  if (!viewMeta.mustUseProp) {
+    return false;
+  }
+  return viewMeta.mustUseProp(type, attr);
+}
+
+function isUnknownElement(el) {
+  return !isKnownView(el);
+}
+
+// Register components
+function registerBuiltinElements() {
+  Object.keys(BUILT_IN_ELEMENTS).forEach(function (tagName) {
+    var meta = BUILT_IN_ELEMENTS[tagName];
+    registerElement(tagName, meta);
+  });
+}
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var PROPERTIES_MAP = {
+  textDecoration: 'textDecorationLine',
+  boxShadowOffset: 'shadowOffset',
+  boxShadowOffsetX: 'shadowOffsetX',
+  boxShadowOffsetY: 'shadowOffsetY',
+  boxShadowOpacity: 'shadowOpacity',
+  boxShadowRadius: 'shadowRadius',
+  boxShadowSpread: 'shadowSpread',
+  boxShadowColor: 'shadowColor',
+  caretColor: 'caret-color',
+};
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* eslint-disable no-underscore-dangle */
+
+var Event = function Event(eventName) {
+  this.type = eventName;
+  this.bubbles = true;
+  this.cancelable = true;
+  this.eventPhase = false;
+  this.timeStamp = Date.now();
+  // TODO: Should point to VDOM element.
+  this.originalTarget = null;
+  this.currentTarget = null;
+  this.target = null;
+  // Private properties
+  this._canceled = false;
+};
+
+var prototypeAccessors$1 = { canceled: { configurable: true } };
+
+prototypeAccessors$1.canceled.get = function () {
+  return this._canceled;
+};
+
+Event.prototype.stopPropagation = function stopPropagation () {
+  this.bubbles = false;
+};
+
+Event.prototype.preventDefault = function preventDefault () {
+  if (!this.cancelable) {
+    return;
+  }
+  this._canceled = true;
+};
+
+/**
+ * Old fashioned compatible.
+ */
+Event.prototype.initEvent = function initEvent (eventName, bubbles, cancelable) {
+    if ( bubbles === void 0 ) bubbles = true;
+    if ( cancelable === void 0 ) cancelable = true;
+
+  this.type = eventName;
+  if (bubbles === false) {
+    this.bubbles = false;
+  }
+  if (cancelable === false) {
+    this.cancelable = false;
+  }
+  return this;
+};
+
+Object.defineProperties( Event.prototype, prototypeAccessors$1 );
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var EventEmitter = function EventEmitter(element) {
+  this.element = element;
+  this._observers = {};
+};
+
+EventEmitter.prototype.getEventListeners = function getEventListeners () {
+  return this._observers;
+};
+
+EventEmitter.prototype.addEventListener = function addEventListener (eventNames, callback, options) {
+  if (typeof eventNames !== 'string') {
+    throw new TypeError('Events name(s) must be string.');
+  }
+
+  if (callback && !isFunction(callback)) {
+    throw new TypeError('callback must be function.');
+  }
+
+  var events = eventNames.split(',');
+  for (var i = 0, l = events.length; i < l; i += 1) {
+    var eventName = events[i].trim();
+    if (process.env.NODE_ENV !== 'production') {
+      if (['touchStart', 'touchMove', 'touchEnd', 'touchCancel'].indexOf(eventName) !== -1) {
+        warn$3(("@" + eventName + " is deprecated because it's not compatible with browser standard, please use @" + (eventName.toLowerCase()) + " to instead as so on."));
+      }
+    }
+    var list = this._getEventList(eventName, true);
+    list.push({
+      callback: callback,
+      options: options,
+    });
+  }
+  return this._observers;
+};
+
+EventEmitter.prototype.removeEventListener = function removeEventListener (eventNames, callback, options) {
+  if (typeof eventNames !== 'string') {
+    throw new TypeError('Events name(s) must be string.');
+  }
+
+  if (callback && !isFunction(callback)) {
+    throw new TypeError('callback must be function.');
+  }
+
+  var events = eventNames.split(',');
+  for (var i = 0, l = events.length; i < l; i += 1) {
+    var eventName = events[i].trim();
+    if (callback) {
+      var list = this._getEventList(eventName, false);
+      if (list) {
+        var index = this._indexOfListener(list, callback, options);
+        if (index >= 0) {
+          list.splice(index, 1);
+        }
+        if (list.length === 0) {
+          this._observers[eventName] = undefined;
+        }
+      }
+    } else {
+      this._observers[eventName] = undefined;
+    }
+  }
+  return this._observers;
+};
+
+EventEmitter.prototype.emit = function emit (eventInstance) {
+  var eventName = eventInstance.type;
+  var observers = this._observers[eventName];
+  if (!observers) {
+    return;
+  }
+  for (var i = observers.length - 1; i >= 0; i -= 1) {
+    var entry = observers[i];
+    if (entry.options && entry.options.once) {
+      observers.splice(i, 1);
+    }
+    if (entry.options && entry.options.thisArg) {
+      entry.callback.apply(entry.options.thisArg, [eventInstance]);
+    } else {
+      entry.callback(eventInstance);
+    }
+  }
+};
+
+EventEmitter.prototype._getEventList = function _getEventList (eventName, createIfNeeded) {
+  var list = this._observers[eventName];
+  if (!list && createIfNeeded) {
+    list = [];
+    this._observers[eventName] = list;
+  }
+
+  return list;
+};
+
+EventEmitter.prototype._indexOfListener = function _indexOfListener (list, callback, options) {
+  return list.findIndex(function (entry) {
+    if (options) {
+      return entry.callback === callback && looseEqual(entry.options, options);
+    }
+    return entry.callback === callback;
+  });
+};
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var componentName$1 = ['%c[event]%c', 'color: green', 'color: auto'];
+
+function getVueEventName(eventName, targetNode) {
+  var ref = targetNode.meta.component;
+  var eventNamesMap = ref.eventNamesMap;
+  // event names map for internal view, i.e. div,ul,li,etc.
+  if (eventNamesMap && eventNamesMap[eventName]) {
+    return eventNamesMap[eventName];
+  }
+  if (eventName.indexOf('on') !== 0) {
+    return eventName;
+  }
+  // remove "on" string and lowercase the first letter
+  var str = eventName.slice(2, eventName.length); // Assume 'on' prefix length = 2.
+  return str.charAt(0).toLowerCase() + str.slice(1);
+}
+
+/**
+ * Special Touch Event handler compatible for previous camelCase touch event,
+ * such as touchStart, touchMove etc.
+ * @type {{isTouchEvent(), mapTouchEvent()}}
+ */
+var SpecialTouchHandler = {
+  isTouchEvent: function isTouchEvent(eventName) {
+    return ['onTouchDown', 'onTouchMove', 'onTouchEnd', 'onTouchCancel'].indexOf(eventName) >= 0;
+  },
+  convertTouchEvent: function convertTouchEvent(eventName, nativeEvent) {
+    var touchEvent;
+    if (eventName === 'onTouchDown') {
+      touchEvent = new Event('touchStart');
+    } else {
+      touchEvent = new Event(("t" + (eventName.slice(3, eventName.length))));
+    }
+    touchEvent.touches = {
+      0: {
+        clientX: nativeEvent.page_x,
+        clientY: nativeEvent.page_y,
+      },
+      length: 1,
+    };
+    return touchEvent;
+  },
+};
+
+var EventDispatcher = {
+  /**
+   * Redirect native events to Vue directly.
+   */
+  receiveNativeEvent: function receiveNativeEvent(nativeEvent) {
+    trace.apply(void 0, componentName$1.concat( ['receiveNativeEvent'], [nativeEvent] ));
+    if (!nativeEvent || !Array.isArray(nativeEvent) || nativeEvent.length < 2) {
+      return;
+    }
+    var eventName = nativeEvent[0];
+    var eventParams = nativeEvent[1];
+    var app = getApp();
+    if (app) {
+      app.$emit(eventName, eventParams);
+    }
+  },
+
+  /**
+   * Receive native interactive events.
+   */
+  receiveNativeGesture: function receiveNativeGesture(nativeEvent) {
+    trace.apply(void 0, componentName$1.concat( ['receiveNativeGesture'], [nativeEvent] ));
+    if (!nativeEvent) {
+      return;
+    }
+    var targetNodeId = nativeEvent.id;
+    var eventName = nativeEvent.name;
+    var targetNode = getNodeById(targetNodeId);
+    if (!targetNode) {
+      return;
+    }
+    var targetEventName = getVueEventName(eventName, targetNode);
+    var targetEvent = new Event(targetEventName);
+    var ref = targetNode._meta.component;
+    var processEventData = ref.processEventData;
+    if (processEventData) {
+      processEventData(targetEvent, eventName, nativeEvent);
+    }
+    targetNode.dispatchEvent(targetEvent);
+    // TODO: Will remove soon.
+    if (SpecialTouchHandler.isTouchEvent(eventName)) {
+      targetNode.dispatchEvent(SpecialTouchHandler.convertTouchEvent(eventName, nativeEvent));
+    }
+  },
+  /**
+   * Receive the events like keyboard typing
+   */
+  receiveUIComponentEvent: function receiveUIComponentEvent(nativeEvent) {
+    trace.apply(void 0, componentName$1.concat( ['receiveUIComponentEvent'], [nativeEvent] ));
+    if (!nativeEvent || !(nativeEvent instanceof Array) || nativeEvent.length < 2) {
+      return;
+    }
+    var targetNodeId = nativeEvent[0];
+    var eventName = nativeEvent[1];
+    var params = nativeEvent[2];
+    if (typeof targetNodeId !== 'number' || typeof eventName !== 'string') {
+      return;
+    }
+    var targetNode = getNodeById(targetNodeId);
+    if (!targetNode) {
+      return;
+    }
+    var targetEventName = getVueEventName(eventName, targetNode);
+    var targetEvent = new Event(targetEventName);
+    // Post event parameters process.
+    if (eventName === 'onLayout') {
+      var layout = params.layout;
+      targetEvent.top = layout.y;
+      targetEvent.left = layout.x;
+      targetEvent.bottom = layout.y + layout.height;
+      targetEvent.right = layout.x + layout.width;
+      targetEvent.width = layout.width;
+      targetEvent.height = layout.height;
+    } else {
+      var ref = targetNode._meta.component;
+      var processEventData = ref.processEventData;
+      if (processEventData) {
+        processEventData(targetEvent, eventName, params);
+      }
+    }
+    targetNode.dispatchEvent(targetEvent);
+  },
+};
+
+if (global.__GLOBAL__) {
+  global.__GLOBAL__.jsModuleList.EventDispatcher = EventDispatcher;
+}
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var ROOT_VIEW_ID = 0;
+var currentNodeId = 0;
+if (global.__GLOBAL__ && Number.isInteger(global.__GLOBAL__.nodeId)) {
+  currentNodeId = global.__GLOBAL__.nodeId;
+}
+function getNodeId() {
+  currentNodeId += 1;
+  if (currentNodeId % 10 === 0) {
+    currentNodeId += 1;
+  }
+  if (currentNodeId % 10 === ROOT_VIEW_ID) {
+    currentNodeId += 1;
+  }
+  return currentNodeId;
+}
+
+var ViewNode = function ViewNode() {
+  // Point to root document element.
+  this._ownerDocument = null;
+  // Component meta information, such as native component will use.
+  this._meta = null;
+  // Will change to be true after insert into Native dom.
+  this._isMounted = false;
+  // Virtual DOM node id, will used in native to identify.
+  this.nodeId = getNodeId();
+  // Index number in children, will update at traverseChildren method.
+  this.index = 0;
+  // Relation nodes.
+  this.childNodes = [];
+  this.parentNode = null;
+  this.prevSibling = null;
+  this.nextSibling = null;
+};
+
+var prototypeAccessors$2 = { firstChild: { configurable: true },lastChild: { configurable: true },meta: { configurable: true },ownerDocument: { configurable: true },isMounted: { configurable: true } };
+
+/* istanbul ignore next */
+ViewNode.prototype.toString = function toString () {
+  return this.constructor.name;
+};
+
+prototypeAccessors$2.firstChild.get = function () {
+  return this.childNodes.length ? this.childNodes[0] : null;
+};
+
+prototypeAccessors$2.lastChild.get = function () {
+  return this.childNodes.length
+    ? this.childNodes[this.childNodes.length - 1]
+    : null;
+};
+
+prototypeAccessors$2.meta.get = function () {
+  if (!this._meta) {
+    return {};
+  }
+  return this._meta;
+};
+
+/* istanbul ignore next */
+prototypeAccessors$2.ownerDocument.get = function () {
+  if (this._ownerDocument) {
+    return this._ownerDocument;
+  }
+
+  var el = this;
+  while (el.constructor.name !== 'DocumentNode') {
+    el = el.parentNode;
+    if (!el) {
+      break;
+    }
+  }
+  this._ownerDocument = el;
+  return el;
+};
+
+prototypeAccessors$2.isMounted.get = function () {
+  return this._isMounted;
+};
+
+prototypeAccessors$2.isMounted.set = function (isMounted) {
+  // TODO: Maybe need validation, maybe not.
+  this._isMounted = isMounted;
+};
+
+ViewNode.prototype.insertBefore = function insertBefore (childNode, referenceNode) {
+  if (!childNode) {
+    throw new Error('Can\'t insert child.');
+  }
+  if (!referenceNode) {
+    return this.appendChild(childNode);
+  }
+  if (referenceNode.parentNode !== this) {
+    throw new Error('Can\'t insert child, because the reference node has a different parent.');
+  }
+  if (childNode.parentNode && childNode.parentNode !== this) {
+    throw new Error('Can\'t insert child, because it already has a different parent.');
+  }
+  var index = this.childNodes.indexOf(referenceNode);
+  childNode.parentNode = this;
+  childNode.nextSibling = referenceNode;
+  childNode.prevSibling = this.childNodes[index - 1];
+  // update previous node's nextSibling to prevent patch bug
+  if (this.childNodes[index - 1]) {
+    this.childNodes[index - 1].nextSibling = childNode;
+  }
+  referenceNode.prevSibling = childNode;
+  this.childNodes.splice(index, 0, childNode);
+  return insertChild(this, childNode, index);
+};
+
+ViewNode.prototype.moveChild = function moveChild (childNode, referenceNode) {
+  if (!childNode) {
+    throw new Error('Can\'t move child.');
+  }
+  if (!referenceNode) {
+    return this.appendChild(childNode);
+  }
+  if (referenceNode.parentNode !== this) {
+    throw new Error('Can\'t move child, because the reference node has a different parent.');
+  }
+  if (childNode.parentNode && childNode.parentNode !== this) {
+    throw new Error('Can\'t move child, because it already has a different parent.');
+  }
+  var oldIndex = this.childNodes.indexOf(childNode);
+  var referenceIndex = this.childNodes.indexOf(referenceNode);
+  // return if the moved index is the same as the previous one
+  if (referenceIndex === oldIndex) {
+    return childNode;
+  }
+  // set new siblings relations
+  childNode.nextSibling = referenceNode;
+  childNode.prevSibling = referenceNode.prevSibling;
+  referenceNode.prevSibling = childNode;
+  if (this.childNodes[referenceIndex - 1]) {
+    this.childNodes[referenceIndex - 1].nextSibling = childNode;
+  }
+  if (this.childNodes[referenceIndex + 1]) {
+    this.childNodes[referenceIndex + 1].prevSibling = childNode;
+  }
+  if (this.childNodes[oldIndex - 1]) {
+    this.childNodes[oldIndex - 1].nextSibling = this.childNodes[oldIndex + 1];
+  }
+  if (this.childNodes[oldIndex + 1]) {
+    this.childNodes[oldIndex + 1].prevSibling = this.childNodes[oldIndex - 1];
+  }
+  this.childNodes.splice(oldIndex, 1);
+  // remove old child node from native
+  removeChild(this, childNode, oldIndex);
+  var newIndex = this.childNodes.indexOf(referenceNode);
+  this.childNodes.splice(newIndex, 0, childNode);
+  return insertChild(this, childNode, newIndex);
+};
+
+ViewNode.prototype.appendChild = function appendChild (childNode) {
+  if (!childNode) {
+    throw new Error('Can\'t append child.');
+  }
+  if (childNode.parentNode && childNode.parentNode !== this) {
+    throw new Error('Can\'t append child, because it already has a different parent.');
+  }
+  // remove childNode if exist
+  if (childNode.isMounted) {
+    this.removeChild(childNode);
+  }
+  childNode.parentNode = this;
+  if (this.lastChild) {
+    childNode.prevSibling = this.lastChild;
+    this.lastChild.nextSibling = childNode;
+  }
+  this.childNodes.push(childNode);
+  insertChild(this, childNode, this.childNodes.length - 1);
+};
+
+ViewNode.prototype.removeChild = function removeChild$1 (childNode) {
+  if (!childNode) {
+    throw new Error('Can\'t remove child.');
+  }
+  if (!childNode.parentNode) {
+    throw new Error('Can\'t remove child, because it has no parent.');
+  }
+  if (childNode.parentNode !== this) {
+    throw new Error('Can\'t remove child, because it has a different parent.');
+  }
+  if (childNode.meta.skipAddToDom) {
+    return;
+  }
+  // FIXME: parentNode should be null when removeChild, But it breaks add the node again.
+  //      Issue position: https://github.com/vuejs/vue/tree/master/src/core/vdom/patch.js#L250
+  // childNode.parentNode = null;
+  if (childNode.prevSibling) {
+    childNode.prevSibling.nextSibling = childNode.nextSibling;
+  }
+  if (childNode.nextSibling) {
+    childNode.nextSibling.prevSibling = childNode.prevSibling;
+  }
+  childNode.prevSibling = null;
+  childNode.nextSibling = null;
+  var index = this.childNodes.indexOf(childNode);
+  this.childNodes.splice(index, 1);
+  removeChild(this, childNode, index);
+};
+
+/**
+ * Find a specific target with condition
+ */
+ViewNode.prototype.findChild = function findChild (condition) {
+  var yes = condition(this);
+  if (yes) {
+    return this;
+  }
+  if (this.childNodes.length) {
+    for (var i = 0; i < this.childNodes.length; i += 1) {
+      var childNode = this.childNodes[i];
+      var targetChild = this.findChild.call(childNode, condition);
+      if (targetChild) {
+        return targetChild;
+      }
+    }
+  }
+  return null;
+};
+
+/**
+ * Traverse the children and execute callback
+ */
+ViewNode.prototype.traverseChildren = function traverseChildren (callback) {
+    var this$1 = this;
+
+  // Find the index and apply callback
+  var index;
+  if (this.parentNode) {
+    index = this.parentNode.childNodes.filter(function (node) { return !node.meta.skipAddToDom; }).indexOf(this);
+  } else {
+    index = 0;
+  }
+  this.index = index;
+  callback(this);
+  // Find the children
+  if (this.childNodes.length) {
+    this.childNodes.forEach(function (childNode) {
+      this$1.traverseChildren.call(childNode, callback);
+    });
+  }
+};
+
+Object.defineProperties( ViewNode.prototype, prototypeAccessors$2 );
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// linear-gradient direction description map
+var LINEAR_GRADIENT_DIRECTION_MAP = {
+  totop: '0',
+  totopright: 'totopright',
+  toright: '90',
+  tobottomright: 'tobottomright',
+  tobottom: '180', // default value
+  tobottomleft: 'tobottomleft',
+  toleft: '270',
+  totopleft: 'totopleft',
+};
+
+var DEGREE_UNIT = {
+  TURN: 'turn',
+  RAD: 'rad',
+  DEG: 'deg',
+};
+
+/**
+ * convert string value to string degree
+ * @param {string} value
+ * @param {string} unit
+ */
+function convertToDegree(value, unit) {
+  if ( unit === void 0 ) unit = DEGREE_UNIT.DEG;
+
+  var convertedNumValue = parseFloat(value);
+  var result = value || '';
+  var ref = value.split('.');
+  var decimals = ref[1];
+  if (decimals && decimals.length > 2) {
+    result = convertedNumValue.toFixed(2);
+  }
+  switch (unit) {
+    // turn unit
+    case DEGREE_UNIT.TURN:
+      result = "" + ((convertedNumValue * 360).toFixed(2));
+      break;
+    // radius unit
+    case DEGREE_UNIT.RAD:
+      result = "" + ((180 / Math.PI * convertedNumValue).toFixed(2));
+      break;
+  }
+  return result;
+}
+
+/**
+ * parse gradient angle or direction
+ * @param {string} value
+ */
+function getLinearGradientAngle(value) {
+  var processedValue = (value || '').replace(/\s*/g, '').toLowerCase();
+  var reg = /^([+-]?\d+\.?\d*)+(deg|turn|rad)|(to\w+)$/g;
+  var valueList = reg.exec(processedValue);
+  if (!Array.isArray(valueList)) { return; }
+  // if default direction is to bottom, i.e. 180degree
+  var angle = '180';
+  var direction = valueList[0];
+  var angleValue = valueList[1];
+  var angleUnit = valueList[2];
+  if (angleValue && angleUnit) { // angle value
+    angle = convertToDegree(angleValue, angleUnit);
+  } else if (direction && typeof LINEAR_GRADIENT_DIRECTION_MAP[direction] !== 'undefined') { // direction description
+    angle = LINEAR_GRADIENT_DIRECTION_MAP[direction];
+  } else {
+    warn$3('linear-gradient direction or angle is invalid, default value [to bottom] would be used');
+  }
+  return angle;
+}
+
+/**
+ * parse gradient color stop
+ * @param {string} value
+ */
+function getLinearGradientColorStop(value) {
+  var processedValue = (value || '').replace(/\s+/g, ' ').trim();
+  var ref = processedValue.split(/\s+(?![^(]*?\))/);
+  var color = ref[0];
+  var percentage = ref[1];
+  var percentageCheckReg = /^([+-]?\d+\.?\d*)%$/g;
+  if (color && !percentageCheckReg.exec(color) && !percentage) {
+    return {
+      color: translateColor(color),
+    };
+  }
+  if (color && percentageCheckReg.exec(percentage)) {
+    return {
+      // color stop ratio
+      ratio: parseFloat(percentage.split('%')[0]) / 100,
+      color: translateColor(color),
+    };
+  }
+  warn$3('linear-gradient color stop is invalid');
+}
+
+/**
+ * parse backgroundImage
+ * @param {string} property
+ * @param {string|Object|number|boolean} value
+ * @returns {(string|{})[]}
+ */
+function parseBackgroundImage(property, value) {
+  var assign;
+
+  var processedValue = value;
+  var processedProperty = property;
+  if (value.indexOf('linear-gradient') === 0) {
+    processedProperty = 'linearGradient';
+    var valueString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
+    var tokens = valueString.split(/,(?![^(]*?\))/);
+    var colorStopList = [];
+    processedValue = {};
+    tokens.forEach(function (value, index) {
+      if (index === 0) {
+        // the angle of linear-gradient parameter can be optional
+        var angle = getLinearGradientAngle(value);
+        if (angle) {
+          processedValue.angle = angle;
+        } else {
+          // if angle ignored, default direction is to bottom, i.e. 180degree
+          processedValue.angle = '180';
+          var colorObject = getLinearGradientColorStop(value);
+          if (colorObject) { colorStopList.push(colorObject); }
+        }
+      } else {
+        var colorObject$1 = getLinearGradientColorStop(value);
+        if (colorObject$1) { colorStopList.push(colorObject$1); }
+      }
+    });
+    processedValue.colorStopList = colorStopList;
+  } else {
+    var regexp = /(?:\(['"]?)(.*?)(?:['"]?\))/;
+    var executed = regexp.exec(value);
+    if (executed && executed.length > 1) {
+      (assign = executed, processedValue = assign[1]);
+    }
+  }
+  return [processedProperty, processedValue];
+}
+
+/**
+ * parse text shadow offset
+ * @param property
+ * @param value
+ * @param style
+ * @returns {(*|number)[]}
+ */
+function parseTextShadowOffset(property, value, style) {
+  var obj;
+
+  if ( value === void 0 ) value = 0;
+  var offsetMap = {
+    textShadowOffsetX: 'width',
+    textShadowOffsetY: 'height',
+  };
+  style.textShadowOffset = style.textShadowOffset || {};
+  Object.assign(style.textShadowOffset, ( obj = {}, obj[offsetMap[property]] = value, obj ));
+  return ['textShadowOffset', style.textShadowOffset];
+}
+
+var ElementNode = /*@__PURE__*/(function (ViewNode) {
+  function ElementNode(tagName) {
+    ViewNode.call(this);
+    // Tag name
+    this.tagName = tagName;
+    // ID attribute in template.
+    this.id = '';
+    // style attribute in template.
+    this.style = {};
+    // Vue style scope id.
+    this._styleScopeId = null;
+    // Class attribute in template.
+    this.classList = new Set(); // Fake DOMTokenLis
+    // Other attributes in template.
+    this.attributes = {};
+    // Event observer.
+    this._emitter = null;
+    // Style pre-processor
+    this.beforeLoadStyle = getBeforeLoadStyle();
+  }
+
+  if ( ViewNode ) ElementNode.__proto__ = ViewNode;
+  ElementNode.prototype = Object.create( ViewNode && ViewNode.prototype );
+  ElementNode.prototype.constructor = ElementNode;
+
+  var prototypeAccessors = { tagName: { configurable: true },meta: { configurable: true },emitter: { configurable: true } };
+
+  ElementNode.prototype.toString = function toString () {
+    return ((this.constructor.name) + "(" + (this._tagName) + ")");
+  };
+
+  prototypeAccessors.tagName.set = function (name) {
+    this._tagName = normalizeElementName(name);
+  };
+
+  prototypeAccessors.tagName.get = function () {
+    return this._tagName;
+  };
+
+  prototypeAccessors.meta.get = function () {
+    if (this._meta) {
+      return this._meta;
+    }
+    this._meta = getViewMeta(this._tagName);
+    return this._meta;
+  };
+
+  prototypeAccessors.emitter.get = function () {
+    return this._emitter;
+  };
+
+  ElementNode.prototype.hasAttribute = function hasAttribute (key) {
+    return !!this.attributes[key];
+  };
+
+  ElementNode.prototype.getAttribute = function getAttribute (key) {
+    return this.attributes[key];
+  };
+
+  ElementNode.prototype.setAttribute = function setAttribute (key, value) {
+    try {
+      // detect expandable attrs for boolean values
+      // See https://vuejs.org/v2/guide/components-props.html#Passing-a-Boolean
+      if (typeof (this.attributes[key]) === 'boolean' && value === '') {
+        value = true;
+      }
+      if (key === undefined) {
+        updateChild(this);
+        return;
+      }
+      switch (key) {
+        case 'class': {
+          var newClassList = new Set(value.split(' ').filter(function (x) { return x.trim(); }));
+          if (setsAreEqual(this.classList, newClassList)) {
+            return;
+          }
+          this.classList = newClassList;
+          // update current node and child nodes
+          updateWithChildren(this);
+          return;
+        }
+        case 'id':
+          if (value === this.id) {
+            return;
+          }
+          this.id = value;
+          // update current node and child nodes
+          updateWithChildren(this);
+          return;
+        // Convert text related to character for interface.
+        case 'text':
+        case 'value':
+        case 'defaultValue':
+        case 'placeholder': {
+          if (typeof value !== 'string') {
+            try {
+              value = value.toString();
+            } catch (err) {
+              throw new TypeError(("Property " + key + " must be string：" + (err.message)));
+            }
+          }
+          value = value.trim().replace(/(&nbsp;|Â)/g, ' ');
+          this.attributes[key] = unicodeToChar(value);
+          break;
+        }
+        // FIXME: UpdateNode numberOfRows will makes Image flicker on Android.
+        //        So make it working on iOS only.
+        case 'numberOfRows':
+          this.attributes[key] = value;
+          if (Native.Platform !== 'ios') {
+            return;
+          }
+          break;
+        case 'caretColor':
+        case 'caret-color':
+          this.attributes['caret-color'] = Native.parseColor(value);
+          break;
+        default:
+          this.attributes[key] = value;
+      }
+      updateChild(this);
+    } catch (err) {
+      // Throw error in development mode
+      if (process.env.NODE_ENV !== 'production') {
+        throw err;
+      }
+    }
+  };
+
+  ElementNode.prototype.removeAttribute = function removeAttribute (key) {
+    delete this.attributes[key];
+  };
+
+  ElementNode.prototype.setStyle = function setStyle (property, value, isBatchUpdate) {
+    var assign, assign$1;
+
+    if ( isBatchUpdate === void 0 ) isBatchUpdate = false;
+    if (value === undefined) {
+      delete this.style[property];
+      return;
+    }
+    // Preprocess the style
+    var ref = this.beforeLoadStyle({
+      property: property,
+      value: value,
+    });
+    var p = ref.property;
+    var v = ref.value;
+    // Process the specific style value
+    switch (p) {
+      case 'fontWeight':
+        if (typeof v !== 'string') {
+          v = v.toString();
+        }
+        break;
+      case 'caretColor':
+        this.attributes['caret-color'] = translateColor(v);
+        break;
+      case 'backgroundImage': {
+        (assign = parseBackgroundImage(p, v), p = assign[0], v = assign[1]);
+        break;
+      }
+      case 'textShadowOffsetX':
+      case 'textShadowOffsetY': {
+        (assign$1 = parseTextShadowOffset(p, v, this.style), p = assign$1[0], v = assign$1[1]);
+        break;
+      }
+      case 'textShadowOffset': {
+        var ref$1 = v || {};
+        var x = ref$1.x; if ( x === void 0 ) x = 0;
+        var width = ref$1.width; if ( width === void 0 ) width = 0;
+        var y = ref$1.y; if ( y === void 0 ) y = 0;
+        var height = ref$1.height; if ( height === void 0 ) height = 0;
+        v = { width: x || width, height: y || height };
+        break;
+      }
+      default: {
+        // Convert the property to W3C standard.
+        if (Object.prototype.hasOwnProperty.call(PROPERTIES_MAP, p)) {
+          p = PROPERTIES_MAP[p];
+        }
+        // Convert the value
+        if (typeof v === 'string') {
+          v = v.trim();
+          // Convert inline color style to int
+          if (p.toLowerCase().indexOf('color') >= 0) {
+            v = translateColor(v, Native.Platform);
+          // Convert inline length style, drop the px unit
+          } else if (endsWith(v, 'px')) {
+            v = parseFloat(v.slice(0, v.length - 2));
+          } else {
+            v = tryConvertNumber(v);
+          }
+        }
+      }
+    }
+    if (v === undefined || v === null || this.style[p] === v) {
+      return;
+    }
+    this.style[p] = v;
+    if (!isBatchUpdate) {
+      updateChild(this);
+    }
+  };
+
+  /**
+   * set native style props
+   */
+  ElementNode.prototype.setNativeProps = function setNativeProps (nativeProps) {
+    var this$1 = this;
+
+    if (nativeProps) {
+      var style = nativeProps.style;
+      if (style) {
+        Object.keys(style).forEach(function (key) {
+          this$1.setStyle(key, style[key], true);
+        });
+        updateChild(this);
+      }
+    }
+  };
+
+  /**
+   * repaint element with latest style map, which maybe loaded from HMR chunk or dynamic chunk
+   */
+  ElementNode.prototype.repaintWithChildren = function repaintWithChildren () {
+    updateWithChildren(this);
+  };
+
+  ElementNode.prototype.setStyleScope = function setStyleScope (styleScopeId) {
+    if (typeof styleScopeId !== 'string') {
+      styleScopeId = styleScopeId.toString();
+    }
+    this._styleScopeId = styleScopeId;
+  };
+
+  ElementNode.prototype.appendChild = function appendChild (childNode) {
+    ViewNode.prototype.appendChild.call(this, childNode);
+    if (childNode.meta.symbol === Text) {
+      this.setText(childNode.text);
+    }
+  };
+
+  ElementNode.prototype.insertBefore = function insertBefore (childNode, referenceNode) {
+    ViewNode.prototype.insertBefore.call(this, childNode, referenceNode);
+    if (childNode.meta.symbol === Text) {
+      this.setText(childNode.text);
+    }
+  };
+
+  ElementNode.prototype.moveChild = function moveChild (childNode, referenceNode) {
+    ViewNode.prototype.moveChild.call(this, childNode, referenceNode);
+    if (childNode.meta.symbol === Text) {
+      this.setText(childNode.text);
+    }
+  };
+
+  ElementNode.prototype.removeChild = function removeChild (childNode) {
+    ViewNode.prototype.removeChild.call(this, childNode);
+    if (childNode.meta.symbol === Text) {
+      this.setText('');
+    }
+  };
+
+  ElementNode.prototype.setText = function setText (text) {
+    // Hacking for textarea, use value props to instance text props
+    if (this.tagName === 'textarea') {
+      return this.setAttribute('value', text);
+    }
+    return this.setAttribute('text', text);
+  };
+
+  ElementNode.prototype.addEventListener = function addEventListener (eventNames, callback, options) {
+    if (!this._emitter) {
+      this._emitter = new EventEmitter(this);
+    }
+    this._emitter.addEventListener(eventNames, callback, options);
+    // Added default scrollEventThrottle when scroll event is added.
+    if (eventNames === 'scroll' && !(this.getAttribute('scrollEventThrottle') > 0)) {
+      var scrollEventThrottle = 200;
+      if (scrollEventThrottle) {
+        this.attributes.scrollEventThrottle = scrollEventThrottle;
+      }
+    }
+    if (this.polyFillNativeEvents) {
+      this.polyFillNativeEvents('addEvent', eventNames, callback, options);
+    }
+    updateChild(this);
+  };
+
+  ElementNode.prototype.removeEventListener = function removeEventListener (eventNames, callback, options) {
+    if (!this._emitter) {
+      return null;
+    }
+    if (this.polyFillNativeEvents) {
+      this.polyFillNativeEvents('removeEvent', eventNames, callback, options);
+    }
+    return this._emitter.removeEventListener(eventNames, callback, options);
+  };
+
+  ElementNode.prototype.dispatchEvent = function dispatchEvent (eventInstance) {
+    if (!(eventInstance instanceof Event)) {
+      throw new Error('dispatchEvent method only accept Event instance');
+    }
+    // Current Target always be the event listener.
+    eventInstance.currentTarget = this;
+    // But target be the first target.
+    // Be careful, here's different than Browser,
+    // because Hippy can't callback without element _emitter.
+    if (!eventInstance.target) {
+      eventInstance.target = this;
+      // IMPORTANT: It's important for vnode diff and directive trigger.
+      if (typeof eventInstance.value === 'string') {
+        eventInstance.target.value = eventInstance.value;
+      }
+    }
+    if (this._emitter) {
+      this._emitter.emit(eventInstance);
+    }
+    if (this.parentNode && eventInstance.bubbles) {
+      this.parentNode.dispatchEvent.call(this.parentNode, eventInstance);
+    }
+  };
+
+  /**
+   * getBoundingClientRect
+   *
+   * Get the position and size of element
+   * Because it's a async function, need await prefix.
+   *
+   * And if the element is out of visible area, result will be none.
+   */
+  ElementNode.prototype.getBoundingClientRect = function getBoundingClientRect () {
+    return Native.measureInWindow(this);
+  };
+
+  /**
+   * Scroll children to specific position.
+   */
+  ElementNode.prototype.scrollToPosition = function scrollToPosition (x, y, duration) {
+    if ( x === void 0 ) x = 0;
+    if ( y === void 0 ) y = 0;
+    if ( duration === void 0 ) duration = 1000;
+
+    if (typeof x !== 'number' || typeof y !== 'number') {
+      return;
+    }
+    if (duration === false) {
+      duration = 0;
+    }
+    Native.callUIFunction(this, 'scrollToWithOptions', [{ x: x, y: y, duration: duration }]);
+  };
+
+  /**
+   * Native implementation for the Chrome/Firefox Element.scrollTop method
+   */
+  ElementNode.prototype.scrollTo = function scrollTo (x, y, duration) {
+    var assign;
+
+    var animationDuration = duration;
+    if (typeof x === 'object' && x) {
+      var left = x.left;
+      var top = x.top;
+      var behavior = x.behavior; if ( behavior === void 0 ) behavior = 'auto';
+      ((assign = x, animationDuration = assign.duration));
+      this.scrollToPosition(left, top, behavior === 'none' ? 0 : animationDuration);
+    } else {
+      this.scrollToPosition(x, y, duration);
+    }
+  };
+
+  Object.defineProperties( ElementNode.prototype, prototypeAccessors );
+
+  return ElementNode;
+}(ViewNode));
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var CommentNode = /*@__PURE__*/(function (ElementNode) {
+  function CommentNode(text) {
+    ElementNode.call(this, 'comment');
+    this.text = text;
+    this._meta = {
+      symbol: Text,
+      skipAddToDom: true,
+    };
+  }
+
+  if ( ElementNode ) CommentNode.__proto__ = ElementNode;
+  CommentNode.prototype = Object.create( ElementNode && ElementNode.prototype );
+  CommentNode.prototype.constructor = CommentNode;
+
+  return CommentNode;
+}(ElementNode));
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var TextNode = /*@__PURE__*/(function (ViewNode) {
+  function TextNode(text) {
+    ViewNode.call(this);
+    this.text = text;
+    this._meta = {
+      symbol: Text,
+      skipAddToDom: true,
+    };
+  }
+
+  if ( ViewNode ) TextNode.__proto__ = ViewNode;
+  TextNode.prototype = Object.create( ViewNode && ViewNode.prototype );
+  TextNode.prototype.constructor = TextNode;
+
+  TextNode.prototype.setText = function setText (text) {
+    this.text = text;
+    this.parentNode.setText(text);
+  };
+
+  return TextNode;
+}(ViewNode));
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Input and Textarea Element
+ */
+var InputNode = /*@__PURE__*/(function (ElementNode) {
+  function InputNode () {
+    ElementNode.apply(this, arguments);
+  }
+
+  if ( ElementNode ) InputNode.__proto__ = ElementNode;
+  InputNode.prototype = Object.create( ElementNode && ElementNode.prototype );
+  InputNode.prototype.constructor = InputNode;
+
+  InputNode.prototype.getValue = function getValue () {
+    var this$1 = this;
+
+    return new Promise(function (resolve) { return Native.callUIFunction(this$1, 'getValue', function (r) { return resolve(r.text); }); });
+  };
+
+  /**
+   * Set text input value
+   */
+  InputNode.prototype.setValue = function setValue (value) {
+    Native.callUIFunction(this, 'setValue', [value]);
+  };
+
+
+  /**
+   * Focus
+   */
+  InputNode.prototype.focus = function focus () {
+    Native.callUIFunction(this, 'focusTextInput', []);
+  };
+
+  /**
+   * Blur
+   */
+  InputNode.prototype.blur = function blur () {
+    Native.callUIFunction(this, 'blurTextInput', []);
+  };
+
+  /**
+   * Clear
+   */
+  InputNode.prototype.clear = function clear () {
+    Native.callUIFunction(this, 'clear', []);
+  };
+
+  /**
+   * Show input method selection dialog.
+   */
+  InputNode.prototype.showInputMethod = function showInputMethod () {
+    Native.callUIFunction(this, 'showInputMethod', []);
+  };
+
+  /**
+   * hideInputMethod
+   */
+  InputNode.prototype.hideInputMethod = function hideInputMethod () {
+    Native.callUIFunction(this, 'hideInputMethod', []);
+  };
+
+  return InputNode;
+}(ElementNode));
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * List element
+ */
+var ListNode = /*@__PURE__*/(function (ElementNode) {
+  function ListNode () {
+    ElementNode.apply(this, arguments);
+  }
+
+  if ( ElementNode ) ListNode.__proto__ = ElementNode;
+  ListNode.prototype = Object.create( ElementNode && ElementNode.prototype );
+  ListNode.prototype.constructor = ListNode;
+
+  ListNode.prototype.scrollToIndex = function scrollToIndex (indexLeft, indexTop, needAnimation) {
+    if ( indexLeft === void 0 ) indexLeft = 0;
+    if ( indexTop === void 0 ) indexTop = 0;
+    if ( needAnimation === void 0 ) needAnimation = true;
+
+    if (typeof indexLeft !== 'number' || typeof indexTop !== 'number') {
+      return;
+    }
+    Native.callUIFunction(this, 'scrollToIndex', [indexLeft, indexTop, needAnimation]);
+  };
+
+  /**
+   * Scroll children to specific position.
+   */
+  ListNode.prototype.scrollToPosition = function scrollToPosition (posX, posY, needAnimation) {
+    if ( posX === void 0 ) posX = 0;
+    if ( posY === void 0 ) posY = 0;
+    if ( needAnimation === void 0 ) needAnimation = true;
+
+    if (typeof posX !== 'number' || typeof posY !== 'number') {
+      return;
+    }
+    Native.callUIFunction(this, 'scrollToContentOffset', [posX, posY, needAnimation]);
+  };
+
+  /**
+   * Polyfill native event
+   */
+  ListNode.prototype.polyFillNativeEvents = function polyFillNativeEvents (method, eventNames, callback, options) {
+    var eventHandlerMap = {
+      addEvent: 'addEventListener',
+      removeEvent: 'removeEventListener',
+    };
+    var name = eventNames;
+    if (eventNames === 'endReached' || eventNames === 'loadMore') {
+      name = eventNames === 'endReached' ? 'loadMore' : 'endReached';
+      if (this.emitter && eventHandlerMap[method]) {
+        var handler = eventHandlerMap[method];
+        this.emitter[handler](name, callback, options);
+      }
+    }
+  };
+
+  return ListNode;
+}(ElementNode));
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * ListItemNode element
+ */
+var ListItemNode = /*@__PURE__*/(function (ElementNode) {
+  function ListItemNode () {
+    ElementNode.apply(this, arguments);
+  }
+
+  if ( ElementNode ) ListItemNode.__proto__ = ElementNode;
+  ListItemNode.prototype = Object.create( ElementNode && ElementNode.prototype );
+  ListItemNode.prototype.constructor = ListItemNode;
+
+  ListItemNode.prototype.polyFillNativeEvents = function polyFillNativeEvents (method, eventNames, callback, options) {
+    var eventHandlerMap = {
+      addEvent: 'addEventListener',
+      removeEvent: 'removeEventListener',
+    };
+    var name = eventNames;
+    if (eventNames === 'disappear') {
+      name = Native.Platform === 'ios' ? 'disappear' : 'disAppear';
+      if (this.emitter && eventHandlerMap[method]) {
+        var handler = eventHandlerMap[method];
+        this.emitter[handler](name, callback, options);
+      }
+    }
+  };
+
+  return ListItemNode;
+}(ElementNode));
+
+/**
+ * img element
+ */
+var ImgNode = /*@__PURE__*/(function (ElementNode) {
+  function ImgNode () {
+    ElementNode.apply(this, arguments);
+  }
+
+  if ( ElementNode ) ImgNode.__proto__ = ElementNode;
+  ImgNode.prototype = Object.create( ElementNode && ElementNode.prototype );
+  ImgNode.prototype.constructor = ImgNode;
+
+  ImgNode.prototype.save = function save () {
+    Native.callUIFunction(this, 'save');
+  };
+
+  return ImgNode;
+}(ElementNode));
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var DocumentNode = /*@__PURE__*/(function (ViewNode) {
+  function DocumentNode() {
+    ViewNode.call(this);
+    this.documentElement = new ElementNode('document');
+    // make static methods accessible via this
+    this.createComment = this.constructor.createComment;
+    this.createElement = this.constructor.createElement;
+    this.createElementNS = this.constructor.createElementNS;
+    this.createTextNode = this.constructor.createTextNode;
+  }
+
+  if ( ViewNode ) DocumentNode.__proto__ = ViewNode;
+  DocumentNode.prototype = Object.create( ViewNode && ViewNode.prototype );
+  DocumentNode.prototype.constructor = DocumentNode;
+
+  DocumentNode.createComment = function createComment (text) {
+    return new CommentNode(text);
+  };
+
+  DocumentNode.createElement = function createElement (tagName) {
+    switch (tagName) {
+      case 'input':
+      case 'textarea':
+        return new InputNode(tagName);
+      case 'ul':
+        return new ListNode(tagName);
+      case 'li':
+        return new ListItemNode(tagName);
+      case 'img':
+          return new ImgNode(tagName);
+      default:
+        return new ElementNode(tagName);
+    }
+  };
+
+  DocumentNode.createElementNS = function createElementNS (namespace, tagName) {
+    return new ElementNode((namespace + ":" + tagName));
+  };
+
+  DocumentNode.createTextNode = function createTextNode (text) {
+    return new TextNode(text);
+  };
+
+  DocumentNode.createEvent = function createEvent (eventName) {
+    return new Event(eventName);
+  };
+
+  return DocumentNode;
+}(ViewNode));
+
 /*  */
 
 var ref$1 = {
@@ -9998,7 +15170,25 @@ var baseModules = [
   directives$1
 ];
 
-/* eslint-disable no-underscore-dangle */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 function updateAttrs(oldVNode, vNode) {
   if (!oldVNode.data.attrs && !vNode.data.attrs) {
@@ -10022,6 +15212,7 @@ function updateAttrs(oldVNode, vNode) {
     }
   });
   Object.keys(oldAttrs).forEach(function (key) {
+    // eslint-disable-next-line eqeqeq
     if (attrs[key] == null) {
       elm.setAttribute(key);
     }
@@ -10033,7 +15224,25 @@ var attrs = {
   update: updateAttrs,
 };
 
-/* eslint-disable no-underscore-dangle */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 function updateClass(oldVNode, vNode) {
   var elm = vNode.elm;
@@ -10046,15 +15255,12 @@ function updateClass(oldVNode, vNode) {
   ) {
     return;
   }
-
   var cls = genClassForVnode(vNode);
-
   // handle transition classes
   var transitionClass = elm._transitionClasses;
   if (transitionClass) {
     cls = concat(cls, stringifyClass(transitionClass));
   }
-
   // set the class
   if (cls !== elm._prevClass) {
     elm.setAttribute('class', cls);
@@ -10067,7 +15273,25 @@ var class_ = {
   update: updateClass,
 };
 
-/* eslint-disable prefer-rest-params */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 var target$1;
 
@@ -10111,7 +15335,25 @@ var events = {
   update: updateDOMListeners,
 };
 
-/* eslint-disable no-underscore-dangle */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 var normalize = cached(camelize);
 
@@ -10134,15 +15376,12 @@ function updateStyle(oldVNode, vNode) {
   var elm = vNode.elm;
   var oldStyle = oldVNode.data.style || {};
   var style = vNode.data.style || {};
-
   var needClone = style.__ob__;
-
   // handle array syntax
   if (Array.isArray(style)) {
     style = toObject$1(style);
     vNode.data.style = style;
   }
-
   // clone the style for future updates,
   // in case the user mutates the style object in-place.
   if (needClone) {
@@ -10185,3974 +15424,47 @@ var style$1 = {
   update: updateStyle,
 };
 
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var platformModules = [attrs, class_, events, style$1];
 
-/* eslint-disable no-bitwise */
-/* eslint-disable no-mixed-operators */
-
-var names = {
-  transparent: 0x00000000,
-  aliceblue: 0xf0f8ffff,
-  antiquewhite: 0xfaebd7ff,
-  aqua: 0x00ffffff,
-  aquamarine: 0x7fffd4ff,
-  azure: 0xf0ffffff,
-  beige: 0xf5f5dcff,
-  bisque: 0xffe4c4ff,
-  black: 0x000000ff,
-  blanchedalmond: 0xffebcdff,
-  blue: 0x0000ffff,
-  blueviolet: 0x8a2be2ff,
-  brown: 0xa52a2aff,
-  burlywood: 0xdeb887ff,
-  burntsienna: 0xea7e5dff,
-  cadetblue: 0x5f9ea0ff,
-  chartreuse: 0x7fff00ff,
-  chocolate: 0xd2691eff,
-  coral: 0xff7f50ff,
-  cornflowerblue: 0x6495edff,
-  cornsilk: 0xfff8dcff,
-  crimson: 0xdc143cff,
-  cyan: 0x00ffffff,
-  darkblue: 0x00008bff,
-  darkcyan: 0x008b8bff,
-  darkgoldenrod: 0xb8860bff,
-  darkgray: 0xa9a9a9ff,
-  darkgreen: 0x006400ff,
-  darkgrey: 0xa9a9a9ff,
-  darkkhaki: 0xbdb76bff,
-  darkmagenta: 0x8b008bff,
-  darkolivegreen: 0x556b2fff,
-  darkorange: 0xff8c00ff,
-  darkorchid: 0x9932ccff,
-  darkred: 0x8b0000ff,
-  darksalmon: 0xe9967aff,
-  darkseagreen: 0x8fbc8fff,
-  darkslateblue: 0x483d8bff,
-  darkslategray: 0x2f4f4fff,
-  darkslategrey: 0x2f4f4fff,
-  darkturquoise: 0x00ced1ff,
-  darkviolet: 0x9400d3ff,
-  deeppink: 0xff1493ff,
-  deepskyblue: 0x00bfffff,
-  dimgray: 0x696969ff,
-  dimgrey: 0x696969ff,
-  dodgerblue: 0x1e90ffff,
-  firebrick: 0xb22222ff,
-  floralwhite: 0xfffaf0ff,
-  forestgreen: 0x228b22ff,
-  fuchsia: 0xff00ffff,
-  gainsboro: 0xdcdcdcff,
-  ghostwhite: 0xf8f8ffff,
-  gold: 0xffd700ff,
-  goldenrod: 0xdaa520ff,
-  gray: 0x808080ff,
-  green: 0x008000ff,
-  greenyellow: 0xadff2fff,
-  grey: 0x808080ff,
-  honeydew: 0xf0fff0ff,
-  hotpink: 0xff69b4ff,
-  indianred: 0xcd5c5cff,
-  indigo: 0x4b0082ff,
-  ivory: 0xfffff0ff,
-  khaki: 0xf0e68cff,
-  lavender: 0xe6e6faff,
-  lavenderblush: 0xfff0f5ff,
-  lawngreen: 0x7cfc00ff,
-  lemonchiffon: 0xfffacdff,
-  lightblue: 0xadd8e6ff,
-  lightcoral: 0xf08080ff,
-  lightcyan: 0xe0ffffff,
-  lightgoldenrodyellow: 0xfafad2ff,
-  lightgray: 0xd3d3d3ff,
-  lightgreen: 0x90ee90ff,
-  lightgrey: 0xd3d3d3ff,
-  lightpink: 0xffb6c1ff,
-  lightsalmon: 0xffa07aff,
-  lightseagreen: 0x20b2aaff,
-  lightskyblue: 0x87cefaff,
-  lightslategray: 0x778899ff,
-  lightslategrey: 0x778899ff,
-  lightsteelblue: 0xb0c4deff,
-  lightyellow: 0xffffe0ff,
-  lime: 0x00ff00ff,
-  limegreen: 0x32cd32ff,
-  linen: 0xfaf0e6ff,
-  magenta: 0xff00ffff,
-  maroon: 0x800000ff,
-  mediumaquamarine: 0x66cdaaff,
-  mediumblue: 0x0000cdff,
-  mediumorchid: 0xba55d3ff,
-  mediumpurple: 0x9370dbff,
-  mediumseagreen: 0x3cb371ff,
-  mediumslateblue: 0x7b68eeff,
-  mediumspringgreen: 0x00fa9aff,
-  mediumturquoise: 0x48d1ccff,
-  mediumvioletred: 0xc71585ff,
-  midnightblue: 0x191970ff,
-  mintcream: 0xf5fffaff,
-  mistyrose: 0xffe4e1ff,
-  moccasin: 0xffe4b5ff,
-  navajowhite: 0xffdeadff,
-  navy: 0x000080ff,
-  oldlace: 0xfdf5e6ff,
-  olive: 0x808000ff,
-  olivedrab: 0x6b8e23ff,
-  orange: 0xffa500ff,
-  orangered: 0xff4500ff,
-  orchid: 0xda70d6ff,
-  palegoldenrod: 0xeee8aaff,
-  palegreen: 0x98fb98ff,
-  paleturquoise: 0xafeeeeff,
-  palevioletred: 0xdb7093ff,
-  papayawhip: 0xffefd5ff,
-  peachpuff: 0xffdab9ff,
-  peru: 0xcd853fff,
-  pink: 0xffc0cbff,
-  plum: 0xdda0ddff,
-  powderblue: 0xb0e0e6ff,
-  purple: 0x800080ff,
-  rebeccapurple: 0x663399ff,
-  red: 0xff0000ff,
-  rosybrown: 0xbc8f8fff,
-  royalblue: 0x4169e1ff,
-  saddlebrown: 0x8b4513ff,
-  salmon: 0xfa8072ff,
-  sandybrown: 0xf4a460ff,
-  seagreen: 0x2e8b57ff,
-  seashell: 0xfff5eeff,
-  sienna: 0xa0522dff,
-  silver: 0xc0c0c0ff,
-  skyblue: 0x87ceebff,
-  slateblue: 0x6a5acdff,
-  slategray: 0x708090ff,
-  slategrey: 0x708090ff,
-  snow: 0xfffafaff,
-  springgreen: 0x00ff7fff,
-  steelblue: 0x4682b4ff,
-  tan: 0xd2b48cff,
-  teal: 0x008080ff,
-  thistle: 0xd8bfd8ff,
-  tomato: 0xff6347ff,
-  turquoise: 0x40e0d0ff,
-  violet: 0xee82eeff,
-  wheat: 0xf5deb3ff,
-  white: 0xffffffff,
-  whitesmoke: 0xf5f5f5ff,
-  yellow: 0xffff00ff,
-  yellowgreen: 0x9acd32ff,
-};
-
-var call = function () {
-  var args = [], len = arguments.length;
-  while ( len-- ) args[ len ] = arguments[ len ];
-
-  return ("\\(\\s*(" + (args.join(')\\s*,\\s*(')) + ")\\s*\\)");
-};
-
-var NUMBER = '[-+]?\\d*\\.?\\d+';
-var PERCENTAGE = NUMBER + "%";
-
-var matchers = {
-  rgb: new RegExp(("rgb" + (call(NUMBER, NUMBER, NUMBER)))),
-  rgba: new RegExp(("rgba" + (call(NUMBER, NUMBER, NUMBER, NUMBER)))),
-  hsl: new RegExp(("hsl" + (call(NUMBER, PERCENTAGE, PERCENTAGE)))),
-  hsla: new RegExp(("hsla" + (call(NUMBER, PERCENTAGE, PERCENTAGE, NUMBER)))),
-  hex3: /^#([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
-  hex4: /^#([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
-  hex6: /^#([0-9a-fA-F]{6})$/,
-  hex8: /^#([0-9a-fA-F]{8})$/,
-};
-
-var parse255 = function (str) {
-  var int = parseInt(str, 10);
-  if (int < 0) {
-    return 0;
-  }
-  if (int > 255) {
-    return 255;
-  }
-  return int;
-};
-
-var parse1 = function (str) {
-  var num = parseFloat(str);
-  if (num < 0) {
-    return 0;
-  }
-  if (num > 1) {
-    return 255;
-  }
-  return Math.round(num * 255);
-};
-
-var hue2rgb = function (p, q, tx) {
-  var t = tx;
-  if (t < 0) {
-    t += 1;
-  }
-  if (t > 1) {
-    t -= 1;
-  }
-  if (t < 1 / 6) {
-    return p + (q - p) * 6 * t;
-  }
-  if (t < 1 / 2) {
-    return q;
-  }
-  if (t < 2 / 3) {
-    return p + (q - p) * (2 / 3 - t) * 6;
-  }
-  return p;
-};
-
-var hslToRgb = function (h, s, l) {
-  var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-  var p = 2 * l - q;
-  var r = hue2rgb(p, q, h + 1 / 3);
-  var g = hue2rgb(p, q, h);
-  var b = hue2rgb(p, q, h - 1 / 3);
-
-  return (
-    (Math.round(r * 255) << 24)
-    | (Math.round(g * 255) << 16)
-    | (Math.round(b * 255) << 8)
-  );
-};
-
-var parse360 = function (str) {
-  var int = parseFloat(str);
-  return (((int % 360) + 360) % 360) / 360;
-};
-
-var parsePercentage = function (str) {
-  var int = parseFloat(str, 10);
-  if (int < 0) {
-    return 0;
-  }
-  if (int > 100) {
-    return 1;
-  }
-  return int / 100;
-};
-
-function baseColor(color) {
-  var match;
-
-  if (typeof color === 'number') {
-    if (color >>> 0 === color && color >= 0 && color <= 0xffffffff) {
-      return color;
-    }
-    return null;
-  }
-
-  match = matchers.hex6.exec(color);
-  if (Array.isArray(match)) {
-    return parseInt(((match[1]) + "ff"), 16) >>> 0;
-  }
-
-  if (Object.hasOwnProperty.call(names, color)) {
-    return names[color];
-  }
-
-  match = matchers.rgb.exec(color);
-  if (Array.isArray(match)) {
-    return (
-      (parse255(match[1]) << 24) // r
-      | (parse255(match[2]) << 16) // g
-      | (parse255(match[3]) << 8) // b
-      | 0x000000ff // a
-    ) >>> 0;
-  }
-
-  match = matchers.rgba.exec(color);
-  if (match) {
-    return (
-      (parse255(match[1]) << 24) // r
-      | (parse255(match[2]) << 16) // g
-      | (parse255(match[3]) << 8) // b
-      | parse1(match[4]) // a
-    ) >>> 0;
-  }
-
-  match = matchers.hex3.exec(color);
-  if (match) {
-    return parseInt(
-      ((match[1] + match[1] // r
-      + match[2] + match[2] // g
-      + match[3] + match[3]) + "ff"), // a
-      16
-    ) >>> 0;
-  }
-
-  match = matchers.hex8.exec(color);
-  if (match) {
-    return parseInt(match[1], 16) >>> 0;
-  }
-
-  match = matchers.hex4.exec(color);
-  if (match) {
-    return parseInt(
-      match[1] + match[1] // r
-      + match[2] + match[2] // g
-      + match[3] + match[3] // b
-      + match[4] + match[4], // a
-      16
-    ) >>> 0;
-  }
-
-  match = matchers.hsl.exec(color);
-  if (match) {
-    return (
-      hslToRgb(
-        parse360(match[1]), // h
-        parsePercentage(match[2]), // s
-        parsePercentage(match[3]) // l
-      )
-      | 0x000000ff // a
-    ) >>> 0;
-  }
-
-  match = matchers.hsla.exec(color);
-  if (match) {
-    return (
-      hslToRgb(
-        parse360(match[1]), // h
-        parsePercentage(match[2]), // s
-        parsePercentage(match[3]) // l
-      )
-      | parse1(match[4]) // a
-    ) >>> 0;
-  }
-
-  return null;
-}
-
-/**
- * Translate the color to make sure native understood.
- */
-function translateColor(color, options) {
-  if ( options === void 0 ) options = {};
-
-  var int32Color = baseColor(color);
-  if (int32Color === null) {
-    throw new Error(("Bad color value: " + color));
-  }
-
-  int32Color = (int32Color << 24 | int32Color >>> 8) >>> 0;
-  if (options && options.platform === 'android') {
-    int32Color |= 0;
-  }
-  return int32Color;
-}
-
-/* eslint-disable prefer-destructuring */
-var HIPPY_VUE_VERSION = "2.1.4";
-
-var _App;
-var _Vue;
-
-/**
- * Style pre-process hook
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
  *
- * Use for hack the style processing, update the property
- * or value mannuly.
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
  *
- * @param {Object} decl - Style declaration.
- * @param {string} decl.property - Style property name.
- * @param {string|number} decl.value - Style property value.
- * @returns {Object} decl - Processed declaration, original declaration by default.
- */
-var _beforeLoadStyle = function (decl) { return decl; };
-
-function setVue(Vue) {
-  _Vue = Vue;
-}
-
-function setApp(app) {
-  _App = app;
-}
-
-function getApp() {
-  return _App;
-}
-
-function setBeforeLoadStyle(beforeLoadStyle) {
-  _beforeLoadStyle = beforeLoadStyle;
-}
-
-function getBeforeLoadStyle() {
-  return _beforeLoadStyle;
-}
-
-var infoTrace = once(function () {
-  console.log(
-    'Hippy-Vue has "Vue.config.silent" set to true, to see output logs set it to false.'
-  );
-});
-
-function trace() {
-  var context = [], len = arguments.length;
-  while ( len-- ) context[ len ] = arguments[ len ];
-
-  // In production build
-  if (process.env.NODE_ENV === 'production') {
-    return;
-  }
-
-  // Not in debugger mode or running in NodeJS
-  if (process && process.release) {
-    return;
-  }
-
-  // Print message while keeps silent
-  if (_Vue && _Vue.config.silent) {
-    infoTrace();
-    return;
-  }
-  // console.log(...context);
-}
-
-function warn$3() {
-  var context = [], len = arguments.length;
-  while ( len-- ) context[ len ] = arguments[ len ];
-
-  if (process.env.NODE_ENV === 'production') {
-    return null;
-  }
-  return console.warn.apply(console, context);
-}
-
-function capitalizeFirstLetter(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/**
- * Convert string to number as possible
- */
-var numberRegEx = new RegExp('^[+-]?\\d*\\.?\\d*([Ee][+-]?\\d+)?$');
-var notEmptyRegEx = new RegExp('^.+$');
-function tryConvertNumber(str) {
-  if (typeof str === 'number') {
-    return str;
-  }
-  if (typeof str === 'string' && numberRegEx.test(str) && notEmptyRegEx.test(str)) {
-    try {
-      return parseFloat(str);
-    } catch (err) {
-      // pass
-    }
-  }
-  return str;
-}
-
-function unicodeToChar(text) {
-  return text.replace(/\\u[\dA-F]{4}|\\x[\dA-F]{2}/gi, function (match) { return String.fromCharCode(parseInt(match.replace(/\\u|\\x/g, ''), 16)); });
-}
-
-function arrayCount(arr, iterator) {
-  var count = 0;
-  for (var i = 0; i < arr.length; i += 1) {
-    if (iterator(arr[i])) {
-      count += 1;
-    }
-  }
-  return count;
-}
-
-/**
- * Better function checking
- */
-function isFunction(func) {
-  return Object.prototype.toString.call(func) === '[object Function]';
-}
-
-/**
- * Compare two sets
- */
-function setsAreEqual(as, bs) {
-  if (as.size !== bs.size) { return false; }
-  var values = as.values();
-  var a = values.next().value;
-  while (a) {
-    if (!bs.has(a)) {
-      return false;
-    }
-    a = values.next().value;
-  }
-  return true;
-}
-
-/**
- * endsWith polyfill for iOS 8 compatiblity
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith#Polyfill
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * @param {string} str - The characters with specified string.
- * @param {string} search - The characters to be searched for at the end of str.
- * @param {number} length - If provided, it is used as the length of str. Defaults to str.length.
- * @return {boolean}
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-function endsWith(str, search, length) {
-  if (String.prototype.endsWith) {
-    return str.endsWith(search, length);
-  }
-  var strLen = length;
-  if (strLen === undefined || strLen > str.length) {
-    strLen = str.length;
-  }
-  return str.slice(strLen - search.length, strLen) === search;
-}
-
-/* eslint-disable no-bitwise */
-
-var PROPERTIES_MAP = {
-  textDecoration: 'textDecorationLine',
-  boxShadowOffset: 'shadowOffset',
-  boxShadowOpacity: 'shadowOpacity',
-  boxShadowRadius: 'shadowRadius',
-  boxShadowSpread: 'shadowSpread',
-  boxShadowColor: 'shadowColor',
-};
-
-var on$1 = Hippy.on;
-var off = Hippy.off;
-var emit = Hippy.emit;
-var Hippy_bridge = Hippy.bridge;
-var callNative = Hippy_bridge.callNative;
-var callNativeWithPromise = Hippy_bridge.callNativeWithPromise;
-var callNativeWithCallbackId = Hippy_bridge.callNativeWithCallbackId;
-var Hippy_device = Hippy.device;
-var Platform = Hippy_device.platform.OS;
-var PixelRatio = Hippy_device.screen.scale;
-var Dimensions = Hippy.device;
-var UIManagerModule = Hippy.document;
-var HippyRegister = Hippy.register;
-
-var CACHE = {};
-
-var measureInWindowByMethod = function measureInWindowByMethod(el, method) {
-  var empty = {
-    top: -1,
-    left: -1,
-    bottom: -1,
-    right: -1,
-    width: -1,
-    height: -1,
-  };
-  if (!el.isMounted || !el.nodeId) {
-    return empty;
-  }
-  var nodeId = el.nodeId;
-  // FIXME: callNativeWithPromise was broken in iOS, it response
-  // UIManager was called with 3 arguments, but expect 2.
-  // So wrap the function with a Promise.
-  var timeout = new Promise(function (resolve) { return setTimeout(function () {
-    resolve(empty);
-  }, 100); });
-  var measure = new Promise(function (resolve) { return callNative('UIManagerModule', method, nodeId, function (pos) {
-    // Android error handler.
-    if (!pos || pos === 'this view is null') {
-      return resolve(empty);
-    }
-    return resolve({
-      top: pos.y,
-      left: pos.x,
-      bottom: pos.y + pos.height,
-      right: pos.x + pos.width,
-      width: pos.width,
-      height: pos.height,
-    });
-  }); });
-  return Promise.race([timeout, measure]);
-};
-
-/**
- * Native communication module
- */
-var Native = {
-  /**
-   * Class native methods
-   */
-  callNative: callNative,
-
-  /**
-   * Call native methods with a promise response.
-   */
-  callNativeWithPromise: callNativeWithPromise,
-
-  /**
-   * Call native with callId returns
-   */
-  callNativeWithCallbackId: callNativeWithCallbackId,
-
-  /**
-   * Draw UI with native language.
-   */
-  UIManagerModule: UIManagerModule,
-
-  /**
-   * Global device event listener
-   */
-  on: on$1,
-  off: off,
-  emit: emit,
-
-  /**
-   * Get the device pixel ratio
-   */
-  PixelRatio: PixelRatio,
-
-  /**
-   * Get the running operating system.
-   */
-  Platform: Platform,
-
-  /**
-   * Hippy-Vue version
-   */
-  version: HIPPY_VUE_VERSION,
-
-  /**
-   * Cookie Module
-   */
-  Cookie: {
-    /**
-     * Get all of cookies by string
-     * @param {string} url - Get the cookies by specific url.
-     * @return {Promise<string>} - Cookie string, like `name=someone;gender=female`.
-     */
-    getAll: function getAll(url) {
-      if (!url) {
-        throw new TypeError('Vue.Native.Cookie.getAll() must have url argument');
-      }
-      return callNativeWithPromise('network', 'getCookie', url);
-    },
-    /**
-     * Set cookie key and value
-     * @param {string} url - Set the cookie to specific url.
-     * @param {string} keyValue - Full of key values, like `name=someone;gender=female`.
-     * @param {Date} expireDate - Specific date of expiration.
-     */
-    set: function set(url, keyValue, expireDate) {
-      if (!url) {
-        throw new TypeError('Vue.Native.Cookie.getAll() must have url argument');
-      }
-      if (typeof keyValue !== 'string') {
-        throw new TypeError('Vue.Native.Cookie.getAll() only receive string type of keyValue');
-      }
-      var expireStr = '';
-      if (expireDate) {
-        if (expireDate instanceof Date) {
-          expireStr = expireDate.toUTCString();
-        } else {
-          throw new TypeError('Vue.Native.Cookie.getAll() only receive Date type of expires');
-        }
-      }
-      callNative('network', 'setCookie', url, keyValue, expireStr);
-    },
-  },
-
-  /**
-   * Clipboard Module
-   */
-  Clipboard: {
-    getString: function getString() {
-      return callNativeWithPromise('ClipboardModule', 'getString');
-    },
-    setString: function setString(content) {
-      callNative('ClipboardModule', 'setString', content);
-    },
-  },
-
-  /**
-   * Determine the device is iPhone X
-   */
-  get isIPhoneX() {
-    if (!isDef(CACHE.isIPhoneX)) {
-      // Assume false in most cases.
-      var isIPhoneX = false;
-      if (Native.Platform === 'ios') {
-        // iOS12 - iPhone11: 48 Phone12/12 pro/12 pro max: 47 other: 44
-        var statusBarHeightList = [44, 47, 48];
-        isIPhoneX = statusBarHeightList.indexOf(Native.Dimensions.screen.statusBarHeight) > -1;
-      }
-      CACHE.isIPhoneX = isIPhoneX;
-    }
-    return CACHE.isIPhoneX;
-  },
-
-  /**
-   * Determine the screen is vertical orientation.
-   * Should always retrieve from scratch.
-   */
-  get screenIsVertical() {
-    return Native.Dimensions.window.width < Native.Dimensions.window.height;
-  },
-
-  /**
-   * Get the device information
-   */
-  get Device() {
-    if (!isDef(CACHE.Device)) {
-      if (Platform === 'ios') {
-        if (global.__HIPPYNATIVEGLOBAL__ && global.__HIPPYNATIVEGLOBAL__.Device) {
-          CACHE.Device = global.__HIPPYNATIVEGLOBAL__.Device;
-        } else {
-          CACHE.Device = 'iPhone';
-        }
-      } else if (Platform === 'android') {
-        // TODO: Need android native fill the information
-        CACHE.Device = 'Android device';
-      } else {
-        CACHE.Device = 'Unknown device';
-      }
-    }
-    return CACHE.Device;
-  },
-
-  /**
-   * Get the OS version
-   * TODO: the API is iOS only so far.
-   */
-  get OSVersion() {
-    if (Platform !== 'ios') {
-      warn$3('Vue.Native.OSVersion is available in iOS only');
-      return null;
-    }
-    if (!global.__HIPPYNATIVEGLOBAL__ || !global.__HIPPYNATIVEGLOBAL__.OSVersion) {
-      warn$3('Vue.Native.OSVersion is only available for iOS SDK > 0.2.0');
-      return null;
-    }
-    return global.__HIPPYNATIVEGLOBAL__.OSVersion;
-  },
-
-  /**
-   * Get the SDK version
-   * TODO: the API is iOS only so far.
-   */
-  get SDKVersion() {
-    if (Platform !== 'ios') {
-      warn$3('Vue.Native.SDKVersion is available in iOS only');
-      return null;
-    }
-    if (!global.__HIPPYNATIVEGLOBAL__ || !global.__HIPPYNATIVEGLOBAL__.OSVersion) {
-      warn$3('Vue.Native.SDKVersion is only available for iOS SDK > 0.2.0');
-      return null;
-    }
-    return global.__HIPPYNATIVEGLOBAL__.SDKVersion;
-  },
-
-  /**
-   * Get the API version
-   * TODO: the API is Android only so far.
-   */
-  get APILevel() {
-    if (Platform !== 'android') {
-      warn$3('Vue.Native.APIVersion is available in Android only');
-      return null;
-    }
-    if (!global.__HIPPYNATIVEGLOBAL__ || !global.__HIPPYNATIVEGLOBAL__.Platform.APILevel) {
-      warn$3('Vue.Native.APILevel needs higher Android SDK version to retrieve');
-      return null;
-    }
-    return global.__HIPPYNATIVEGLOBAL__.Platform.APILevel;
-  },
-
-  /**
-   * Get the screen or view size.
-   */
-  get Dimensions() {
-    var screen = Dimensions.screen;
-    // Convert statusBarHeight to dp unit for android platform
-    // Here's a base issue: statusBarHeight for iOS is dp, but for statusBarHeight is pixel.
-    // So make them be same to hippy-vue.
-    var statusBarHeight = screen.statusBarHeight;
-    if (Native.Platform === 'android') {
-      statusBarHeight /= Native.PixelRatio;
-    }
-    return {
-      window: Dimensions.window,
-      screen: Object.assign({}, screen,
-        {statusBarHeight: statusBarHeight}),
-    };
-  },
-
-  /**
-   * Get the one pixel size of device
-   */
-  get OnePixel() {
-    if (!isDef(CACHE.OnePixel)) {
-      var ratio = Native.PixelRatio;
-      var onePixel = Math.round(0.4 * ratio) / ratio;
-      if (!onePixel) { // Assume 0 is false
-        onePixel = 1 / ratio;
-      }
-      CACHE.OnePixel = onePixel;
-    }
-    return CACHE.OnePixel;
-  },
-
-  /**
-   * Call native UI methods.
-   */
-  callUIFunction: function callUIFunction() {
-    var args = [], len = arguments.length;
-    while ( len-- ) args[ len ] = arguments[ len ];
-
-    var el = args[0];
-    var funcName = args[1];
-    var options = args.slice(2);
-    var nodeId = el.nodeId;
-    var params = options[0]; if ( params === void 0 ) params = [];
-    var callback = options[1];
-    if (typeof params === 'function') {
-      callback = params;
-      params = [];
-    }
-    trace('callUIFunction', { nodeId: nodeId, funcName: funcName, params: params });
-    if (Native.Platform === 'android') {
-      if (isFunction(callback)) {
-        callNative('UIManagerModule', 'callUIFunction', [nodeId, funcName, params], callback);
-      } else {
-        callNative('UIManagerModule', 'callUIFunction', [nodeId, funcName, params]);
-      }
-    } else if (Native.Platform === 'ios' && el.meta.component.name) {
-      var ref = el.meta.component;
-      var componentName = ref.name;
-      // FIXME: iOS callNative method need the real component name,
-      //        but there's no a module named View in __GLOBAL__.NativeModules.
-      //        Because only ScrollView use the method so far, so just a workaround here.
-      if (componentName === 'View') {
-        componentName = 'ScrollView';
-      }
-      if (isFunction(callback) && Array.isArray(params)) {
-        params.push(callback);
-      }
-      callNative('UIManagerModule', 'callUIFunction', [componentName, nodeId, funcName, params]);
-    }
-  },
-
-  /**
-   * Measure the component size and position.
-   */
-  measureInWindow: function measureInWindow(el) {
-    return measureInWindowByMethod(el, 'measureInWindow');
-  },
-
-  /**
-   * Measure the component size and position.
-   */
-  measureInAppWindow: function measureInAppWindow(el) {
-    if (Native.Platform === 'android') {
-      return measureInWindowByMethod(el, 'measureInWindow');
-    }
-    return measureInWindowByMethod(el, 'measureInAppWindow');
-  },
-
-  /**
-   * parse the color to int32Color which native can understand.
-   * @param { String | Number } color
-   * @param { {platform: "ios" | "android"} } options
-   * @returns { Number } int32Color
-   */
-  parseColor: function parseColor(color, options) {
-    if ( options === void 0 ) options = { platform: Native.Platform };
-
-    var cache = CACHE.COLOR_PARSER || (CACHE.COLOR_PARSER = Object.create(null));
-    if (!cache[color]) {
-      var int32Color = translateColor(color, options);
-      // cache the calculation result
-      cache[color] = int32Color;
-    }
-    return cache[color];
-  },
-};
-
-/* eslint-disable consistent-return */
-/* eslint-disable import/no-mutable-exports */
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable no-else-return */
-/* eslint-disable no-param-reassign */
-
-// Check the Regexp is support sticky flag.
-var REGEXP_SUPPORTING_STICKY_FLAG = (function () {
-  try {
-    return !!new RegExp('foo', 'y');
-  } catch (err) {
-    return false;
-  }
-})();
-
-
-// Regexp strings
-var REGEXP_STRINGS = {
-  whiteSpaceRegEx: '\\s*',
-  universalSelectorRegEx: '\\*',
-  simpleIdentifierSelectorRegEx: '(#|\\.|:|\\b)([_-\\w][_-\\w\\d]*)',
-  attributeSelectorRegEx: '\\[\\s*([_-\\w][_-\\w\\d]*)\\s*(?:(=|\\^=|\\$=|\\*=|\\~=|\\|=)\\s*(?:([_-\\w][_-\\w\\d]*)|"((?:[^\\\\"]|\\\\(?:"|n|r|f|\\\\|0-9a-f))*)"|\'((?:[^\\\\\']|\\\\(?:\'|n|r|f|\\\\|0-9a-f))*)\')\\s*)?\\]',
-  combinatorRegEx: '\\s*(\\+|~|>)?\\s*',
-};
-
-// RegExp instance cache
-var REGEXPS = {};
-
-// Execute the RegExp
-function execRegExp(regexpKey, text, start) {
-  var flags = '';
-
-  // Check the sticky flag supporting, and cache the RegExp instance.
-  if (REGEXP_SUPPORTING_STICKY_FLAG) {
-    flags = 'gy';
-  }
-  if (!REGEXPS[regexpKey]) {
-    REGEXPS[regexpKey] = new RegExp(REGEXP_STRINGS[regexpKey], flags);
-  }
-  var regexp = REGEXPS[regexpKey];
-  var result;
-  // Fallback to split the text if sticky is not supported.
-  if (REGEXP_SUPPORTING_STICKY_FLAG) {
-    regexp.lastIndex = start;
-    result = regexp.exec(text);
-  } else {
-    text = text.slice(start, text.length);
-    result = regexp.exec(text);
-    if (!result) {
-      return {
-        result: null,
-        regexp: regexp,
-      };
-    }
-    // add start index to prevent infinite loop caused by class name like .aa_bb.aa
-    regexp.lastIndex = start + result[0].length;
-  }
-  return {
-    result: result,
-    regexp: regexp,
-  };
-}
-
-function parseUniversalSelector(text, start) {
-  var ref = execRegExp('universalSelectorRegEx', text, start);
-  var result = ref.result;
-  var regexp = ref.regexp;
-  if (!result) {
-    return null;
-  }
-  var end = regexp.lastIndex;
-  return {
-    value: {
-      type: '*',
-    },
-    start: start,
-    end: end,
-  };
-}
-
-function parseSimpleIdentifierSelector(text, start) {
-  var ref = execRegExp('simpleIdentifierSelectorRegEx', text, start);
-  var result = ref.result;
-  var regexp = ref.regexp;
-  if (!result) {
-    return null;
-  }
-  var end = regexp.lastIndex;
-  var type = result[1];
-  var identifier = result[2];
-  var value = { type: type, identifier: identifier };
-  return {
-    value: value,
-    start: start,
-    end: end,
-  };
-}
-
-function parseAttributeSelector(text, start) {
-  var ref = execRegExp('attributeSelectorRegEx', text, start);
-  var result = ref.result;
-  var regexp = ref.regexp;
-  if (!result) {
-    return null;
-  }
-  var end = regexp.lastIndex;
-  var property = result[1];
-  if (result[2]) {
-    var test = result[2];
-    var value = result[3] || result[4] || result[5];
-    return {
-      value: {
-        type: '[]',
-        property: property,
-        test: test,
-        value: value,
-      },
-      start: start,
-      end: end,
-    };
-  }
-  return {
-    value: {
-      type: '[]',
-      property: property,
-    },
-    start: start,
-    end: end,
-  };
-}
-
-function parseSimpleSelector(text, start) {
-  return parseUniversalSelector(text, start)
-    || parseSimpleIdentifierSelector(text, start)
-    || parseAttributeSelector(text, start);
-}
-
-function parseSimpleSelectorSequence(text, start) {
-  var assign;
-
-  var simpleSelector = parseSimpleSelector(text, start);
-  if (!simpleSelector) {
-    return null;
-  }
-  var end = simpleSelector.end;
-  var value = [];
-  while (simpleSelector) {
-    value.push(simpleSelector.value);
-    ((assign = simpleSelector, end = assign.end));
-    simpleSelector = parseSimpleSelector(text, end);
-  }
-  return {
-    start: start,
-    end: end,
-    value: value,
-  };
-}
-
-function parseCombinator(text, start) {
-  var ref = execRegExp('combinatorRegEx', text, start);
-  var result = ref.result;
-  var regexp = ref.regexp;
-  if (!result) {
-    return null;
-  }
-  var end;
-  if (REGEXP_SUPPORTING_STICKY_FLAG) {
-    end = regexp.lastIndex;
-  } else {
-    end = start;
-  }
-  var value = result[1] || ' ';
-  return {
-    start: start,
-    end: end,
-    value: value,
-  };
-}
-
-function parseSelectorWithRegExpGY(text, start) {
-  var assign, assign$1;
-
-  var end = start;
-  var ref = execRegExp('whiteSpaceRegEx', text, start);
-  var result = ref.result;
-  var regexp = ref.regexp;
-  if (result) {
-    end = regexp.lastIndex;
-  }
-  var value = [];
-  var combinator;
-  var expectSimpleSelector = true;
-  var pair = [];
-  do {
-    var simpleSelectorSequence = parseSimpleSelectorSequence(text, end);
-    if (!simpleSelectorSequence) {
-      if (expectSimpleSelector) {
-        return null;
-      } else {
-        break;
-      }
-    }
-    ((assign = simpleSelectorSequence, end = assign.end));
-    if (combinator) {
-      pair[1] = combinator.value;
-    }
-    pair = [simpleSelectorSequence.value, undefined];
-    value.push(pair);
-
-    combinator = parseCombinator(text, end);
-    if (combinator) {
-      ((assign$1 = combinator, end = assign$1.end));
-    }
-    expectSimpleSelector = combinator && combinator.value !== ' ';
-  } while (combinator);
-  return {
-    start: start,
-    end: end,
-    value: value,
-  };
-}
-
-function parseSelectorWithoutRegExpGY(cssText, start) {
-  var end = start;
-  var ref = execRegExp('whiteSpaceRegEx', cssText, start);
-  var result = ref.result;
-  var regexp = ref.regexp;
-  if (result) {
-    end = regexp.lastIndex;
-  }
-  var value = [];
-  var combinator;
-  var expectSimpleSelector = true;
-  var pair = [];
-  cssText.split(' ').forEach(function (text) {
-    var assign, assign$1;
-
-    if (text === '') {
-      return;
-    }
-    end = 0;
-    do {
-      var simpleSelectorSequence = parseSimpleSelectorSequence(text, end);
-      if (!simpleSelectorSequence) {
-        if (expectSimpleSelector) {
-          return null;
-        } else {
-          break;
-        }
-      }
-      ((assign = simpleSelectorSequence, end = assign.end));
-      if (combinator) {
-        pair[1] = combinator.value;
-      }
-      pair = [simpleSelectorSequence.value, undefined];
-      value.push(pair);
-
-      combinator = parseCombinator(text, end);
-      if (combinator) {
-        ((assign$1 = combinator, end = assign$1.end));
-      }
-      expectSimpleSelector = combinator && combinator.value !== ' ';
-    } while (combinator);
-  });
-  return {
-    start: start,
-    end: end,
-    value: value,
-  };
-}
-
-var parseSelector;
-if (REGEXP_SUPPORTING_STICKY_FLAG) {
-  parseSelector = parseSelectorWithRegExpGY;
-} else {
-  parseSelector = parseSelectorWithoutRegExpGY;
-}
-
-var parseSelector$1 = parseSelector;
-
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable key-spacing */
-/* eslint-disable no-cond-assign */
-/* eslint-disable arrow-body-style */
-/* eslint-disable no-useless-escape */
-/* eslint-disable max-len */
-/* eslint-disable no-continue */
-/* eslint-disable no-param-reassign */
-
-/**
- * Base classes
- */
-var SelectorCore = function SelectorCore () {};
-
-SelectorCore.prototype.lookupSort = function lookupSort (sorter, base) {
-  sorter.sortAsUniversal(base || this);
-};
-
-var SimpleSelector = /*@__PURE__*/(function (SelectorCore) {
-  function SimpleSelector () {
-    SelectorCore.apply(this, arguments);
-  }
-
-  if ( SelectorCore ) SimpleSelector.__proto__ = SelectorCore;
-  SimpleSelector.prototype = Object.create( SelectorCore && SelectorCore.prototype );
-  SimpleSelector.prototype.constructor = SimpleSelector;
-
-  SimpleSelector.prototype.accumulateChanges = function accumulateChanges (node, map) {
-    if (!this.dynamic) {
-      return this.match(node);
-    }
-    if (this.mayMatch(node)) {
-      this.trackChanges(node, map);
-      return true;
-    }
-    return false;
-  };
-
-  SimpleSelector.prototype.mayMatch = function mayMatch (node) {
-    return this.match(node);
-  };
-
-  SimpleSelector.prototype.trackChanges = function trackChanges () {
-    return null;
-  };
-
-  return SimpleSelector;
-}(SelectorCore));
-
-var SimpleSelectorSequence = /*@__PURE__*/(function (SimpleSelector) {
-  function SimpleSelectorSequence(selectors) {
-    SimpleSelector.call(this);
-    this.specificity = selectors.reduce(function (sum, sel) { return sel.specificity + sum; }, 0);
-    this.head = selectors.reduce(function (prev, curr) {
-      return !prev || (curr.rarity > prev.rarity) ? curr : prev;
-    }, null);
-    this.dynamic = selectors.some(function (sel) { return sel.dynamic; });
-    this.selectors = selectors;
-  }
-
-  if ( SimpleSelector ) SimpleSelectorSequence.__proto__ = SimpleSelector;
-  SimpleSelectorSequence.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
-  SimpleSelectorSequence.prototype.constructor = SimpleSelectorSequence;
-
-  SimpleSelectorSequence.prototype.toString = function toString () {
-    return ("" + (this.selectors.join('')) + (this.combinator));
-  };
-
-  SimpleSelectorSequence.prototype.match = function match (node) {
-    return this.selectors.every(function (sel) { return sel.match(node); });
-  };
-
-  SimpleSelectorSequence.prototype.mayMatch = function mayMatch (node) {
-    return this.selectors.every(function (sel) { return sel.mayMatch(node); });
-  };
-
-  SimpleSelectorSequence.prototype.trackChanges = function trackChanges (node, map) {
-    this.selectors.forEach(function (sel) { return sel.trackChanges(node, map); });
-  };
-
-  SimpleSelectorSequence.prototype.lookupSort = function lookupSort (sorter, base) {
-    this.head.lookupSort(sorter, base || this);
-  };
-
-  return SimpleSelectorSequence;
-}(SimpleSelector));
-
-/**
- * Universal Selector
- */
-var UniversalSelector = /*@__PURE__*/(function (SimpleSelector) {
-  function UniversalSelector() {
-    SimpleSelector.call(this);
-    this.specificity = 0x00000000;
-    this.rarity = 0;
-    this.dynamic = false;
-  }
-
-  if ( SimpleSelector ) UniversalSelector.__proto__ = SimpleSelector;
-  UniversalSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
-  UniversalSelector.prototype.constructor = UniversalSelector;
-
-  UniversalSelector.prototype.toString = function toString () {
-    return ("*" + (this.combinator));
-  };
-
-  UniversalSelector.prototype.match = function match () { return true; };
-
-  return UniversalSelector;
-}(SimpleSelector));
-
-/**
- * Id Selector
- */
-var IdSelector = /*@__PURE__*/(function (SimpleSelector) {
-  function IdSelector(id) {
-    SimpleSelector.call(this);
-    this.specificity = 0x00010000;
-    this.rarity = 3;
-    this.dynamic = false;
-    this.id = id;
-  }
-
-  if ( SimpleSelector ) IdSelector.__proto__ = SimpleSelector;
-  IdSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
-  IdSelector.prototype.constructor = IdSelector;
-
-  IdSelector.prototype.toString = function toString () {
-    return ("#" + (this.id) + (this.combinator));
-  };
-
-  IdSelector.prototype.match = function match (node) {
-    return node.id === this.id;
-  };
-
-  IdSelector.prototype.lookupSort = function lookupSort (sorter, base) {
-    sorter.sortById(this.id, base || this);
-  };
-
-  return IdSelector;
-}(SimpleSelector));
-
-
-/**
- * Type Selector
- */
-var TypeSelector = /*@__PURE__*/(function (SimpleSelector) {
-  function TypeSelector(cssType) {
-    SimpleSelector.call(this);
-    this.specificity = 0x00000001;
-    this.rarity = 1;
-    this.dynamic = false;
-    this.cssType = cssType;
-  }
-
-  if ( SimpleSelector ) TypeSelector.__proto__ = SimpleSelector;
-  TypeSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
-  TypeSelector.prototype.constructor = TypeSelector;
-
-  TypeSelector.prototype.toString = function toString () {
-    return ("" + (this.cssType) + (this.combinator));
-  };
-
-  TypeSelector.prototype.match = function match (node) {
-    return node.tagName === this.cssType;
-  };
-
-  TypeSelector.prototype.lookupSort = function lookupSort (sorter, base) {
-    sorter.sortByType(this.cssType, base || this);
-  };
-
-  return TypeSelector;
-}(SimpleSelector));
-
-/**
- * Class Selector
- */
-var ClassSelector = /*@__PURE__*/(function (SimpleSelector) {
-  function ClassSelector(className) {
-    SimpleSelector.call(this);
-    this.specificity = 0x00000100;
-    this.rarity = 2;
-    this.dynamic = false;
-    this.className = className;
-  }
-
-  if ( SimpleSelector ) ClassSelector.__proto__ = SimpleSelector;
-  ClassSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
-  ClassSelector.prototype.constructor = ClassSelector;
-
-  ClassSelector.prototype.toString = function toString () {
-    return ("." + (this.className) + (this.combinator));
-  };
-
-  ClassSelector.prototype.match = function match (node) {
-    return node.classList.size && node.classList.has(this.className);
-  };
-
-  ClassSelector.prototype.lookupSort = function lookupSort (sorter, base) {
-    sorter.sortByClass(this.className, base || this);
-  };
-
-  return ClassSelector;
-}(SimpleSelector));
-
-/**
- * Pseudo Class Selector
- */
-var PseudoClassSelector = /*@__PURE__*/(function (SimpleSelector) {
-  function PseudoClassSelector(cssPseudoClass) {
-    SimpleSelector.call(this);
-    this.specificity = 0x00000100;
-    this.rarity = 0;
-    this.dynamic = true;
-    this.cssPseudoClass = cssPseudoClass;
-  }
-
-  if ( SimpleSelector ) PseudoClassSelector.__proto__ = SimpleSelector;
-  PseudoClassSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
-  PseudoClassSelector.prototype.constructor = PseudoClassSelector;
-
-  PseudoClassSelector.prototype.toString = function toString () {
-    return (":" + (this.cssPseudoClass) + (this.combinator));
-  };
-
-  PseudoClassSelector.prototype.match = function match (node) {
-    return node.cssPseudoClasses && node.cssPseudoClasses.has(this.cssPseudoClass);
-  };
-
-  PseudoClassSelector.prototype.mayMatch = function mayMatch () {
-    return true;
-  };
-
-  PseudoClassSelector.prototype.trackChanges = function trackChanges (node, map) {
-    map.addPseudoClass(node, this.cssPseudoClass);
-  };
-
-  return PseudoClassSelector;
-}(SimpleSelector));
-
-/**
- * Attribute Selector
- */
-
-var AttributeSelector = /*@__PURE__*/(function (SimpleSelector) {
-  function AttributeSelector(attribute, test, value) {
-    SimpleSelector.call(this);
-    this.specificity = 0x00000100;
-    this.rarity = 0;
-    this.dynamic = true;
-    this.attribute = attribute;
-    this.test = test;
-    this.value = value;
-
-    if (!test) {
-      // HasAttribute
-      this.match = function (node) { return !!node[attribute]; };
-      return;
-    }
-
-    if (!value) {
-      this.match = function () { return false; };
-    }
-
-    var escapedValue = value.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-    var regexp = null;
-    switch (test) {
-      case '^=': // PrefixMatch
-        regexp = new RegExp(("^" + escapedValue));
-        break;
-      case '$=': // SuffixMatch
-        regexp = new RegExp((escapedValue + "$"));
-        break;
-      case '*=': // SubstringMatch
-        regexp = new RegExp(escapedValue);
-        break;
-      case '=': // Equals
-        regexp = new RegExp(("^" + escapedValue + "$"));
-        break;
-      case '~=': // Includes
-        if (/\s/.test(value)) {
-          this.match = function () { return false; };
-          return;
-        }
-        regexp = new RegExp(("(^|\\s)" + escapedValue + "(\\s|$)"));
-        break;
-      case '|=': // DashMatch
-        regexp = new RegExp(("^" + escapedValue + "(-|$)"));
-        break;
-    }
-
-    if (regexp) {
-      this.match = function (node) { return regexp.test(("" + (node[attribute]))); };
-      return;
-    }
-    this.match = function () { return false; };
-  }
-
-  if ( SimpleSelector ) AttributeSelector.__proto__ = SimpleSelector;
-  AttributeSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
-  AttributeSelector.prototype.constructor = AttributeSelector;
-
-  AttributeSelector.prototype.toString = function toString () {
-    return ("[" + (this.attribute) + (this.test) + ((this.test && this.value) || '') + "]" + (this.combinator));
-  };
-
-  AttributeSelector.prototype.match = function match () {
-    return false;
-  };
-
-  AttributeSelector.prototype.mayMatch = function mayMatch () {
-    return true;
-  };
-
-  AttributeSelector.prototype.trackChanges = function trackChanges (node, map) {
-    map.addAttribute(node, this.attribute);
-  };
-
-  return AttributeSelector;
-}(SimpleSelector));
-
-/**
- * Invalid Selector
- */
-var InvalidSelector = /*@__PURE__*/(function (SimpleSelector) {
-  function InvalidSelector(err) {
-    SimpleSelector.call(this);
-    this.specificity = 0x00000000;
-    this.rarity = 4;
-    this.dynamic = false;
-    this.combinator = undefined;
-    this.err = err;
-  }
-
-  if ( SimpleSelector ) InvalidSelector.__proto__ = SimpleSelector;
-  InvalidSelector.prototype = Object.create( SimpleSelector && SimpleSelector.prototype );
-  InvalidSelector.prototype.constructor = InvalidSelector;
-
-  InvalidSelector.prototype.toString = function toString () {
-    return ("<error: " + (this.err) + ">");
-  };
-
-  InvalidSelector.prototype.match = function match () {
-    return false;
-  };
-
-  InvalidSelector.prototype.lookupSort = function lookupSort () {
-    return null;
-  };
-
-  return InvalidSelector;
-}(SimpleSelector));
-
-var ChildGroup = function ChildGroup(selectors) {
-  this.selectors = selectors;
-  this.dynamic = selectors.some(function (sel) { return sel.dynamic; });
-};
-
-ChildGroup.prototype.match = function match (node) {
-  var pass = this.selectors.every(function (sel, i) {
-    if (i !== 0) {
-      node = node.parentNode;
-    }
-    return !!node && !!sel.match(node);
-  });
-  return pass ? node : null;
-};
-
-ChildGroup.prototype.mayMatch = function mayMatch (node) {
-  var pass = this.selectors.every(function (sel, i) {
-    if (i !== 0) {
-      node = node.parentNode;
-    }
-    return !!node && !!sel.mayMatch(node);
-  });
-  return pass ? node : null;
-};
-
-ChildGroup.prototype.trackChanges = function trackChanges (node, map) {
-  this.selectors.forEach(function (sel, i) {
-    if (i !== 0) {
-      node = node.parentNode;
-    }
-    if (!node) {
-      return;
-    }
-    sel.trackChanges(node, map);
-  });
-};
-
-var SiblingGroup = function SiblingGroup(selectors) {
-  this.selectors = selectors;
-  this.dynamic = selectors.some(function (sel) { return sel.dynamic; });
-};
-
-SiblingGroup.prototype.match = function match (node) {
-  var pass = this.selectors.every(function (sel, i) {
-    if (i !== 0) {
-      node = node.nextSibling;
-    }
-    return !!node && !!sel.match(node);
-  });
-  return pass ? node : null;
-};
-
-SiblingGroup.prototype.mayMatch = function mayMatch (node) {
-  var pass = this.selectors.every(function (sel, i) {
-    if (i !== 0) {
-      node = node.nextSibling;
-    }
-    return !!node && !!sel.mayMatch(node);
-  });
-  return pass ? node : null;
-};
-
-SiblingGroup.prototype.trackChanges = function trackChanges (node, map) {
-  this.selectors.forEach(function (sel, i) {
-    if (i !== 0) {
-      node = node.nextSibling;
-    }
-    if (!node) {
-      return;
-    }
-    sel.trackChanges(node, map);
-  });
-};
-
-/**
- * Big  Selector
- */
-var Selector = /*@__PURE__*/(function (SelectorCore) {
-  function Selector(selectors) {
-    SelectorCore.call(this);
-    var supportedCombinator = [undefined, ' ', '>', '+'];
-    var siblingGroup;
-    var lastGroup;
-    var groups = [];
-    selectors.reverse().forEach(function (sel) {
-      if (supportedCombinator.indexOf(sel.combinator) === -1) {
-        throw new Error(("Unsupported combinator \"" + (sel.combinator) + "\"."));
-      }
-      if (sel.combinator === undefined || sel.combinator === ' ') {
-        groups.push(lastGroup = [siblingGroup = []]);
-      }
-      if (sel.combinator === '>') {
-        lastGroup.push(siblingGroup = []);
-      }
-      siblingGroup.push(sel);
-    });
-    this.groups = groups.map(function (g) { return new Selector.ChildGroup(g.map(function (sg) { return new Selector.SiblingGroup(sg); })); });
-    this.last = selectors[0];
-    this.specificity = selectors.reduce(function (sum, sel) { return sel.specificity + sum; }, 0);
-    this.dynamic = selectors.some(function (sel) { return sel.dynamic; });
-  }
-
-  if ( SelectorCore ) Selector.__proto__ = SelectorCore;
-  Selector.prototype = Object.create( SelectorCore && SelectorCore.prototype );
-  Selector.prototype.constructor = Selector;
-
-  Selector.prototype.toString = function toString () {
-    return this.selectors.join('');
-  };
-
-  Selector.prototype.match = function match (node) {
-    return this.groups.every(function (group, i) {
-      if (i === 0) {
-        node = group.match(node);
-        return !!node;
-      }
-      var ancestor = node;
-      while (ancestor = ancestor.parentNode) {
-        if (node = group.match(ancestor)) {
-          return true;
-        }
-      }
-      return false;
-    });
-  };
-
-  Selector.prototype.lookupSort = function lookupSort (sorter) {
-    this.last.lookupSort(sorter, this);
-  };
-
-  Selector.prototype.accumulateChanges = function accumulateChanges (node, map) {
-    if (!this.dynamic) {
-      return this.match(node);
-    }
-
-    var bounds = [];
-    var mayMatch = this.groups.every(function (group, i) {
-      if (i === 0) {
-        var nextNode = group.mayMatch(node);
-        bounds.push({ left: node, right: node });
-        node = nextNode;
-        return !!node;
-      }
-      var ancestor = node;
-      while (ancestor = ancestor.parentNode) {
-        var nextNode$1 = group.mayMatch(ancestor);
-        if (nextNode$1) {
-          bounds.push({ left: ancestor, right: null });
-          node = nextNode$1;
-          return true;
-        }
-      }
-      return false;
-    });
-
-    // Calculating the right bounds for each selectors won't save much
-    if (!mayMatch) {
-      return false;
-    }
-
-    if (!map) {
-      return mayMatch;
-    }
-
-    for (var i = 0; i < this.groups.length; i += 1) {
-      var group = this.groups[i];
-      if (!group.dynamic) {
-        continue;
-      }
-      var bound = bounds[i];
-      var leftBound = bound.left;
-      do {
-        if (group.mayMatch(leftBound)) {
-          group.trackChanges(leftBound, map);
-        }
-      } while ((leftBound !== bound.right) && (leftBound = node.parentNode));
-    }
-
-    return mayMatch;
-  };
-
-  return Selector;
-}(SelectorCore));
-Selector.ChildGroup = ChildGroup;
-Selector.SiblingGroup = SiblingGroup;
-
-/**
- * Rule Set
- */
-var RuleSet = function RuleSet(selectors, declarations) {
-  var this$1 = this;
-
-  selectors.forEach(function (sel) {
-    sel.ruleSet = this$1;                  // FIXME: It makes circular dependency
-    return null;
-  });
-  this.selectors = selectors;
-  this.declarations = declarations;
-};
-
-RuleSet.prototype.toString = function toString () {
-  return ((this.selectors.join(', ')) + " {" + (this.declarations.map(function (d, i) { return ("" + (i === 0 ? ' ' : '') + (d.property) + ": " + (d.value)); }).join('; ')) + "}");
-};
-
-RuleSet.prototype.lookupSort = function lookupSort (sorter) {
-  this.selectors.forEach(function (sel) { return sel.lookupSort(sorter); });
-};
-
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable no-param-reassign */
-
-/**
- * Selector Map
- */
-var SelectorsMatch = function SelectorsMatch() {
-  this.changeMap = new Map();
-};
-
-SelectorsMatch.prototype.addAttribute = function addAttribute (node, attribute) {
-  var deps = this.properties(node);
-  if (!deps.attributes) {
-    deps.attributes = new Set();
-  }
-  deps.attributes.add(attribute);
-};
-
-SelectorsMatch.prototype.addPseudoClass = function addPseudoClass (node, pseudoClass) {
-  var deps = this.properties(node);
-  if (!deps.pseudoClasses) {
-    deps.pseudoClasses = new Set();
-  }
-  deps.pseudoClasses.add(pseudoClass);
-};
-
-SelectorsMatch.prototype.properties = function properties (node) {
-  var set = this.changeMap.get(node);
-  if (!set) {
-    this.changeMap.set(node, set = {});
-  }
-  return set;
-};
-
-var SelectorsMap = function SelectorsMap(ruleSets) {
-  var this$1 = this;
-
-  this.id = {};
-  this.class = {};
-  this.type = {};
-  this.universal = [];
-  this.position = 0;
-  this.ruleSets = ruleSets;
-  ruleSets.forEach(function (rule) { return rule.lookupSort(this$1); });
-};
-
-SelectorsMap.prototype.query = function query (node) {
-    var this$1 = this;
-
-  var tagName = node.tagName;
-    var id = node.id;
-    var classList = node.classList;
-  var selectorClasses = [
-    this.universal,
-    this.id[id],
-    this.type[tagName] ];
-  if (classList.size) {
-    classList.forEach(function (c) { return selectorClasses.push(this$1.class[c]); });
-  }
-  var selectors = selectorClasses
-    .filter(function (arr) { return !!arr; })
-    .reduce(function (cur, next) { return cur.concat(next); }, []);
-
-  var selectorsMatch = new SelectorsMatch();
-
-  selectorsMatch.selectors = selectors
-    .filter(function (sel) { return sel.sel.accumulateChanges(node, selectorsMatch); })
-    .sort(function (a, b) { return a.sel.specificity - b.sel.specificity || a.pos - b.pos; })
-    .map(function (docSel) { return docSel.sel; });
-
-  return selectorsMatch;
-};
-
-SelectorsMap.prototype.sortById = function sortById (id, sel) {
-  this.addToMap(this.id, id, sel);
-};
-
-SelectorsMap.prototype.sortByClass = function sortByClass (cssClass, sel) {
-  this.addToMap(this.class, cssClass, sel);
-};
-
-SelectorsMap.prototype.sortByType = function sortByType (cssType, sel) {
-  this.addToMap(this.type, cssType, sel);
-};
-
-SelectorsMap.prototype.sortAsUniversal = function sortAsUniversal (sel) {
-  this.universal.push(this.makeDocSelector(sel));
-};
-
-SelectorsMap.prototype.addToMap = function addToMap (map, head, sel) {
-  this.position += 1;
-  var list = map[head];
-  if (list) {
-    list.push(this.makeDocSelector(sel));
-  } else {
-    map[head] = [this.makeDocSelector(sel)];
-  }
-};
-
-SelectorsMap.prototype.makeDocSelector = function makeDocSelector (sel) {
-  this.position += 1;
-  return { sel: sel, pos: this.position };
-};
-
-/* eslint-disable import/prefer-default-export */
-
-function isDeclaration(node) {
-  return node.type === 'declaration';
-}
-
-function createDeclaration(beforeLoadStyle) {
-  return function (decl) {
-    var newDecl = beforeLoadStyle(decl);
-    if (process.env.NODE_ENV !== 'production') {
-      if (!newDecl) {
-        throw new Error('beforeLoadStyle hook must returns the processed style object');
-      }
-    }
-    return newDecl;
-  };
-}
-
-function createSimpleSelectorFromAst(ast) {
-  switch (ast.type) {
-    case '*': return new UniversalSelector();
-    case '#': return new IdSelector(ast.identifier);
-    case '': return new TypeSelector(ast.identifier.replace(/-/, '').toLowerCase());
-    case '.': return new ClassSelector(ast.identifier);
-    case ':': return new PseudoClassSelector(ast.identifier);
-    case '[]': return ast.test ? new AttributeSelector(ast.property, ast.test, ast.value) : new AttributeSelector(ast.property);
-    default: return null;
-  }
-}
-
-function createSimpleSelectorSequenceFromAst(ast) {
-  if (ast.length === 0) {
-    return new InvalidSelector(new Error('Empty simple selector sequence.'));
-  }
-  if (ast.length === 1) {
-    return createSimpleSelectorFromAst(ast[0]);
-  }
-
-  return new SimpleSelectorSequence(ast.map(createSimpleSelectorFromAst));
-}
-
-function createSelectorFromAst(ast) {
-  if (ast.length === 0) {
-    return new InvalidSelector(new Error('Empty selector.'));
-  }
-  if (ast.length === 1) {
-    return createSimpleSelectorSequenceFromAst(ast[0][0]);
-  }
-  var simpleSelectorSequences = [];
-  for (var i = 0; i < ast.length; i += 1) {
-    var simpleSelectorSequence = createSimpleSelectorSequenceFromAst(ast[i][0]);
-    var combinator = ast[i][1];
-    if (combinator) {
-      simpleSelectorSequence.combinator = combinator;
-    }
-    simpleSelectorSequences.push(simpleSelectorSequence);
-  }
-  return new Selector(simpleSelectorSequences);
-}
-
-function createSelector(sel) {
-  try {
-    var parsedSelector = parseSelector$1(sel);
-    if (!parsedSelector) {
-      return new InvalidSelector(new Error('Empty selector'));
-    }
-    return createSelectorFromAst(parsedSelector.value);
-  } catch (e) {
-    return new InvalidSelector(e);
-  }
-}
-
-function fromAstNodes(astRules) {
-  if ( astRules === void 0 ) astRules = [];
-
-  var beforeLoadStyle = getBeforeLoadStyle();
-
-  return astRules.map(function (rule) {
-    var declarations = rule.declarations
-      .filter(isDeclaration)
-      .map(createDeclaration(beforeLoadStyle));
-    var selectors = rule.selectors.map(createSelector);
-    var ruleSet = new RuleSet(selectors, declarations);
-    return ruleSet;
-  });
-}
-
-/* eslint-disable import/prefer-default-export */
-
-/**
- * hippy-vue-css-loader will translate the CSS texts to be AST
- * and attached at global[GLOBAL_STYLE_NAME]
- */
-var GLOBAL_STYLE_NAME   = '__HIPPY_VUE_STYLES__';
-
-/**
- * Hippy debug address
- */
-var HIPPY_DEBUG_ADDRESS = "http://127.0.0.1:" + (process.env.PORT) + "/";
-
-/**
- * Hippy static resources protocol
- */
-var HIPPY_STATIC_PROTOCOL = 'hpfile://';
-
-/* eslint-disable no-underscore-dangle */
-
-var componentName = ['%c[native]%c', 'color: red', 'color: auto'];
-
-if (typeof global.Symbol !== 'function') {
-  global.Symbol = function (str) { return str; };
-}
-
-/**
- * UI Operations
- */
-var NODE_OPERATION_TYPES = {
-  createNode: Symbol('createNode'),
-  updateNode: Symbol('updateNode'),
-  deleteNode: Symbol('deleteNode'),
-};
-var __batchIdle = true;
-var __batchNodes = [];
-
-/**
- * Convert an ordered node array into multiple fragments
- */
-function chunkNodes(batchNodes) {
-  var result = [];
-  for (var i = 0; i < batchNodes.length; i += 1) {
-    var chunk = batchNodes[i];
-    var type = chunk.type;
-    var nodes = chunk.nodes;
-    var _chunk = result[result.length - 1];
-    if (!_chunk || _chunk.type !== type) {
-      result.push({
-        type: type,
-        nodes: nodes,
-      });
-    } else {
-      _chunk.nodes = _chunk.nodes.concat(nodes);
-    }
-  }
-  return result;
-}
-
-/**
- * Initial CSS Map;
- */
-var __cssMap;
-
-function startBatch() {
-  if (__batchIdle) {
-    UIManagerModule.startBatch();
-  }
-}
-
-function endBatch(app) {
-  if (!__batchIdle) {
-    return;
-  }
-  __batchIdle = false;
-  var $nextTick = app.$nextTick;
-  var rootViewId = app.$options.rootViewId;
-
-  $nextTick(function () {
-    var chunks = chunkNodes(__batchNodes);
-    chunks.forEach(function (chunk) {
-      switch (chunk.type) {
-        case NODE_OPERATION_TYPES.createNode:
-          trace.apply(void 0, componentName.concat( ['createNode'], [chunk.nodes] ));
-          UIManagerModule.createNode(rootViewId, chunk.nodes);
-          break;
-        case NODE_OPERATION_TYPES.updateNode:
-          trace.apply(void 0, componentName.concat( ['updateNode'], [chunk.nodes] ));
-          // FIXME: iOS should be able to update mutiple nodes at once.
-          if (__PLATFORM__ === 'ios' || Native.Platform === 'ios') {
-            chunk.nodes.forEach(function (node) { return (
-              UIManagerModule.updateNode(rootViewId, [node])
-            ); });
-          } else {
-            UIManagerModule.updateNode(rootViewId, chunk.nodes);
-          }
-          break;
-        case NODE_OPERATION_TYPES.deleteNode:
-          trace.apply(void 0, componentName.concat( ['deleteNode'], [chunk.nodes] ));
-          // FIXME: iOS should be able to delete mutiple nodes at once.
-          if (__PLATFORM__ === 'ios' || Native.Platform === 'ios') {
-            chunk.nodes.forEach(function (node) { return (
-              UIManagerModule.deleteNode(rootViewId, [node])
-            ); });
-          } else {
-            UIManagerModule.deleteNode(rootViewId, chunk.nodes);
-          }
-          break;
-          // pass
-      }
-    });
-    UIManagerModule.endBatch();
-    __batchIdle = true;
-    __batchNodes = [];
-  });
-}
-
-function getCssMap() {
-  if (__cssMap) {
-    return __cssMap;
-  }
-  // HERE IS A SECRET STARTUP OPTION: beforeStyleLoadHook
-  // Usage for process the styles while styles loading.
-  var cssRules = fromAstNodes(global[GLOBAL_STYLE_NAME]);
-  __cssMap = new SelectorsMap(cssRules);
-  delete global[GLOBAL_STYLE_NAME];
-  return __cssMap;
-}
-
-/**
- * Translate to native props from attributes and meta
- */
-function getNativeProps(node) {
-  // Initial the props with empty
-  var props = {};
-
-  // Get the default native props from meta
-  if (node.meta.component.defaultNativeProps) {
-    Object.keys(node.meta.component.defaultNativeProps).forEach(function (key) {
-      // Skip the defined attribute
-      if (node.getAttribute(key) !== undefined) {
-        return;
-      }
-      // Get the default props
-      var defaultNativeProps = node.meta.component.defaultNativeProps[key];
-      if (isFunction(defaultNativeProps)) {
-        props[key] = defaultNativeProps(node);
-      } else {
-        props[key] = defaultNativeProps;
-      }
-    });
-  }
-
-  // Get the proceed props from node attributes
-  Object.keys(node.attributes).forEach(function (key) {
-    var value = node.getAttribute(key);
-
-    // No defined map
-    if (!node.meta.component.attributeMaps) {
-      props[key] = value;
-      return;
-    }
-    if (!node.meta.component.attributeMaps[key]) {
-      props[key] = value;
-      return;
-    }
-
-    // Defined mapped props.
-    var map = node.meta.component.attributeMaps[key];
-    if (typeof map === 'string') {
-      props[map] = value;
-      return;
-    }
-
-    // Define mapped props is a function.
-    if (isFunction(map)) {
-      props[key] = map(value);
-      return;
-    }
-
-    // Defined object map with value
-    var propsKey = map.name;
-    var propsValue = map.propsValue;
-    if (isFunction(propsValue)) {
-      value = propsValue(value);
-    }
-    props[propsKey] = value;
-  });
-
-  // Get the force props from meta, it's can't be override
-  if (node.meta.component.nativeProps) {
-    Object.assign(props, node.meta.component.nativeProps);
-  }
-
-  // FIXME: Workaround for Image src props, should unify to use src.
-  if (node.tagName === 'img' && (__PLATFORM__ === 'ios' || Native.Platform === 'ios')) {
-    props.source = [{
-      uri: props.src,
-    }];
-    delete props.src;
-  }
-
-  return props;
-}
-
-/**
- * Render Element to native
- */
-function renderToNative(rootViewId, targetNode) {
-  if (targetNode.meta.skipAddToDom) {
-    return null;
-  }
-  if (!targetNode.meta.component) {
-    throw new Error(("Specific tag is not supported yet: " + (targetNode.tagName)));
-  }
-
-  var style = {};
-  // Apply styles when the targetNode attach to document at first time.
-  if (targetNode.meta.component.defaultNativeStyle) {
-    style = Object.assign({}, targetNode.meta.component.defaultNativeStyle);
-  }
-
-  // Apply styles from CSS
-  var matchedSelectors = getCssMap().query(targetNode);
-  matchedSelectors.selectors.forEach(function (matchedSelector) {
-    matchedSelector.ruleSet.declarations.forEach(function (cssStyle) {
-      style[cssStyle.property] = cssStyle.value;
-    });
-  });
-
-  // Apply style from style attribute.
-  style = Object.assign({}, style, targetNode.style);
-
-  // Convert to real native event
-  var events = {};
-  // FIXME: Bad accessing the private property.
-  if (targetNode._emitter) {
-    var vueEventNames = Object.keys(targetNode._emitter.getEventListeners());
-    var ref = targetNode.meta.component;
-    var eventNamesMap = ref.eventNamesMap;
-    if (eventNamesMap) {
-      vueEventNames.forEach(function (vueEventName) {
-        var nativeEventName = eventNamesMap[vueEventName];
-        if (nativeEventName) {
-          events[nativeEventName] = true;
-        } else {
-          events[("on" + (capitalizeFirstLetter(vueEventName)))] = true;
-        }
-      });
-    } else {
-      vueEventNames.forEach(function (vueEventName) {
-        events[("on" + (capitalizeFirstLetter(vueEventName)))] = true;
-      });
-    }
-  }
-
-  // Translate to native node
-  var nativeNode = {
-    id: targetNode.nodeId,
-    pId: (targetNode.parentNode && targetNode.parentNode.nodeId) || rootViewId,
-    index: targetNode.index,
-    name: targetNode.meta.component.name,
-    props: Object.assign({}, getNativeProps(targetNode),
-      events,
-      {style: style}),
-  };
-
-  // Change View to ScrollView when meet overflow=scroll style.
-  if (targetNode.meta.component.name === 'View') {
-    if (style.overflowX === 'scroll' && style.overflowY === 'scroll') {
-      warn$3('overflow-x and overflow-y for View can not work together');
-    }
-
-    if (style.overflowY === 'scroll') {
-      nativeNode.name = 'ScrollView';
-    } else if (style.overflowX === 'scroll') {
-      nativeNode.name = 'ScrollView';
-      nativeNode.props.horizontal = true; // Necessary for horizontal scrolling
-    }
-
-    // Change the ScrollView child collapsable attribute
-    if (nativeNode.name === 'ScrollView') {
-      if (targetNode.childNodes.length !== 1) {
-        warn$3('Only one child node is acceptable for View with overflow');
-      }
-      if (targetNode.childNodes.length) {
-        targetNode.childNodes[0].setStyle('collapsable', false);
-      }
-    }
-  }
-
-  return nativeNode;
-}
-
-/**
- * Render Element with child to native
- */
-function renderToNativeWithChildren(rootViewId, node) {
-  var nativeLanguages = [];
-  node.traverseChildren(function (targetNode) {
-    var nativeNode = renderToNative(rootViewId, targetNode);
-    if (nativeNode) {
-      nativeLanguages.push(nativeNode);
-    }
-  });
-  return nativeLanguages;
-}
-
-function isLayout(node, rootView) {
-  // First time init rootViewId always be 3.
-  if (node.nodeId === 3) {
-    return true;
-  }
-  // Check the id is specific for rootView.
-  if (process.env.NODE_ENV !== 'production') {
-    if (!rootView) {
-      warn$3('rootView option is necessary for new HippyVue()');
-    }
-    if (rootView.charAt(0) !== '#') {
-      warn$3('rootView option must be unique ID selector start with # ');
-    }
-  }
-  return node.id === rootView.slice(1 - rootView.length);
-}
-
-function insertChild(parentNode, childNode, atIndex) {
-  if ( atIndex === void 0 ) atIndex = -1;
-
-  if (!parentNode) {
-    return;
-  }
-
-  if (parentNode.meta && isFunction(parentNode.meta.insertChild)) {
-    parentNode.meta.insertChild(parentNode, childNode, atIndex);
-  }
-
-  if (childNode.meta.skipAddToDom) {
-    return;
-  }
-
-  var app = getApp();
-  if (!app) {
-    return;
-  }
-  var app_$options = app.$options;
-  var rootViewId = app_$options.rootViewId;
-  var rootView = app_$options.rootView;
-  // Render the root node
-  if (isLayout(parentNode, rootView) && !parentNode.isMounted) {
-    // Start real native work.
-    var translated = renderToNativeWithChildren(rootViewId, parentNode);
-    startBatch();
-    __batchNodes.push({
-      type: NODE_OPERATION_TYPES.createNode,
-      nodes: translated,
-    });
-    endBatch(app);
-    parentNode.traverseChildren(function (node) {
-      if (!node.isMounted) {
-        node.isMounted = true;
-      }
-    });
-  // Render others child nodes.
-  } else if (parentNode.isMounted && !childNode.isMounted) {
-    var translated$1 = renderToNativeWithChildren(rootViewId, childNode);
-    startBatch();
-    __batchNodes.push({
-      type: NODE_OPERATION_TYPES.createNode,
-      nodes: translated$1,
-    });
-    endBatch(app);
-    childNode.traverseChildren(function (node) {
-      if (!node.isMounted) {
-        node.isMounted = true;
-      }
-    });
-  }
-}
-
-function removeChild(parentNode, childNode) {
-  if (parentNode && parentNode.meta && isFunction(parentNode.meta.removeChild)) {
-    parentNode.meta.removeChild(parentNode, childNode);
-  }
-
-  if (!childNode || childNode.meta.skipAddToDom) {
-    return;
-  }
-
-  childNode.isMounted = false;
-  childNode.traverseChildren(function (node) {
-    if (node.isMounted) {
-      node.isMounted = false;
-    }
-  });
-  var app = getApp();
-  var deleteNodeIds = [];
-  childNode.traverseChildren(function (targetNode) {
-    if (targetNode.meta.skipAddToDom) {
-      return;
-    }
-    deleteNodeIds.push({
-      id: targetNode.nodeId,
-      index: targetNode.index,
-      pId: targetNode.parentNode.nodeId,
-    });
-  });
-  startBatch();
-  __batchNodes.push({
-    type: NODE_OPERATION_TYPES.deleteNode,
-    nodes: deleteNodeIds,
-  });
-  endBatch(app);
-}
-
-function updateChild(parentNode) {
-  if (!parentNode.isMounted) {
-    return;
-  }
-  var app = getApp();
-  var rootViewId = app.$options.rootViewId;
-  var translated = renderToNative(rootViewId, parentNode);
-  if (translated) {
-    startBatch();
-    __batchNodes.push({
-      type: NODE_OPERATION_TYPES.updateNode,
-      nodes: [translated],
-    });
-    endBatch(app);
-  }
-}
-
-function updateWithChildren(parentNode) {
-  if (!parentNode.isMounted) {
-    return;
-  }
-  var app = getApp();
-  var rootViewId = app.$options.rootViewId;
-  var translated = renderToNativeWithChildren(rootViewId, parentNode);
-  startBatch();
-  __batchNodes.push({
-    type: NODE_OPERATION_TYPES.updateNode,
-    nodes: translated,
-  });
-  endBatch(app);
-}
-
-/**
- * All of component implemented by Native.
- */
-
-var View = Symbol('View');
-var Image = Symbol('Image');
-var ListView = Symbol('ListView');
-var ListViewItem = Symbol('ListViewItem');
-var Text = Symbol('Text');
-var TextInput = Symbol('TextInput');
-var WebView = Symbol('WebView');
-var VideoPlayer = Symbol('VideoPlayer');
-
-var NATIVE_COMPONENT_NAME_MAP = {};
-NATIVE_COMPONENT_NAME_MAP[View] = 'View';
-NATIVE_COMPONENT_NAME_MAP[Image] = 'Image';
-NATIVE_COMPONENT_NAME_MAP[ListView] = 'ListView';
-NATIVE_COMPONENT_NAME_MAP[ListViewItem] = 'ListViewItem';
-NATIVE_COMPONENT_NAME_MAP[Text] = 'Text';
-NATIVE_COMPONENT_NAME_MAP[TextInput] = 'TextInput';
-NATIVE_COMPONENT_NAME_MAP[WebView] = 'WebView';
-NATIVE_COMPONENT_NAME_MAP[VideoPlayer] = 'VideoPlayer';
-
-/* eslint-disable no-param-reassign */
-
-function mapEvent() {
-  var args = [], len = arguments.length;
-  while ( len-- ) args[ len ] = arguments[ len ];
-
-  var map = {};
-  if (Array.isArray(args[0])) {
-    args[0].forEach(function (ref) {
-      var vueEventName = ref[0];
-      var nativeEventName = ref[1];
-
-      map[map[vueEventName] = nativeEventName] = vueEventName;
-    });
-  } else {
-    var vueEventName = args[0];
-    var nativeEventName = args[1];
-    map[map[vueEventName] = nativeEventName] = vueEventName;
-  }
-  return map;
-}
-
-var INPUT_VALUE_MAP = {
-  number: 'numeric',
-  text: 'default',
-  search: 'web-search',
-};
-
-// View area
-var button = {
-  symbol: View,
-  component: {
-    name: NATIVE_COMPONENT_NAME_MAP[View],
-    defaultNativeStyle: {
-      // TODO: Fill border style.
-    },
-  },
-};
-
-var div = {
-  symbol: View,
-  component: {
-    name: NATIVE_COMPONENT_NAME_MAP[View],
-    eventNamesMap: mapEvent([
-      ['touchStart', 'onTouchDown'], // TODO: Back compatible, will remove soon
-      ['touchstart', 'onTouchDown'],
-      ['touchmove', 'onTouchMove'],
-      ['touchend', 'onTouchEnd'],
-      ['touchcancel', 'onTouchCancel'] ]),
-    processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
-      switch (nativeEventName) {
-        case 'onScroll':
-          event.offsetX = nativeEventParams.contentOffset.x;
-          event.offsetY = nativeEventParams.contentOffset.y;
-          break;
-        case 'onTouchDown':
-        case 'onTouchMove':
-        case 'onTouchEnd':
-        case 'onTouchCancel':
-          event.touches = {
-            0: {
-              clientX: nativeEventParams.page_x,
-              clientY: nativeEventParams.page_y,
-            },
-            length: 1,
-          };
-          break;
-        case 'onFocus':
-          event.isFocused = nativeEventName.focus;
-          break;
-      }
-      return event;
-    },
-  },
-};
-
-var form = {
-  symbol: View,
-  component: {
-    name: NATIVE_COMPONENT_NAME_MAP[View],
-  },
-};
-
-// Image area
-var img = {
-  symbol: Image,
-  component: {
-    name: NATIVE_COMPONENT_NAME_MAP[Image],
-    defaultNativeStyle: {
-      backgroundColor: 0,
-    },
-    eventNamesMap: mapEvent([
-      ['saveResult', 'onSaveResult'] ]),
-    processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
-      event.nativeEventName = nativeEventName;
-      event.nativeEventParams = nativeEventParams;
-      return event
-    },
-    attributeMaps: {
-      // TODO: check placeholder or defaultSource value in compile-time wll be better.
-      placeholder: {
-        name: 'defaultSource',
-        propsValue: function propsValue(value) {
-          if (value.slice(0, 11) !== 'data:image/') {
-            warn$3(("img placeholder should be a base64 image, recommend to use `import image from '!!url-loader?modules!./image.png'` to import placeholder then use: " + value));
-          }
-          return value;
-        },
-      },
-      // For Anroid, will use src property
-      // For iOS, will convert to use source property
-      // At line: hippy-vuv/renderer/native/index.js line 196.
-      src: function src(value) {
-        var url = value;
-        if (/^assets/.test(url)) {
-          if (process.env.NODE_ENV !== 'production') {
-            url = "" + HIPPY_DEBUG_ADDRESS + url;
-          } else {
-            url = HIPPY_STATIC_PROTOCOL + "./" + url;
-          }
-        }
-        return url;
-      },
-    },
-  },
-};
-
-// ListView area
-var ul = {
-  symbol: ListView,
-  component: {
-    name: NATIVE_COMPONENT_NAME_MAP[ListView],
-    defaultNativeStyle: {
-      flex: 1,              // Necessary by iOS
-    },
-    defaultNativeProps: {
-      numberOfRows: function numberOfRows(node) {
-        return arrayCount(node.childNodes, function (childNode) { return !childNode.meta.skipAddToDom; });
-      },
-    },
-    eventNamesMap: mapEvent('listReady', 'initialListReady'),
-    processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
-      switch (nativeEventName) {
-        case 'onScroll':
-          event.offsetX = nativeEventParams.contentOffset.x;
-          event.offsetY = nativeEventParams.contentOffset.y;
-          break;
-      }
-      return event;
-    },
-  },
-};
-
-var li = {
-  symbol: ListViewItem,
-  component: {
-    name: NATIVE_COMPONENT_NAME_MAP[ListViewItem],
-  },
-};
-
-// Text area
-var span = {
-  symbol: View, // IMPORTANT: Can't be Text.
-  component: {
-    name: NATIVE_COMPONENT_NAME_MAP[Text],
-    defaultNativeProps: {
-      text: '',
-    },
-    defaultNativeStyle: {
-      color: 4278190080,      // Black color(#000), necessary for Android
-    },
-  },
-};
-
-var label = span;
-
-var p$1 = span;
-
-var a = {
-  component: Object.assign({}, span.component,
-    {defaultNativeStyle: {
-      color: 4278190318,      // Blue color(rgb(0, 0, 238), necessary for android
-    },
-    attributeMaps: {
-      href: {
-        name: 'href',
-        propsValue: function propsValue(value) {
-          if (['//', 'http://', 'https://'].filter(function (url) { return value.indexOf(url) === 0; }).length) {
-            warn$3(("href attribute can't apply effect in native with url: " + value));
-            return '';
-          }
-          return value;
-        },
-      },
-    }}),
-};
-
-// TextInput area
-var input = {
-  symbol: TextInput,
-  component: {
-    name: NATIVE_COMPONENT_NAME_MAP[TextInput],
-    attributeMaps: {
-      type: {
-        name: 'keyboardType',
-        propsValue: function propsValue(value) {
-          var newValue = INPUT_VALUE_MAP[value];
-          if (!newValue) {
-            return value;
-          }
-          return newValue;
-        },
-      },
-      disabled: {
-        name: 'editable',
-        propsValue: function propsValue(value) {
-          return !value;
-        },
-      },
-      value: 'defaultValue',
-      maxlength: 'maxLength',
-    },
-    nativeProps: {
-      numberOfLines: 1,
-      multiline: false,
-    },
-    defaultNativeProps: {
-      underlineColorAndroid: 0,       // Remove the android underline
-    },
-    defaultNativeStyle: {
-      padding: 0,                     // Remove the android underline
-      color: 4278190080,              // Black color(#000), necessary for Android
-    },
-    eventNamesMap: mapEvent([
-      ['change', 'onChangeText'],
-      ['select', 'onSelectionChange'] ]),
-    processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
-      switch (nativeEventName) {
-        case 'onChangeText':
-        case 'onEndEditing':
-          event.value = nativeEventParams.text;
-          break;
-        case 'onSelectionChange':
-          // The event in web not response meaningful things.
-          // But in hippy we can response the selection start & end position.
-          event.start = nativeEventParams.selection.start;
-          event.end = nativeEventParams.selection.end;
-          break;
-        case 'onKeyboardWillShow':
-          event.keyboardHeight = nativeEventParams.keyboardHeight;
-          if (__PLATFORM__ === 'android' || Native.Platform === 'android') {
-            event.keyboardHeight /= Native.PixelRatio;
-          }
-          break;
-        case 'onContentSizeChange':
-          event.width = nativeEventParams.contentSize.width;
-          event.height = nativeEventParams.contentSize.height;
-          break;
-      }
-      return event;
-    },
-  },
-};
-
-var textarea = {
-  symbol: TextInput,
-  component: {
-    name: NATIVE_COMPONENT_NAME_MAP[TextInput],
-    defaultNativeProps: Object.assign({}, input.component.defaultNativeProps,
-      {numberOfLines: 5}),
-    attributeMaps: Object.assign({}, input.component.attributeMaps,
-      {rows: 'numberOfLines'}),
-    nativeProps: {
-      multiline: true,
-    },
-    defaultNativeStyle: input.component.defaultNativeStyle,
-    eventNamesMap: input.component.eventNamesMap,
-    processEventData: input.component.processEventData,
-  },
-};
-
-// Iframe area
-var iframe = {
-  symbol: WebView,
-  component: {
-    name: NATIVE_COMPONENT_NAME_MAP[WebView],
-    defaultNativeProps: {
-      method: 'get',
-      userAgent: '',
-    },
-    attributeMaps: {
-      src: {
-        name: 'source',
-        propsValue: function propsValue(value) {
-          return {
-            uri: value,
-          };
-        },
-      },
-    },
-    processEventData: function processEventData(event, nativeEventName, nativeEventParams) {
-      switch (nativeEventName) {
-        case 'onLoad':
-        case 'onLoadStart':
-        case 'onLoadEnd':
-          event.url = nativeEventParams.url;
-          break;
-      }
-      return event;
-    },
-  },
-};
-
-var BUILT_IN_ELEMENTS = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  button: button,
-  div: div,
-  form: form,
-  img: img,
-  input: input,
-  label: label,
-  li: li,
-  p: p$1,
-  span: span,
-  a: a,
-  textarea: textarea,
-  ul: ul,
-  iframe: iframe
-});
-
-var isReservedTag$1 = makeMap(
-  'template,script,style,element,content,slot,'
-  + 'button,div,form,img,input,label,li,p,span,textarea,ul',
-  true
-);
-
-var elementMap = new Map();
-
-var defaultViewMeta = {
-  skipAddToDom: false,      // The tag will not add to native DOM.
-  isUnaryTag: false,        // Single tag, such as img, input...
-  tagNamespace: '',         // Tag space, such as svg or math, not in using so far.
-  canBeLeftOpenTag: false,  // Able to no close.
-  mustUseProp: false,       // Tag must have attribute, such as src with img.
-  model: null,
-  component: null,
-};
-
-function getDefaultComponent(elementName, meta, normalizedName) {
-  return {
-    name: elementName,
-    functional: true,
-    model: meta.model,
-    render: function render(h, ref) {
-      var data = ref.data;
-      var children = ref.children;
-
-      return h(normalizedName, data, children);
-    },
-  };
-}
-
-// Methods
-function normalizeElementName(elementName) {
-  return elementName.toLowerCase();
-}
-
-function registerElement(elementName, oldMeta) {
-  var normalizedName = normalizeElementName(elementName);
-
-  var meta = Object.assign({}, defaultViewMeta, oldMeta);
-
-  if (elementMap.has(normalizedName)) {
-    throw new Error(("Element for " + elementName + " already registered."));
-  }
-
-  meta.component = Object.assign({}, getDefaultComponent(elementName, meta, normalizedName),
-    meta.component);
-
-  var entry = {
-    meta: meta,
-  };
-  elementMap.set(normalizedName, entry);
-  return entry;
-}
-
-function getElementMap() {
-  return elementMap;
-}
-
-function getViewMeta(elementName) {
-  var normalizedName = normalizeElementName(elementName);
-
-  var viewMeta = defaultViewMeta;
-  var entry = elementMap.get(normalizedName);
-
-  if (entry && entry.meta) {
-    viewMeta = entry.meta;
-  }
-
-  return viewMeta;
-}
-
-function isKnownView(elementName) {
-  return elementMap.has(normalizeElementName(elementName));
-}
-
-function mustUseProp$1(el, type, attr) {
-  var viewMeta = getViewMeta(el);
-  if (!viewMeta.mustUseProp) {
-    return false;
-  }
-  return viewMeta.mustUseProp(type, attr);
-}
-
-function isUnknownElement(el) {
-  return !isKnownView(el);
-}
-
-// Register components
-function registerBuiltinElements() {
-  Object.keys(BUILT_IN_ELEMENTS).forEach(function (tagName) {
-    var meta = BUILT_IN_ELEMENTS[tagName];
-    registerElement(tagName, meta);
-  });
-}
-
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable no-underscore-dangle */
-
-var Event = function Event(eventName) {
-  this.type = eventName;
-  this.bubbles = true;
-  this.cancelable = true;
-  this.eventPhase = false;
-  this.timeStamp = Date.now();
-
-  // TODO: Should point to VDOM element.
-  this.originalTarget = null;
-  this.currentTarget = null;
-  this.target = null;
-
-  // Private properties
-  this._canceled = false;
-};
-
-var prototypeAccessors$1 = { canceled: { configurable: true } };
-
-prototypeAccessors$1.canceled.get = function () {
-  return this._canceled;
-};
-
-Event.prototype.stopPropagation = function stopPropagation () {
-  this.bubbles = false;
-};
-
-Event.prototype.preventDefault = function preventDefault () {
-  if (!this.cancelable) {
-    return;
-  }
-  this._canceled = true;
-};
-
-/**
- * Old fashioned compatible.
- */
-Event.prototype.initEvent = function initEvent (eventName, bubbles, cancelable) {
-    if ( bubbles === void 0 ) bubbles = true;
-    if ( cancelable === void 0 ) cancelable = true;
-
-  this.type = eventName;
-  if (bubbles === false) {
-    this.bubbles = false;
-  }
-  if (cancelable === false) {
-    this.cancelable = false;
-  }
-  return this;
-};
-
-Object.defineProperties( Event.prototype, prototypeAccessors$1 );
-
-/* eslint-disable import/prefer-default-export */
-
-var EventEmitter = function EventEmitter(element) {
-  this.element = element;
-  this._observers = {};
-};
-
-EventEmitter.prototype.getEventListeners = function getEventListeners () {
-  return this._observers;
-};
-
-EventEmitter.prototype.addEventListener = function addEventListener (eventNames, callback, options) {
-  if (typeof eventNames !== 'string') {
-    throw new TypeError('Events name(s) must be string.');
-  }
-
-  if (callback && !isFunction(callback)) {
-    throw new TypeError('callback must be function.');
-  }
-
-  var events = eventNames.split(',');
-  for (var i = 0, l = events.length; i < l; i += 1) {
-    var eventName = events[i].trim();
-    if (process.env.NODE_ENV !== 'production') {
-      if (['touchStart', 'touchMove', 'touchEnd', 'touchCancel'].indexOf(eventName) !== -1) {
-        warn$3(("@" + eventName + " is deprecated because it's not compatible with browser standard, please use @" + (eventName.toLowerCase()) + " to instead as soon, supported after hippy-vue 1.3.3"));
-      }
-    }
-    var list = this._getEventList(eventName, true);
-    list.push({
-      callback: callback,
-      options: options,
-    });
-  }
-  return this._observers;
-};
-
-EventEmitter.prototype.removeEventListener = function removeEventListener (eventNames, callback, options) {
-  if (typeof eventNames !== 'string') {
-    throw new TypeError('Events name(s) must be string.');
-  }
-
-  if (callback && !isFunction(callback)) {
-    throw new TypeError('callback must be function.');
-  }
-
-  var events = eventNames.split(',');
-  for (var i = 0, l = events.length; i < l; i += 1) {
-    var eventName = events[i].trim();
-    if (callback) {
-      var list = this._getEventList(eventName, false);
-      if (list) {
-        var index = this._indexOfListener(list, callback, options);
-        if (index >= 0) {
-          list.splice(index, 1);
-        }
-        if (list.length === 0) {
-          delete this._observers[eventName];
-        }
-      }
-    } else {
-      this._observers[eventName] = undefined;
-      delete this._observers[eventName];
-    }
-  }
-  return this._observers;
-};
-
-EventEmitter.prototype.emit = function emit (eventInstance) {
-  var eventName = eventInstance.type;
-  var observers = this._observers[eventName];
-  if (!observers) {
-    return;
-  }
-  for (var i = observers.length - 1; i >= 0; i -= 1) {
-    var entry = observers[i];
-    if (entry.options && entry.options.once) {
-      observers.splice(i, 1);
-    }
-    if (entry.options && entry.options.thisArg) {
-      entry.callback.apply(entry.options.thisArg, [eventInstance]);
-    } else {
-      entry.callback(eventInstance);
-    }
-  }
-};
-
-EventEmitter.prototype._getEventList = function _getEventList (eventName, createIfNeeded) {
-  var list = this._observers[eventName];
-  if (!list && createIfNeeded) {
-    list = [];
-    this._observers[eventName] = list;
-  }
-
-  return list;
-};
-
-EventEmitter.prototype._indexOfListener = function _indexOfListener (list, callback, options) {
-  return list.findIndex(function (entry) {
-    if (options) {
-      return entry.callback === callback && looseEqual(entry.options, options);
-    }
-    return entry.callback === callback;
-  });
-};
-
-/* eslint-disable import/prefer-default-export */
-
-var componentName$1 = ['%c[event]%c', 'color: green', 'color: auto'];
-
-function getVueEventName(eventName, targetNode) {
-  var ref = targetNode.meta.component;
-  var eventNamesMap = ref.eventNamesMap;
-  if (eventNamesMap && eventNamesMap[eventName]) {
-    return eventNamesMap[eventName];
-  }
-  if (eventName.indexOf('on') !== 0) {
-    return eventName;
-  }
-  var str = eventName.slice(2, eventName.length); // Assume 'on' prefix length = 2.
-  return str.charAt(0).toLowerCase() + str.slice(1);
-}
-
-var EventDispatcher = {
-  /**
-   * Redirect native events to Vue directly.
-   */
-  receiveNativeEvent: function receiveNativeEvent(nativeEvent) {
-    trace.apply(void 0, componentName$1.concat( ['receiveNativeEvent'], [nativeEvent] ));
-    if (!nativeEvent || !Array.isArray((nativeEvent)) || nativeEvent.length < 2) {
-      return;
-    }
-    var eventName = nativeEvent[0];
-    var eventParams = nativeEvent[1];
-    var app = getApp();
-    if (app) {
-      app.$emit(eventName, eventParams);
-    }
-  },
-  /**
-   * Receive native interactive events.
-   */
-  receiveNativeGesture: function receiveNativeGesture(nativeEvent) {
-    trace.apply(void 0, componentName$1.concat( ['receiveNativeGesture'], [nativeEvent] ));
-    if (!nativeEvent) {
-      return;
-    }
-    var targetNodeId = nativeEvent.id;
-    var eventName = nativeEvent.name;
-    var ref = getApp();
-    var rootNode = ref.$el;
-    var targetNode = rootNode.findChild(function (node) { return node.nodeId === targetNodeId; });
-    if (!targetNode) {
-      return;
-    }
-
-    var targetEventName = getVueEventName(eventName, targetNode);
-    var targetEvent = new Event(targetEventName);
-    var ref$1 = targetNode._meta.component;
-    var processEventData = ref$1.processEventData;
-    if (processEventData) {
-      processEventData(targetEvent, eventName, nativeEvent);
-    }
-    targetNode.dispatchEvent(targetEvent);
-    // Back compatible for previous touch events
-    // TODO: Will remove soon.
-    if (['onTouchDown', 'onTouchMove', 'onTouchEnd', 'onTouchCancel'].indexOf(eventName) !== -1) {
-      var touchEvent;
-      if (eventName === 'onTouchDown') {
-        touchEvent = new Event('touchStart');
-      } else {
-        touchEvent = new Event(("t" + (eventName.slice(3, eventName.length))));
-      }
-      touchEvent.touches = [
-        {
-          clientX: nativeEvent.page_x,
-          clientY: nativeEvent.page_y,
-        } ];
-      targetNode.dispatchEvent(touchEvent);
-    }
-  },
-  /**
-   * Receive the events like keyboard typing
-   */
-  receiveUIComponentEvent: function receiveUIComponentEvent(nativeEvent) {
-    trace.apply(void 0, componentName$1.concat( ['receiveUIComponentEvent'], [nativeEvent] ));
-    if (!nativeEvent || !(nativeEvent instanceof Array) || nativeEvent.length < 2) {
-      return;
-    }
-    var targetNodeId = nativeEvent[0];
-    var eventName = nativeEvent[1];
-    var params = nativeEvent[2];
-    if (typeof targetNodeId !== 'number' || typeof eventName !== 'string') {
-      return;
-    }
-    var ref = getApp();
-    var rootNode = ref.$el;
-    var targetNode = rootNode.findChild(function (node) { return node.nodeId === targetNodeId; });
-    if (!targetNode) {
-      return;
-    }
-    var targetEventName = getVueEventName(eventName, targetNode);
-    var targetEvent = new Event(targetEventName);
-    // Post event parameters process.
-    if (eventName === 'onLayout') {
-      var layout = params.layout;
-      targetEvent.top = layout.y;
-      targetEvent.left = layout.x;
-      targetEvent.bottom = layout.y + layout.height;
-      targetEvent.right = layout.x + layout.width;
-      targetEvent.width = layout.width;
-      targetEvent.height = layout.height;
-    } else {
-      var ref$1 = targetNode._meta.component;
-      var processEventData = ref$1.processEventData;
-      if (processEventData) {
-        processEventData(targetEvent, eventName, params);
-      }
-    }
-    targetNode.dispatchEvent(targetEvent);
-  },
-};
-
-if (global.__GLOBAL__) {
-  global.__GLOBAL__.jsModuleList.EventDispatcher = EventDispatcher;
-}
-
-/* eslint-disable no-underscore-dangle */
-
-var ROOT_VIEW_ID = 0;
-var currentNodeId = 0;
-if (global.__GLOBAL__ && Number.isInteger(global.__GLOBAL__.nodeId)) {
-  currentNodeId = global.__GLOBAL__.nodeId;
-}
-function getNodeId() {
-  currentNodeId += 1;
-  if (currentNodeId % 10 === 0) {
-    currentNodeId += 1;
-  }
-  if (currentNodeId % 10 === ROOT_VIEW_ID) {
-    currentNodeId += 1;
-  }
-  return currentNodeId;
-}
-
-var ViewNode = function ViewNode() {
-  // Point to root document element.
-  this._ownerDocument = null;
-
-  // Component meta information, such as native component will use.
-  this._meta = null;
-
-  // Will change to be true after insert into Native dom.
-  this._isMounted = false;
-
-  // Virtual DOM node id, will used in native to identify.
-  this.nodeId = getNodeId();
-
-  // Index number in children, will update at traverseChildren method.
-  this.index = 0;
-
-  // Relation nodes.
-  this.childNodes = [];
-  this.parentNode = null;
-  this.prevSibling = null;
-  this.nextSibling = null;
-};
-
-var prototypeAccessors$2 = { firstChild: { configurable: true },lastChild: { configurable: true },meta: { configurable: true },ownerDocument: { configurable: true },isMounted: { configurable: true } };
-
-/* istanbul ignore next */
-ViewNode.prototype.toString = function toString () {
-  return this.constructor.name;
-};
-
-prototypeAccessors$2.firstChild.get = function () {
-  return this.childNodes.length ? this.childNodes[0] : null;
-};
-
-prototypeAccessors$2.lastChild.get = function () {
-  return this.childNodes.length
-    ? this.childNodes[this.childNodes.length - 1]
-    : null;
-};
-
-prototypeAccessors$2.meta.get = function () {
-  if (!this._meta) {
-    return {};
-  }
-  return this._meta;
-};
-
-/* istanbul ignore next */
-prototypeAccessors$2.ownerDocument.get = function () {
-  if (this._ownerDocument) {
-    return this._ownerDocument;
-  }
-
-  var el = this;
-  while (el.constructor.name !== 'DocumentNode') {
-    el = el.parentNode;
-    if (!el) {
-      break;
-    }
-  }
-  this._ownerDocument = el;
-  return el;
-};
-
-prototypeAccessors$2.isMounted.get = function () {
-  return this._isMounted;
-};
-
-prototypeAccessors$2.isMounted.set = function (isMounted) {
-  // TODO: Maybe need validation, maybe not.
-  this._isMounted = isMounted;
-};
-
-ViewNode.prototype.insertBefore = function insertBefore (childNode, referenceNode) {
-  if (!childNode) {
-    throw new Error('Can\'t insert child.');
-  }
-
-  if (!referenceNode) {
-    return this.appendChild(childNode);
-  }
-
-  if (referenceNode.parentNode !== this) {
-    throw new Error(
-      'Can\'t insert child, because the reference node has a different parent.'
-    );
-  }
-
-  if (childNode.parentNode && childNode.parentNode !== this) {
-    throw new Error(
-      'Can\'t insert child, because it already has a different parent.'
-    );
-  }
-
-  var index = this.childNodes.indexOf(referenceNode);
-
-  childNode.parentNode = this;
-  childNode.nextSibling = referenceNode;
-  childNode.prevSibling = this.childNodes[index - 1];
-
-  // update previous node's nextSibling to prevent patch bug
-  if (this.childNodes[index - 1]) {
-    this.childNodes[index - 1].nextSibling = childNode;
-  }
-
-  referenceNode.prevSibling = childNode;
-  this.childNodes.splice(index, 0, childNode);
-
-  return insertChild(this, childNode, index);
-};
-
-ViewNode.prototype.moveChild = function moveChild (childNode, referenceNode) {
-  if (!childNode) {
-    throw new Error('Can\'t mvoe child.');
-  }
-
-  if (!referenceNode) {
-    return this.appendChild(childNode);
-  }
-
-  if (referenceNode.parentNode !== this) {
-    throw new Error(
-      'Can\'t move child, because the reference node has a different parent.'
-    );
-  }
-
-  if (childNode.parentNode && childNode.parentNode !== this) {
-    throw new Error(
-      'Can\'t move child, because it already has a different parent.'
-    );
-  }
-
-  var oldIndex = this.childNodes.indexOf(childNode);
-  var newIndex = this.childNodes.indexOf(referenceNode);
-
-  // return if the moved index is the same as the previous one
-  if (newIndex === oldIndex) {
-    return childNode;
-  }
-
-  // set new siblings relations
-  childNode.nextSibling = referenceNode;
-  childNode.prevSibling = referenceNode.prevSibling;
-  referenceNode.prevSibling = childNode;
-
-  if (this.childNodes[newIndex - 1]) {
-    this.childNodes[newIndex - 1].nextSibling = childNode;
-  }
-  if (this.childNodes[newIndex + 1]) {
-    this.childNodes[newIndex + 1].prevSibling = childNode;
-  }
-  if (this.childNodes[oldIndex - 1]) {
-    this.childNodes[oldIndex - 1].nextSibling = this.childNodes[oldIndex + 1];
-  }
-  if (this.childNodes[oldIndex + 1]) {
-    this.childNodes[oldIndex + 1].prevSibling = this.childNodes[oldIndex - 1];
-  }
-
-  // remove old child node from native
-  removeChild(this, childNode);
-
-  // remove old child and insert new child, which is like moving child
-  this.childNodes.splice(newIndex, 0, childNode);
-  this.childNodes.splice(oldIndex + (newIndex < oldIndex ? 1 : 0), 1);
-
-  // should filter empty nodes before finding the index of node
-  var atIndex = this.childNodes.filter(function (ch) { return ch.index > -1; }).indexOf(childNode);
-  return insertChild(this, childNode, atIndex);
-};
-
-ViewNode.prototype.appendChild = function appendChild (childNode) {
-  if (!childNode) {
-    throw new Error('Can\'t append child.');
-  }
-
-  if (childNode.parentNode && childNode.parentNode !== this) {
-    throw new Error(
-      'Can\'t append child, because it already has a different parent.'
-    );
-  }
-
-  // remove childNode if exist
-  if (childNode.isMounted) {
-    this.removeChild(childNode);
-  }
-
-  childNode.parentNode = this;
-
-  if (this.lastChild) {
-    childNode.prevSibling = this.lastChild;
-    this.lastChild.nextSibling = childNode;
-  }
-
-  this.childNodes.push(childNode);
-
-  insertChild(this, childNode, this.childNodes.length - 1);
-};
-
-ViewNode.prototype.removeChild = function removeChild$1 (childNode) {
-  if (!childNode) {
-    throw new Error('Can\'t remove child.');
-  }
-
-  if (!childNode.parentNode) {
-    throw new Error('Can\'t remove child, because it has no parent.');
-  }
-
-  if (childNode.parentNode !== this) {
-    throw new Error('Can\'t remove child, because it has a different parent.');
-  }
-
-  if (childNode.meta.skipAddToDom) {
-    return;
-  }
-
-  removeChild(this, childNode);
-
-  // FIXME: parentNode should be null when removeChild, But it breaks add the node again.
-  //      Issue position: https://github.com/vuejs/vue/tree/master/src/core/vdom/patch.js#L250
-  // childNode.parentNode = null;
-
-  if (childNode.prevSibling) {
-    childNode.prevSibling.nextSibling = childNode.nextSibling;
-  }
-
-  if (childNode.nextSibling) {
-    childNode.nextSibling.prevSibling = childNode.prevSibling;
-  }
-
-  childNode.prevSibling = null;
-  childNode.nextSibling = null;
-  this.childNodes = this.childNodes.filter(function (node) { return node !== childNode; });
-};
-
-/**
- * Find a specific target with condition
- */
-ViewNode.prototype.findChild = function findChild (condition) {
-  var yes = condition(this);
-  if (yes) {
-    return this;
-  }
-  if (this.childNodes.length) {
-    for (var i = 0; i < this.childNodes.length; i += 1) {
-      var childNode = this.childNodes[i];
-      var targetChild = this.findChild.call(childNode, condition);
-      if (targetChild) {
-        return targetChild;
-      }
-    }
-  }
-  return null;
-};
-
-/**
- * Traverse the children and execute callback
- */
-ViewNode.prototype.traverseChildren = function traverseChildren (callback) {
-    var this$1 = this;
-
-  // Find the index and apply callback
-  var index;
-  if (this.parentNode) {
-    index = this.parentNode.childNodes.filter(function (node) { return !node.meta.skipAddToDom; }).indexOf(this);
-  } else {
-    index = 0;
-  }
-  this.index = index;
-  callback(this);
-
-  // Find the children
-  if (this.childNodes.length) {
-    this.childNodes.forEach(function (childNode) {
-      this$1.traverseChildren.call(childNode, callback);
-    });
-  }
-};
-
-Object.defineProperties( ViewNode.prototype, prototypeAccessors$2 );
-
-/* eslint-disable no-underscore-dangle */
-
-var ElementNode = /*@__PURE__*/(function (ViewNode) {
-  function ElementNode(tagName) {
-    ViewNode.call(this);
-
-    // Tag name
-    this.tagName = tagName;
-
-    // ID attribute in template.
-    this.id = '';
-
-    // style attribute in template.
-    this.style = {};
-
-    // Vue style scope id.
-    this._styleScopeId = null;
-
-    // Class attribute in template.
-    this.classList = new Set(); // Fake DOMTokenLis
-
-    // Other attributes in template.
-    this.attributes = {};
-
-    // Event observer.
-    this._emitter = null;
-
-    // Style pre-processor
-    this.beforeLoadStyle = getBeforeLoadStyle();
-  }
-
-  if ( ViewNode ) ElementNode.__proto__ = ViewNode;
-  ElementNode.prototype = Object.create( ViewNode && ViewNode.prototype );
-  ElementNode.prototype.constructor = ElementNode;
-
-  var prototypeAccessors = { tagName: { configurable: true },meta: { configurable: true } };
-
-  ElementNode.prototype.toString = function toString () {
-    return ((this.constructor.name) + "(" + (this._tagName) + ")");
-  };
-
-  prototypeAccessors.tagName.set = function (name) {
-    this._tagName = normalizeElementName(name);
-  };
-
-  prototypeAccessors.tagName.get = function () {
-    return this._tagName;
-  };
-
-  prototypeAccessors.meta.get = function () {
-    if (this._meta) {
-      return this._meta;
-    }
-    this._meta = getViewMeta(this._tagName);
-    return this._meta;
-  };
-
-
-  ElementNode.prototype.hasAttribute = function hasAttribute (key) {
-    return !!this.attributes[key];
-  };
-
-  ElementNode.prototype.getAttribute = function getAttribute (key) {
-    return this.attributes[key];
-  };
-
-  /* istanbul ignore next */
-  ElementNode.prototype.setAttribute = function setAttribute (key, value) {
-    try {
-      // detect expandable attrs for boolean values
-      // See https://vuejs.org/v2/guide/components-props.html#Passing-a-Boolean
-      if (typeof (this.attributes[key]) === 'boolean' && value === '') {
-        value = true;
-      }
-      if (key === undefined) {
-        updateChild(this);
-        return;
-      }
-
-      switch (key) {
-        case 'class': {
-          var newClassList = new Set(value.split(' ').filter(function (x) { return x.trim(); }));
-          if (setsAreEqual(this.classList, newClassList)) {
-            return;
-          }
-          this.classList = newClassList;
-          // update current node and child nodes
-          updateWithChildren(this);
-          return;
-        }
-        case 'id':
-          if (value === this.id) {
-            return;
-          }
-          this.id = value;
-          // update current node and child nodes
-          updateWithChildren(this);
-          return;
-        // Convert text related to character for interface.
-        case 'text':
-        case 'value':
-        case 'defaultValue':
-        case 'placeholder': {
-          if (typeof value !== 'string') {
-            try {
-              value = value.toString();
-            } catch (err) {
-              throw new TypeError(("Property " + key + " must be string：" + (err.message)));
-            }
-          }
-          value = value.trim().replace(/(&nbsp;|Â)/g, ' ');
-          this.attributes[key] = unicodeToChar(value);
-          break;
-        }
-        // FIXME: UpdateNode numberOfRows will makes Image flicker on Android.
-        //        So make it working on iOS only.
-        case 'numberOfRows':
-          this.attributes[key] = value;
-          if (Native.Platform !== 'ios') {
-            return;
-          }
-          break;
-        case 'caretColor':
-        case 'caret-color':
-          this.attributes['caret-color'] = Native.parseColor(value);
-          break;
-        default:
-          this.attributes[key] = tryConvertNumber(value);
-      }
-
-      updateChild(this);
-    } catch (err) {
-      // Throw error in development mode
-      if (process.env.NODE_ENV !== 'production') {
-        throw err;
-      }
-    }
-  };
-
-  ElementNode.prototype.removeAttribute = function removeAttribute (key) {
-    delete this.attributes[key];
-  };
-
-  ElementNode.prototype.setStyle = function setStyle (property, value, isBatchUpdate) {
-    if ( isBatchUpdate === void 0 ) isBatchUpdate = false;
-
-    if (value === undefined) {
-      delete this.style[property];
-      return;
-    }
-
-    // Preprocess the style
-    var ref = this.beforeLoadStyle({
-      property: property,
-      value: value,
-    });
-    var p = ref.property;
-    var v = ref.value;
-
-    // Process the specifc style value
-    switch (p) {
-      case 'fontWeight':
-        if (typeof v !== 'string') {
-          v = v.toString();
-        }
-        break;
-      case 'caretColor':
-        this.attributes['caret-color'] = translateColor(v);
-        break;
-      default: {
-        // Convert the property to W3C standard.
-        if (Object.prototype.hasOwnProperty.call(PROPERTIES_MAP, p)) {
-          p = PROPERTIES_MAP[p];
-        }
-        // Convert the value
-        if (typeof v === 'string') {
-          v = v.trim();
-          // Convert inline color style to int
-          if (p.toLowerCase().indexOf('color') >= 0) {
-            v = translateColor(v, Native.Platform);
-          // Convert inline length style, drop the px unit
-          } else if (endsWith(v, 'px')) {
-            v = parseFloat(v.slice(0, v.length - 2));
-          } else {
-            v = tryConvertNumber(v);
-          }
-        }
-      }
-    }
-
-    if (v === undefined || v === null || this.style[p] === v) {
-      return;
-    }
-    this.style[p] = v;
-    if (!isBatchUpdate) {
-      updateChild(this);
-    }
-  };
-
-  /**
-   * set native style props
-   */
-  ElementNode.prototype.setNativeProps = function setNativeProps (nativeProps) {
-    var this$1 = this;
-
-    if (nativeProps) {
-      var style = nativeProps.style;
-      if (style) {
-        Object.keys(style).forEach(function (key) {
-          this$1.setStyle(key, style[key], true);
-        });
-        updateChild(this);
-      }
-    }
-  };
-
-  ElementNode.prototype.setStyleScope = function setStyleScope (styleScopeId) {
-    if (typeof styleScopeId !== 'string') {
-      styleScopeId = styleScopeId.toString();
-    }
-    this._styleScopeId = styleScopeId;
-  };
-
-  ElementNode.prototype.appendChild = function appendChild (childNode) {
-    ViewNode.prototype.appendChild.call(this, childNode);
-
-    if (childNode.meta.symbol === Text) {
-      this.setText(childNode.text);
-    }
-  };
-
-  ElementNode.prototype.insertBefore = function insertBefore (childNode, referenceNode) {
-    ViewNode.prototype.insertBefore.call(this, childNode, referenceNode);
-
-    if (childNode.meta.symbol === Text) {
-      this.setText(childNode.text);
-    }
-  };
-
-  ElementNode.prototype.moveChild = function moveChild (childNode, referenceNode) {
-    ViewNode.prototype.moveChild.call(this, childNode, referenceNode);
-
-    if (childNode.meta.symbol === Text) {
-      this.setText(childNode.text);
-    }
-  };
-
-  ElementNode.prototype.removeChild = function removeChild (childNode) {
-    ViewNode.prototype.removeChild.call(this, childNode);
-
-    if (childNode.meta.symbol === Text) {
-      this.setText('');
-    }
-  };
-
-  ElementNode.prototype.setText = function setText (text) {
-    // Hacking for textarea, use value props to instance text props
-    if (this.tagName === 'textarea') {
-      return this.setAttribute('value', text);
-    }
-    return this.setAttribute('text', text);
-  };
-
-  ElementNode.prototype.addEventListener = function addEventListener (eventNames, callback, options) {
-    if (!this._emitter) {
-      this._emitter = new EventEmitter(this);
-    }
-    this._emitter.addEventListener(eventNames, callback, options);
-
-    // Added default scrollEventThrottle when scroll event is added.
-    if (eventNames === 'scroll' && !(this.getAttribute('scrollEventThrottle') > 0)) {
-      var scrollEventThrottle = 200;
-      if (scrollEventThrottle) {
-        this.attributes.scrollEventThrottle = scrollEventThrottle;
-      }
-    }
-
-    updateChild(this);
-  };
-
-  ElementNode.prototype.removeEventListener = function removeEventListener (eventNames, callback, options) {
-    if (!this._emitter) {
-      return null;
-    }
-    return this._emitter.removeEventListener(eventNames, callback, options);
-  };
-
-  ElementNode.prototype.dispatchEvent = function dispatchEvent (eventInstance) {
-    if (!(eventInstance instanceof Event)) {
-      throw new Error('dispatchEvent method only accept Event instance');
-    }
-
-    // Current Target always be the event listener.
-    eventInstance.currentTarget = this;
-
-    // But target be the first target.
-    // Be careful, here's different than Browser,
-    // because Hippy can't callback without element _emitter.
-    if (!eventInstance.target) {
-      eventInstance.target = this;
-      // IMPORTANT: It's important for vnode diff and directive trigger.
-      if (typeof eventInstance.value === 'string') {
-        eventInstance.target.value = eventInstance.value;
-      }
-    }
-
-    if (this._emitter) {
-      this._emitter.emit(eventInstance);
-    }
-
-    if (this.parentNode && eventInstance.bubbles) {
-      this.parentNode.dispatchEvent.call(this.parentNode, eventInstance);
-    }
-  };
-
-  /**
-   * getBoundingClientRect
-   *
-   * Get the position and size of element
-   * Because it's a async function, need await prefix.
-   *
-   * And if the element is out of visible area, result will be none.
-   */
-  ElementNode.prototype.getBoundingClientRect = function getBoundingClientRect () {
-    return Native.measureInWindow(this);
-  };
-
-  /**
-   * Scroll children to specific position.
-   */
-  ElementNode.prototype.scrollToPosition = function scrollToPosition (x, y, duration)  {
-    if ( x === void 0 ) x = 0;
-    if ( y === void 0 ) y = 0;
-    if ( duration === void 0 ) duration = 1000;
-
-    if (typeof x !== 'number' || typeof y !== 'number') {
-      return;
-    }
-    if (duration === false) {
-      duration = 0;
-    }
-    Native.callUIFunction(this, 'scrollToWithOptions', [{ x: x, y: y, duration: duration }]);
-  };
-
-  /**
-   * Native implementation for the Chrome/Firefox Element.scrollTop method
-   */
-  ElementNode.prototype.scrollTo = function scrollTo (x, y, duration) {
-    var assign;
-
-    var animationDuration = duration;
-    if (typeof x === 'object' && x) {
-      var left = x.left;
-      var top = x.top;
-      var behavior = x.behavior; if ( behavior === void 0 ) behavior = 'auto';
-      ((assign = x, animationDuration = assign.duration));
-      this.scrollToPosition(left, top, behavior === 'none' ? 0 : animationDuration);
-    } else {
-      this.scrollToPosition(x, y, duration);
-    }
-  };
-
-  Object.defineProperties( ElementNode.prototype, prototypeAccessors );
-
-  return ElementNode;
-}(ViewNode));
-
-/* eslint-disable no-underscore-dangle */
-
-var CommentNode = /*@__PURE__*/(function (ElementNode) {
-  function CommentNode(text) {
-    ElementNode.call(this, 'comment');
-
-    this.text = text;
-    this._meta = {
-      symbol: Text,
-      skipAddToDom: true,
-    };
-  }
-
-  if ( ElementNode ) CommentNode.__proto__ = ElementNode;
-  CommentNode.prototype = Object.create( ElementNode && ElementNode.prototype );
-  CommentNode.prototype.constructor = CommentNode;
-
-  return CommentNode;
-}(ElementNode));
-
-/* eslint-disable no-underscore-dangle */
-
-var TextNode = /*@__PURE__*/(function (ViewNode) {
-  function TextNode(text) {
-    ViewNode.call(this);
-
-    this.text = text;
-    this._meta = {
-      symbol: Text,
-      skipAddToDom: true,
-    };
-  }
-
-  if ( ViewNode ) TextNode.__proto__ = ViewNode;
-  TextNode.prototype = Object.create( ViewNode && ViewNode.prototype );
-  TextNode.prototype.constructor = TextNode;
-
-  TextNode.prototype.setText = function setText (text) {
-    this.text = text;
-    this.parentNode.setText(text);
-  };
-
-  return TextNode;
-}(ViewNode));
-
-/**
- * Input and Textarea Element
- */
-var InputNode = /*@__PURE__*/(function (ElementNode) {
-  function InputNode () {
-    ElementNode.apply(this, arguments);
-  }
-
-  if ( ElementNode ) InputNode.__proto__ = ElementNode;
-  InputNode.prototype = Object.create( ElementNode && ElementNode.prototype );
-  InputNode.prototype.constructor = InputNode;
-
-  InputNode.prototype.getValue = function getValue () {
-    var this$1 = this;
-
-    return new Promise(function (resolve) { return Native.callUIFunction(this$1, 'getValue', function (r) { return resolve(r.text); }); });
-  };
-
-  /**
-   * Set text input value
-   */
-  InputNode.prototype.setValue = function setValue (value) {
-    Native.callUIFunction(this, 'setValue', [value]);
-  };
-
-
-  /**
-   * Focus
-   */
-  InputNode.prototype.focus = function focus () {
-    Native.callUIFunction(this, 'focusTextInput', []);
-  };
-
-  /**
-   * Blur
-   */
-  InputNode.prototype.blur = function blur () {
-    Native.callUIFunction(this, 'blurTextInput', []);
-  };
-
-  /**
-   * Clear
-   */
-  InputNode.prototype.clear = function clear () {
-    Native.callUIFunction(this, 'clear', []);
-  };
-
-  return InputNode;
-}(ElementNode));
-
-/**
- * List element
- */
-var ListNode = /*@__PURE__*/(function (ElementNode) {
-  function ListNode () {
-    ElementNode.apply(this, arguments);
-  }
-
-  if ( ElementNode ) ListNode.__proto__ = ElementNode;
-  ListNode.prototype = Object.create( ElementNode && ElementNode.prototype );
-  ListNode.prototype.constructor = ListNode;
-
-  ListNode.prototype.scrollToIndex = function scrollToIndex (indexLeft, indexTop, needAnimation) {
-    if ( indexLeft === void 0 ) indexLeft = 0;
-    if ( indexTop === void 0 ) indexTop = 0;
-    if ( needAnimation === void 0 ) needAnimation = true;
-
-    if (typeof indexLeft !== 'number' || typeof indexTop !== 'number') {
-      return;
-    }
-    Native.callUIFunction(this, 'scrollToIndex', [indexLeft, indexTop, needAnimation]);
-  };
-
-  /**
-   * Scroll children to specific position.
-   */
-  ListNode.prototype.scrollToPosition = function scrollToPosition (posX, posY, needAnimation)  {
-    if ( posX === void 0 ) posX = 0;
-    if ( posY === void 0 ) posY = 0;
-    if ( needAnimation === void 0 ) needAnimation = true;
-
-    if (typeof posX !== 'number' || typeof posY !== 'number') {
-      return;
-    }
-    Native.callUIFunction(this, 'scrollToContentOffset', [posX, posY, needAnimation]);
-  };
-
-  return ListNode;
-}(ElementNode));
-
-/**
- * img element
- */
-var ImgNode = /*@__PURE__*/(function (ElementNode) {
-  function ImgNode () {
-    ElementNode.apply(this, arguments);
-  }
-
-  if ( ElementNode ) ImgNode.__proto__ = ElementNode;
-  ImgNode.prototype = Object.create( ElementNode && ElementNode.prototype );
-  ImgNode.prototype.constructor = ImgNode;
-
-  ImgNode.prototype.save = function save () {
-    Native.callUIFunction(this, 'save');
-  };
-
-  return ImgNode;
-}(ElementNode));
-
-var DocumentNode = /*@__PURE__*/(function (ViewNode) {
-  function DocumentNode() {
-    ViewNode.call(this);
-
-    this.documentElement = new ElementNode('document');
-
-    // make static methods accessible via this
-    this.createComment = this.constructor.createComment;
-    this.createElement = this.constructor.createElement;
-    this.createElementNS = this.constructor.createElementNS;
-    this.createTextNode = this.constructor.createTextNode;
-  }
-
-  if ( ViewNode ) DocumentNode.__proto__ = ViewNode;
-  DocumentNode.prototype = Object.create( ViewNode && ViewNode.prototype );
-  DocumentNode.prototype.constructor = DocumentNode;
-
-  DocumentNode.createComment = function createComment (text) {
-    return new CommentNode(text);
-  };
-
-  DocumentNode.createElement = function createElement (tagName) {
-    // TODO: create element instance by tagName definition.
-    switch (tagName) {
-      case 'input':
-      case 'textarea':
-        return new InputNode(tagName);
-      case 'img':
-          return new ImgNode(tagName);
-      case 'ul':
-        return new ListNode(tagName);
-      default:
-        return new ElementNode(tagName);
-    }
-  };
-
-  DocumentNode.createElementNS = function createElementNS (namespace, tagName) {
-    return new ElementNode((namespace + ":" + tagName));
-  };
-
-  DocumentNode.createTextNode = function createTextNode (text) {
-    return new TextNode(text);
-  };
-
-  DocumentNode.createEvent = function createEvent (eventName) {
-    var eventInstance = new Event(eventName);
-    return eventInstance;
-  };
-
-  return DocumentNode;
-}(ViewNode));
-
-/* eslint-disable import/prefer-default-export */
 
 var namespaceMap = {};
 
@@ -14183,6 +15495,7 @@ function insertBefore(pNode, newNode, referenceNode) {
 
 function removeChild$1(node, child) {
   node.removeChild(child);
+  unCacheNodeOnIdle(child);
 }
 
 function appendChild(node, child) {
@@ -14232,16 +15545,51 @@ var nodeOps = /*#__PURE__*/Object.freeze({
   setStyleScope: setStyleScope
 });
 
-/* eslint-disable import/prefer-default-export */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 var modules$1 = platformModules.concat(baseModules);
-
 var patch = createPatchFunction({
   nodeOps: nodeOps,
   modules: modules$1,
 });
 
-/* eslint-disable import/prefer-default-export */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 function drawStatusBar(appOptions) {
   var assign;
@@ -14295,7 +15643,25 @@ function drawStatusBar(appOptions) {
   return statusBar;
 }
 
-/* eslint-disable import/prefer-default-export */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 // FIXME: Android Should update defaultValue while typing for update contents by state.
 function androidUpdate(el, value, oldValue) {
@@ -14326,7 +15692,6 @@ var model$2 = {
       el._vModifiers = binding.modifiers;
       // Initial value
       el.attributes.defaultValue = binding.value;
-
       // Binding event when typing
       if (!binding.modifiers.lazy) {
         el.addEventListener('change', function (ref) {
@@ -14348,18 +15713,35 @@ var model$2 = {
   },
 };
 
-/* eslint-disable import/prefer-default-export */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-param-reassign */
-
-// TODO: Transition support.
 
 function toggle(el, value, vNode, originalDisplay) {
   if (value) {
     vNode.data.show = true;
     el.setStyle('display', originalDisplay);
   } else {
-    el.setStyle('display', value ? originalDisplay : 'none');
+    el.setStyle('display', 'none');
   }
 }
 
@@ -14391,7 +15773,25 @@ var show = {
   },
 };
 
-
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 var platformDirectives = /*#__PURE__*/Object.freeze({
   __proto__: null,
@@ -14399,9 +15799,27 @@ var platformDirectives = /*#__PURE__*/Object.freeze({
   show: show
 });
 
-/* eslint-disable import/no-unresolved */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-var componentName$2 = ['%c[Hippy-Vue "2.1.4"]%c', 'color: #4fc08d; font-weight: bold', 'color: auto; font-weight: auto'];
+var componentName$2 = ['%c[Hippy-Vue "2.2.1"]%c', 'color: #4fc08d; font-weight: bold', 'color: auto; font-weight: auto'];
 
 // Install document
 var documentNode = new DocumentNode();
@@ -14459,7 +15877,8 @@ Vue.prototype.$mount = function $mount(el, hydrating) {
 /**
  * Register the Hippy-Vue app to Native.
  *
- * @param {function} callback - Callback after register completed.
+ * @param {function} afterCallback - Callback after register completed.
+ * @param {function} beforeCallback - Callback before register completed.
  */
 Vue.prototype.$start = function $start(afterCallback, beforeCallback) {
   var this$1 = this;
@@ -14478,15 +15897,13 @@ Vue.prototype.$start = function $start(afterCallback, beforeCallback) {
   });
 
   // Register the entry point into Hippy
-  // The callback will be exectue when Native trigger loadInstance
+  // The callback will be execute when Native trigger loadInstance
   // or runApplication event.
   HippyRegister.regist(this.$options.appName, function (superProps) {
     var rootViewId = superProps.__instanceId__;
     this$1.$options.$superProps = superProps;
     this$1.$options.rootViewId = rootViewId;
-
     trace.apply(void 0, componentName$2.concat( ['Start'], [this$1.$options.appName], ['with rootViewId'], [rootViewId], [superProps] ));
-
     // Destroy the old instance and set the new one when restart the app
     if (this$1.$el) {
       this$1.$destroy();
@@ -14494,15 +15911,12 @@ Vue.prototype.$start = function $start(afterCallback, beforeCallback) {
       var newApp = new AppConstructor(this$1.$options);
       setApp(newApp);
     }
-
     // Call the callback before $mount
     if (isFunction(beforeCallback)) {
       beforeCallback(this$1, superProps);
     }
-
     // Draw the app.
     this$1.$mount();
-
     // Draw the iPhone status bar background.
     // It should execute after $mount, otherwise this.$el will be undefined.
     if (Native.Platform === 'ios') {
@@ -14515,7 +15929,6 @@ Vue.prototype.$start = function $start(afterCallback, beforeCallback) {
         }
       }
     }
-
     // Call the callback after $mount
     if (isFunction(afterCallback)) {
       afterCallback(this$1, superProps);
@@ -14560,9 +15973,7 @@ Vue.extend = function hippyExtend(extendOptions) {
   if (cachedCtors[SuperId]) {
     return cachedCtors[SuperId];
   }
-
   var name = extendOptions.name || Super.options.name;
-
   var Sub = function VueComponent(options) {
     this._init(options);
   };
@@ -14572,7 +15983,6 @@ Vue.extend = function hippyExtend(extendOptions) {
   Sub.cid = cid;
   Sub.options = mergeOptions(Super.options, extendOptions);
   Sub.super = Super;
-
   // For props and computed properties, we define the proxy getters on
   // the Vue instances at extension time, on the extended prototype. This
   // avoids Object.defineProperty calls for each instance created.
@@ -14582,12 +15992,10 @@ Vue.extend = function hippyExtend(extendOptions) {
   if (Sub.options.computed) {
     initComputed$2(Sub);
   }
-
   // allow further extension/mixin/plugin usage
   Sub.extend = Super.extend;
   Sub.mixin = Super.mixin;
   Sub.use = Super.use;
-
   // create asset registers, so extended classes
   // can have their private assets too.
   ASSET_TYPES.forEach(function (type) {
@@ -14597,14 +16005,12 @@ Vue.extend = function hippyExtend(extendOptions) {
   if (name) {
     Sub.options.components[name] = Sub;
   }
-
   // keep a reference to the super options at extension time.
   // later at instantiation we can check if Super's options have
   // been updated.
   Sub.superOptions = Super.options;
   Sub.extendOptions = extendOptions;
   Sub.sealedOptions = extend({}, Sub.options);
-
   // cache constructor
   cachedCtors[SuperId] = Sub;
   return Sub;
@@ -14613,8 +16019,30 @@ Vue.extend = function hippyExtend(extendOptions) {
 // Binding Native Properties
 Vue.Native = Native;
 
+Vue.getApp = getApp;
+
 // Register the built-in elements
 Vue.use(registerBuiltinElements);
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 var READY_STATE_CONNECTING = 0;
 var READY_STATE_OPEN = 1;
@@ -14624,8 +16052,7 @@ var READY_STATE_CLOSED = 3;
 var WEB_SOCKET_MODULE_NAME = 'websocket';
 var WEB_SOCKET_NATIVE_EVENT = 'hippyWebsocketEvents';
 
-var websocketEventHub;
-var app;
+var app$2;
 
 /**
  * The WebSocket API is an advanced technology that makes it possible to open a two-way
@@ -14633,44 +16060,33 @@ var app;
  * you can send messages to a server and receive event-driven responses without having to
  * poll the server for a reply.
  */
-var WebSocket = function WebSocket(url, protocals, extrasHeaders) {
+var WebSocket = function WebSocket(url, protocols, extrasHeaders) {
   var this$1 = this;
 
-  if (!app) {
-    app = getApp();
-  }
-
+  app$2 = getApp();
   this.url = url;
   this.readyState = READY_STATE_CONNECTING;
   this.webSocketCallbacks = {};
   this.onWebSocketEvent = this.onWebSocketEvent.bind(this);
   var headers = Object.assign({}, extrasHeaders);
-
-  if (!websocketEventHub) {
-    websocketEventHub = app.$on(WEB_SOCKET_NATIVE_EVENT, this.onWebSocketEvent);
-  }
-
+  app$2.$on(WEB_SOCKET_NATIVE_EVENT, this.onWebSocketEvent);
   if (!url || typeof url !== 'string') {
     throw new TypeError('Invalid WebSocket url');
   }
-
-  if (Array.isArray(protocals) && protocals.length > 0) {
-    headers['Sec-WebSocket-Protocol'] = protocals.join(',');
-  } else if (typeof protocals === 'string') {
-    headers['Sec-WebSocket-Protocol'] = protocals;
+  if (Array.isArray(protocols) && protocols.length > 0) {
+    headers['Sec-WebSocket-Protocol'] = protocols.join(',');
+  } else if (typeof protocols === 'string') {
+    headers['Sec-WebSocket-Protocol'] = protocols;
   }
-
   var params = {
     headers: headers,
     url: url,
   };
-
   Native.callNativeWithPromise(WEB_SOCKET_MODULE_NAME, 'connect', params).then(function (resp) {
     if (!resp || resp.code !== 0 || typeof resp.id !== 'number') {
       warn$3('Fail to create websocket connection', resp);
       return;
     }
-
     this$1.webSocketId = resp.id;
   });
 };
@@ -14693,7 +16109,6 @@ WebSocket.prototype.close = function close (code, reason) {
   if (this.readyState !== READY_STATE_OPEN) {
     return;
   }
-
   this.readyState = READY_STATE_CLOSING;
   Native.callNative(WEB_SOCKET_MODULE_NAME, 'close', {
     id: this.webSocketId,
@@ -14712,11 +16127,9 @@ WebSocket.prototype.send = function send (data) {
     warn$3('WebSocket is not connected');
     return;
   }
-
   if (typeof data !== 'string') {
     throw new TypeError(("Unsupported websocket data type: " + (typeof data)));
   }
-
   Native.callNative(WEB_SOCKET_MODULE_NAME, 'send', {
     id: this.webSocketId,
     data: data,
@@ -14762,19 +16175,16 @@ WebSocket.prototype.onWebSocketEvent = function onWebSocketEvent (param) {
   if (typeof param !== 'object' || param.id !== this.webSocketId) {
     return;
   }
-
   var eventType = param.type;
   if (typeof eventType !== 'string') {
     return;
   }
-
   if (eventType === 'onOpen') {
     this.readyState = READY_STATE_OPEN;
   } else if (eventType === 'onClose') {
     this.readyState = READY_STATE_CLOSED;
-    app.$off(WEB_SOCKET_NATIVE_EVENT);
+    app$2.$off(WEB_SOCKET_NATIVE_EVENT, this.onWebSocketEvent);
   }
-
   var callback = this.webSocketCallbacks[eventType];
   if (isFunction(callback)) {
     callback(param.data);
@@ -14783,12 +16193,31 @@ WebSocket.prototype.onWebSocketEvent = function onWebSocketEvent (param) {
 
 Object.defineProperties( WebSocket.prototype, prototypeAccessors$3 );
 
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 global.process = global.process || {};
 global.process.env = global.process.env || {};
 global.WebSocket = WebSocket;
 
 Vue.config.silent = false;
-
 setVue(Vue);
 
 export default Vue;

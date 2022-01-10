@@ -1,7 +1,7 @@
 /*!
- * @hippy/vue-css-loader v2.1.2
- * (Using Vue v2.6.11 and Hippy-Vue v2.1.4)
- * Build at: Thu Jan 06 2022 21:57:23 GMT+0800 (China Standard Time)
+ * @hippy/vue-css-loader v2.2.1
+ * (Using Vue v2.6.11 and Hippy-Vue v2.2.1)
+ * Build at: Mon Jan 10 2022 15:49:18 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -24,8 +24,10 @@
 
 'use strict';
 
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var crypto = _interopDefault(require('crypto'));
 require('path');
-require('crypto');
 
 function unwrapExports (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
@@ -4173,13 +4175,34 @@ var emojiList = emojisList.filter(function (emoji) { return emojiRegex.test(emoj
 
 var getOptions_1$1 = getOptions_1;
 
-/* eslint-disable import/prefer-default-export */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 /**
  * hippy-vue-css-loader will translate the CSS texts to be AST
- * and attached at global[GLOBAL_STYLE_NAME]
+ * and attached at global[GLOBAL_STYLE_NAME].
+ * when use HMR, the outdated chunk style will be attached at
+ * global[GLOBAL_DISPOSE_STYLE_NAME].
  */
-var GLOBAL_STYLE_NAME   = '__HIPPY_VUE_STYLES__';
+var GLOBAL_STYLE_NAME = '__HIPPY_VUE_STYLES__';
+var GLOBAL_DISPOSE_STYLE_NAME = '__HIPPY_VUE_DISPOSE_STYLES__';
 
 /**
  * Hippy debug address
@@ -4237,18 +4260,45 @@ var camelize = cached(function (str) {
   return str.replace(camelizeRE, function (_, c) { return c ? c.toUpperCase() : ''; })
 });
 
-/* eslint-disable prefer-destructuring */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+function warn() {
+  var context = [], len = arguments.length;
+  while ( len-- ) context[ len ] = arguments[ len ];
+
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
+  return console.warn.apply(console, context);
+}
 
 /**
  * Convert string to number as possible
  */
-var numberRegEx = new RegExp('^[+-]?\\d*\\.?\\d*([Ee][+-]?\\d+)?$');
-var notEmptyRegEx = new RegExp('^.+$');
+var numberRegEx = new RegExp('^(?=.+)[+-]?\\d*\\.?\\d*([Ee][+-]?\\d+)?$');
 function tryConvertNumber(str) {
   if (typeof str === 'number') {
     return str;
   }
-  if (typeof str === 'string' && numberRegEx.test(str) && notEmptyRegEx.test(str)) {
+  if (typeof str === 'string' && numberRegEx.test(str)) {
     try {
       return parseFloat(str);
     } catch (err) {
@@ -4258,768 +4308,26 @@ function tryConvertNumber(str) {
   return str;
 }
 
-/* eslint-disable no-bitwise */
-
-var PROPERTIES_MAP = {
-  textDecoration: 'textDecorationLine',
-  boxShadowOffset: 'shadowOffset',
-  boxShadowOpacity: 'shadowOpacity',
-  boxShadowRadius: 'shadowRadius',
-  boxShadowSpread: 'shadowSpread',
-  boxShadowColor: 'shadowColor',
-};
-
-var commentRegexp = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
-
-/**
- * Trim `str`.
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-function trim(str) {
-  return str ? str.replace(/^\s+|\s+$/g, '') : '';
-}
 
-
-/**
- * Adds non-enumerable parent node reference to each node.
- */
-function addParent(obj, parent) {
-  var isNode = obj && typeof obj.type === 'string';
-  var childParent = isNode ? obj : parent;
-  Object.keys(obj).forEach(function (k) {
-    var value = obj[k];
-    if (Array.isArray(value)) {
-      value.forEach(function (v) { addParent(v, childParent); });
-    } else if (value && typeof value === 'object') {
-      addParent(value, childParent);
-    }
-  });
-
-  if (isNode) {
-    Object.defineProperty(obj, 'parent', {
-      configurable: true,
-      writable: true,
-      enumerable: false,
-      value: parent || null,
-    });
-  }
-
-  return obj;
-}
-
-/**
- * Convert the px unit to pt directly.
- * We found to the behavior of convert the unit directly is correct.
- */
-function convertPxUnitToPt(value) {
-  // If value is number just ignore
-  if (Number.isInteger(value)) {
-    return value;
-  }
-  // If value unit is px, change to use pt as 1:1.
-  if (value.endsWith('px')) {
-    var num = parseFloat(value.slice(0, value.indexOf('px')), 10);
-    if (!Number.isNaN(num)) {
-      value = num;
-    }
-  }
-  return value;
-}
-
-/**
- * Parse the CSS to be AST tree.
- */
-function parseCSS(css, options) {
-  options = options || {};
-
-  /**
-   * Positional.
-   */
-
-  var lineno = 1;
-  var column = 1;
-
-  /**
-   * Update lineno and column based on `str`.
-   */
-
-  function updatePosition(str) {
-    var lines = str.match(/\n/g);
-    if (lines) { lineno += lines.length; }
-    var i = str.lastIndexOf('\n');
-    column = ~i ? str.length - i : column + str.length;
-  }
-
-  /**
-   * Mark position and patch `node.position`.
-   */
-
-  function position() {
-    var start = { line: lineno, column: column };
-    return function (node) {
-      node.position = new Position(start);
-      whitespace();
-      return node;
-    };
-  }
-
-  /**
-   * Store position information for a node
-   */
-  var Position = function Position(start) {
-    this.start = start;
-    this.end = { line: lineno, column: column };
-    this.source = options.source;
-    this.content = css;
-  };
-
-  /**
-   * Error `msg`.
-   */
-
-  var errorsList = [];
-
-  function error(msg) {
-    var err = new Error(((options.source) + ":" + lineno + ":" + column + ": " + msg));
-    err.reason = msg;
-    err.filename = options.source;
-    err.line = lineno;
-    err.column = column;
-    err.source = css;
-
-    if (options.silent) {
-      errorsList.push(err);
-    } else {
-      throw err;
-    }
-  }
-
-  /**
-   * Parse stylesheet.
-   */
-
-  function stylesheet() {
-    var rulesList = rules();
-
-    return {
-      type: 'stylesheet',
-      stylesheet: {
-        source: options.source,
-        rules: rulesList,
-        parsingErrors: errorsList,
-      },
-    };
-  }
-
-  /**
-   * Opening brace.
-   */
-
-  function open() {
-    return match(/^{\s*/);
-  }
-
-  /**
-   * Closing brace.
-   */
-
-  function close() {
-    return match(/^}/);
-  }
-
-  /**
-   * Parse ruleset.
-   */
-
-  function rules() {
-    var node;
-    var rules = [];
-    whitespace();
-    comments(rules);
-    while (css.length && css.charAt(0) !== '}' && (node = atrule() || rule())) {
-      if (node !== false) {
-        rules.push(node);
-        comments(rules);
-      }
-    }
-    return rules;
-  }
-
-  /**
-   * Match `re` and return captures.
-   */
-
-  function match(re) {
-    var m = re.exec(css);
-    if (!m) {
-      return null;
-    }
-    var str = m[0];
-    updatePosition(str);
-    css = css.slice(str.length);
-    return m;
-  }
-
-  /**
-   * Parse whitespace.
-   */
-
-  function whitespace() {
-    match(/^\s*/);
-  }
-
-  /**
-   * Parse comments;
-   */
-
-  function comments(rules) {
-    if ( rules === void 0 ) rules = [];
-
-    var c;
-    rules = rules || [];
-    while (c = comment()) {
-      if (c !== false) {
-        rules.push(c);
-      }
-    }
-    return rules;
-  }
-
-  /**
-   * Parse comment.
-   */
-
-  function comment() {
-    var pos = position();
-    if (css.charAt(0) !== '/' || css.charAt(1) !== '*') {
-      return null;
-    }
-
-    var i = 2;
-    while (css.charAt(i) !== '' && (css.charAt(i) !== '*' || css.charAt(i + 1) !== '/')) {
-      i += 1;
-    }
-    i += 2;
-
-    if (css.charAt(i - 1) === '') {
-      return error('End of comment missing');
-    }
-
-    var str = css.slice(2, i - 2);
-    column += 2;
-    updatePosition(str);
-    css = css.slice(i);
-    column += 2;
-
-    return pos({
-      type: 'comment',
-      comment: str,
-    });
-  }
-
-  /**
-   * Parse selector.
-   */
-
-  function selector() {
-    var m = match(/^([^{]+)/);
-    if (!m) {
-      return null;
-    }
-    /* @fix Remove all comments from selectors
-     * http://ostermiller.org/findcomment.html */
-    return trim(m[0])
-      .replace(/\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/+/g, '')
-      .replace(/"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function (m) { return m.replace(/,/g, '\u200C'); })
-      .split(/\s*(?![^(]*\)),\s*/)
-      .map(function (s) { return s.replace(/\u200C/g, ','); });
-  }
-
-  /**
-   * Parse declaration.
-   */
-
-  function declaration() {
-    var assign;
-
-    var pos = position();
-
-    // prop
-    var prop = match(/^(\*?[-#/*\\\w]+(\[[0-9a-z_-]+\])?)\s*/);
-    if (!prop) {
-      return null;
-    }
-    prop = trim(prop[0]);
-
-    // :
-    if (!match(/^:\s*/)) {
-      return error("property missing ':'");
-    }
-
-    // val
-    var propertyName = prop.replace(commentRegexp, '');
-    var camelizedProperty = camelize(propertyName);
-    var property = (function () {
-      var property = PROPERTIES_MAP[camelizedProperty];
-      if (property) {
-        return property;
-      }
-      return camelizedProperty;
-    })();
-    var val = match(/^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^)]*?\)|[^};])+)/);
-    var value = val ? trim(val[0]).replace(commentRegexp, '') : '';
-
-    switch (property) {
-      case 'backgroundImage': {
-        var regexp = /(?:\(['"]?)(.*?)(?:['"]?\))/;
-        var executed = regexp.exec(value);
-        if (executed.length > 1) {
-          (assign = executed, value = assign[1]);
-        }
-        break;
-      }
-      case 'transform': {
-        var keyReg = /((\w+)\s*\()/;
-        var valueReg = /(?:\(['"]?)(.*?)(?:['"]?\))/;
-        var oldValue = value;
-        value = [];
-        oldValue.split(' ').forEach(function (transformKeyValue) {
-          if (keyReg.test(transformKeyValue)) {
-            var key = keyReg.exec(transformKeyValue)[2];
-            var v = valueReg.exec(transformKeyValue)[1];
-            if (v.indexOf('.') === 0) {
-              v = "0" + v;
-            }
-            if (parseFloat(v).toString() === v) {
-              v = parseFloat(v);
-            }
-            var transform = {};
-            transform[key] = v;
-            value.push(transform);
-          } else {
-            error("missing '('");
-          }
-        });
-        break;
-      }
-      case 'fontWeight':
-        // Keep string and going on.
-        break;
-      case 'shadowOffset': {
-        var pos$1 = value.split(' ')
-          .filter(function (v) { return v; })
-          .map(function (v) { return convertPxUnitToPt(v); });
-        var ref = pos$1;
-        var x = ref[0];
-        var ref$1 = pos$1;
-        var y = ref$1[1];
-        if (!y) {
-          y = x;
-        }
-        // FIXME: should not be width and height, should be x and y.
-        value = {
-          width: x,
-          height: y,
-        };
-        break;
-      }
-      default: {
-        value = tryConvertNumber(value);
-        // Convert the px to pt for specific properties
-        var sizeProperties = ['top', 'left', 'right', 'bottom', 'height', 'width', 'size', 'padding', 'margin', 'ratio', 'radius', 'offset', 'spread'];
-        if (sizeProperties.find(function (size) { return property.toLowerCase().indexOf(size) > -1; })) {
-          value = convertPxUnitToPt(value);
-        }
-      }
-    }
-
-    var ret = pos({
-      type: 'declaration',
-      value: value,
-      property: property,
-    });
-
-    // ;
-    match(/^[;\s]*/);
-
-    return ret;
-  }
-
-  /**
-   * Parse declarations.
-   */
-
-  function declarations() {
-    var decls = [];
-
-    if (!open()) { return error("missing '{'"); }
-    comments(decls);
-
-    // declarations
-    var decl;
-    while (decl = declaration()) {
-      if (decl !== false) {
-        if (Array.isArray(decl)) {
-          decls = decls.concat(decl);
-        } else {
-          decls.push(decl);
-        }
-        comments(decls);
-      }
-    }
-
-    if (!close()) { return error("missing '}'"); }
-    return decls;
-  }
-
-  /**
-   * Parse keyframe.
-   */
-
-  function keyframe() {
-    var m;
-    var vals = [];
-    var pos = position();
-
-    while (m = match(/^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/)) {
-      vals.push(m[1]);
-      match(/^,\s*/);
-    }
-
-    if (!vals.length) {
-      return null;
-    }
-
-    return pos({
-      type: 'keyframe',
-      values: vals,
-      declarations: declarations(),
-    });
-  }
-
-  /**
-   * Parse keyframes.
-   */
-
-  function atkeyframes() {
-    var pos = position();
-    var m = match(/^@([-\w]+)?keyframes\s*/);
-
-    if (!m) {
-      return null;
-    }
-    var vendor = m[1];
-
-    // identifier
-    m = match(/^([-\w]+)\s*/);
-    if (!m) {
-      return error('@keyframes missing name');
-    }
-    var name = m[1];
-
-    if (!open()) { return error("@keyframes missing '{'"); }
-
-    var frame;
-    var frames = comments();
-    while (frame = keyframe()) {
-      frames.push(frame);
-      frames = frames.concat(comments());
-    }
-
-    if (!close()) { return error("@keyframes missing '}'"); }
-
-    return pos({
-      type: 'keyframes',
-      name: name,
-      vendor: vendor,
-      keyframes: frames,
-    });
-  }
-
-  /**
-   * Parse supports.
-   */
-
-  function atsupports() {
-    var pos = position();
-    var m = match(/^@supports *([^{]+)/);
-
-    if (!m) {
-      return null;
-    }
-    var supports = trim(m[1]);
-
-    if (!open()) { return error("@supports missing '{'"); }
-
-    var style = comments().concat(rules());
-
-    if (!close()) { return error("@supports missing '}'"); }
-
-    return pos({
-      type: 'supports',
-      supports: supports,
-      rules: style,
-    });
-  }
-
-  /**
-   * Parse host.
-   */
-
-  function athost() {
-    var pos = position();
-    var m = match(/^@host\s*/);
-
-    if (!m) {
-      return null;
-    }
-
-    if (!open()) {
-      return error("@host missing '{'");
-    }
-
-    var style = comments().concat(rules());
-
-    if (!close()) {
-      return error("@host missing '}'");
-    }
-
-    return pos({
-      type: 'host',
-      rules: style,
-    });
-  }
-
-  /**
-   * Parse media.
-   */
-
-  function atmedia() {
-    var pos = position();
-    var m = match(/^@media *([^{]+)/);
-
-    if (!m) {
-      return null;
-    }
-    var media = trim(m[1]);
-
-    if (!open()) {
-      return error("@media missing '{'");
-    }
-
-    var style = comments().concat(rules());
-
-    if (!close()) {
-      return error("@media missing '}'");
-    }
-
-    return pos({
-      type: 'media',
-      media: media,
-      rules: style,
-    });
-  }
-
-
-  /**
-   * Parse custom-media.
-   */
-
-  function atcustommedia() {
-    var pos = position();
-    var m = match(/^@custom-media\s+(--[^\s]+)\s*([^{;]+);/);
-    if (!m) {
-      return null;
-    }
-
-    return pos({
-      type: 'custom-media',
-      name: trim(m[1]),
-      media: trim(m[2]),
-    });
-  }
-
-  /**
-   * Parse paged media.
-   */
-
-  function atpage() {
-    var pos = position();
-    var m = match(/^@page */);
-    if (!m) {
-      return null;
-    }
-
-    var sel = selector() || [];
-
-    if (!open()) {
-      return error("@page missing '{'");
-    }
-    var decls = comments();
-
-    // declarations
-    var decl;
-    while (decl = declaration()) {
-      decls.push(decl);
-      decls = decls.concat(comments());
-    }
-
-    if (!close()) {
-      return error("@page missing '}'");
-    }
-
-    return pos({
-      type: 'page',
-      selectors: sel,
-      declarations: decls,
-    });
-  }
-
-  /**
-   * Parse document.
-   */
-
-  function atdocument() {
-    var pos = position();
-    var m = match(/^@([-\w]+)?document *([^{]+)/);
-    if (!m) {
-      return null;
-    }
-
-    var vendor = trim(m[1]);
-    var doc = trim(m[2]);
-
-    if (!open()) {
-      return error("@document missing '{'");
-    }
-
-    var style = comments().concat(rules());
-
-    if (!close()) {
-      return error("@document missing '}'");
-    }
-
-    return pos({
-      type: 'document',
-      document: doc,
-      vendor: vendor,
-      rules: style,
-    });
-  }
-
-  /**
-   * Parse font-face.
-   */
-
-  function atfontface() {
-    var pos = position();
-    var m = match(/^@font-face\s*/);
-    if (!m) {
-      return null;
-    }
-
-    if (!open()) {
-      return error("@font-face missing '{'");
-    }
-    var decls = comments();
-
-    // declarations
-    var decl;
-    while (decl = declaration()) {
-      decls.push(decl);
-      decls = decls.concat(comments());
-    }
-
-    if (!close()) {
-      return error("@font-face missing '}'");
-    }
-
-    return pos({
-      type: 'font-face',
-      declarations: decls,
-    });
-  }
-
-  /**
-   * Parse import
-   */
-
-  var atimport = compileAtRule('import');
-
-  /**
-   * Parse charset
-   */
-
-  var atcharset = compileAtRule('charset');
-
-  /**
-   * Parse namespace
-   */
-
-  var atnamespace = compileAtRule('namespace');
-
-  /**
-   * Parse non-block at-rules
-   */
-
-
-  function compileAtRule(name) {
-    var re = new RegExp(("^@" + name + "\\s*([^;]+);"));
-    return function () {
-      var pos = position();
-      var m = match(re);
-      if (!m) {
-        return null;
-      }
-      var ret = { type: name };
-      ret[name] = m[1].trim();
-      return pos(ret);
-    };
-  }
-
-  /**
-   * Parse at rule.
-   */
-
-  function atrule() {
-    if (css[0] !== '@') {
-      return null;
-    }
-
-    return atkeyframes()
-      || atmedia()
-      || atcustommedia()
-      || atsupports()
-      || atimport()
-      || atcharset()
-      || atnamespace()
-      || atdocument()
-      || atpage()
-      || athost()
-      || atfontface();
-  }
-
-  /**
-   * Parse rule.
-   */
-
-  function rule() {
-    var pos = position();
-    var sel = selector();
-
-    if (!sel) { return error('selector missing'); }
-    comments();
-
-    return pos({
-      type: 'rule',
-      selectors: sel,
-      declarations: declarations(),
-    });
-  }
-
-  return addParent(stylesheet());
-}
-
-/* eslint-disable no-bitwise */
 /* eslint-disable no-mixed-operators */
 
 var names = {
@@ -5244,7 +4552,6 @@ var hslToRgb = function (h, s, l) {
   var r = hue2rgb(p, q, h + 1 / 3);
   var g = hue2rgb(p, q, h);
   var b = hue2rgb(p, q, h - 1 / 3);
-
   return (
     (Math.round(r * 255) << 24)
     | (Math.round(g * 255) << 16)
@@ -5270,23 +4577,19 @@ var parsePercentage = function (str) {
 
 function baseColor(color) {
   var match;
-
   if (typeof color === 'number') {
     if (color >>> 0 === color && color >= 0 && color <= 0xffffffff) {
       return color;
     }
     return null;
   }
-
   match = matchers.hex6.exec(color);
   if (Array.isArray(match)) {
     return parseInt(((match[1]) + "ff"), 16) >>> 0;
   }
-
   if (Object.hasOwnProperty.call(names, color)) {
     return names[color];
   }
-
   match = matchers.rgb.exec(color);
   if (Array.isArray(match)) {
     return (
@@ -5296,7 +4599,6 @@ function baseColor(color) {
       | 0x000000ff // a
     ) >>> 0;
   }
-
   match = matchers.rgba.exec(color);
   if (match) {
     return (
@@ -5306,7 +4608,6 @@ function baseColor(color) {
       | parse1(match[4]) // a
     ) >>> 0;
   }
-
   match = matchers.hex3.exec(color);
   if (match) {
     return parseInt(
@@ -5316,12 +4617,10 @@ function baseColor(color) {
       16
     ) >>> 0;
   }
-
   match = matchers.hex8.exec(color);
   if (match) {
     return parseInt(match[1], 16) >>> 0;
   }
-
   match = matchers.hex4.exec(color);
   if (match) {
     return parseInt(
@@ -5332,7 +4631,6 @@ function baseColor(color) {
       16
     ) >>> 0;
   }
-
   match = matchers.hsl.exec(color);
   if (match) {
     return (
@@ -5344,7 +4642,6 @@ function baseColor(color) {
       | 0x000000ff // a
     ) >>> 0;
   }
-
   match = matchers.hsla.exec(color);
   if (match) {
     return (
@@ -5356,7 +4653,6 @@ function baseColor(color) {
       | parse1(match[4]) // a
     ) >>> 0;
   }
-
   return null;
 }
 
@@ -5370,7 +4666,6 @@ function translateColor(color, options) {
   if (int32Color === null) {
     throw new Error(("Bad color value: " + color));
   }
-
   int32Color = (int32Color << 24 | int32Color >>> 8) >>> 0;
   if (options && options.platform === 'android') {
     int32Color |= 0;
@@ -5378,9 +4673,879 @@ function translateColor(color, options) {
   return int32Color;
 }
 
-/* eslint-disable import/no-unresolved */
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-var sourceId              = 0;
+var PROPERTIES_MAP = {
+  textDecoration: 'textDecorationLine',
+  boxShadowOffset: 'shadowOffset',
+  boxShadowOffsetX: 'shadowOffsetX',
+  boxShadowOffsetY: 'shadowOffsetY',
+  boxShadowOpacity: 'shadowOpacity',
+  boxShadowRadius: 'shadowRadius',
+  boxShadowSpread: 'shadowSpread',
+  boxShadowColor: 'shadowColor',
+  caretColor: 'caret-color',
+};
+
+// linear-gradient direction description map
+var LINEAR_GRADIENT_DIRECTION_MAP = {
+  totop: '0',
+  totopright: 'totopright',
+  toright: '90',
+  tobottomright: 'tobottomright',
+  tobottom: '180', // default value
+  tobottomleft: 'tobottomleft',
+  toleft: '270',
+  totopleft: 'totopleft',
+};
+
+var DEGREE_UNIT = {
+  TURN: 'turn',
+  RAD: 'rad',
+  DEG: 'deg',
+};
+
+var commentRegexp = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
+
+/**
+ * Trim `str`.
+ */
+function trim(str) {
+  return str ? str.replace(/^\s+|\s+$/g, '') : '';
+}
+
+
+/**
+ * Adds non-enumerable parent node reference to each node.
+ */
+function addParent(obj, parent) {
+  var isNode = obj && typeof obj.type === 'string';
+  var childParent = isNode ? obj : parent;
+  Object.keys(obj).forEach(function (k) {
+    var value = obj[k];
+    if (Array.isArray(value)) {
+      value.forEach(function (v) {
+        addParent(v, childParent);
+      });
+    } else if (value && typeof value === 'object') {
+      addParent(value, childParent);
+    }
+  });
+  if (isNode) {
+    Object.defineProperty(obj, 'parent', {
+      configurable: true,
+      writable: true,
+      enumerable: false,
+      value: parent || null,
+    });
+  }
+  return obj;
+}
+
+/**
+ * Convert the px unit to pt directly.
+ * We found to the behavior of convert the unit directly is correct.
+ */
+function convertPxUnitToPt(value) {
+  // If value is number just ignore
+  if (Number.isInteger(value)) {
+    return value;
+  }
+  // If value unit is px, change to use pt as 1:1.
+  if (value.endsWith('px')) {
+    var num = parseFloat(value.slice(0, value.indexOf('px')), 10);
+    if (!Number.isNaN(num)) {
+      value = num;
+    }
+  }
+  return value;
+}
+
+/**
+ * Parse the CSS to be AST tree.
+ */
+function parseCSS(css, options) {
+  options = options || {};
+
+  /**
+   * Positional.
+   */
+  var lineno = 1;
+  var column = 1;
+
+  /**
+   * Update lineno and column based on `str`.
+   */
+  function updatePosition(str) {
+    var lines = str.match(/\n/g);
+    if (lines) { lineno += lines.length; }
+    var i = str.lastIndexOf('\n');
+    column = ~i ? str.length - i : column + str.length;
+  }
+
+  /**
+   * Mark position and patch `node.position`.
+   */
+  function position() {
+    var start = { line: lineno, column: column };
+    return function (node) {
+      node.position = new Position(start);
+      whitespace();
+      return node;
+    };
+  }
+
+  /**
+   * Store position information for a node
+   */
+  var Position = function Position(start) {
+    this.start = start;
+    this.end = { line: lineno, column: column };
+    this.source = options.source;
+    this.content = css;
+  };
+
+  /**
+   * Error `msg`.
+   */
+  var errorsList = [];
+  function error(msg) {
+    var err = new Error(((options.source) + ":" + lineno + ":" + column + ": " + msg));
+    err.reason = msg;
+    err.filename = options.source;
+    err.line = lineno;
+    err.column = column;
+    err.source = css;
+    if (options.silent) {
+      errorsList.push(err);
+    } else {
+      throw err;
+    }
+  }
+
+  /**
+   * Parse stylesheet.
+   */
+  function stylesheet() {
+    var rulesList = rules();
+
+    return {
+      type: 'stylesheet',
+      stylesheet: {
+        source: options.source,
+        rules: rulesList,
+        parsingErrors: errorsList,
+      },
+    };
+  }
+
+  /**
+   * Opening brace.
+   */
+  function open() {
+    return match(/^{\s*/);
+  }
+
+  /**
+   * Closing brace.
+   */
+  function close() {
+    return match(/^}/);
+  }
+
+  /**
+   * Parse ruleset.
+   */
+  function rules() {
+    var node;
+    var rules = [];
+    whitespace();
+    comments(rules);
+    // eslint-disable-next-line no-cond-assign
+    while (css.length && css.charAt(0) !== '}' && (node = atrule() || rule())) {
+      if (node !== false) {
+        rules.push(node);
+        comments(rules);
+      }
+    }
+    return rules;
+  }
+
+  /**
+   * Match `re` and return captures.
+   */
+  function match(re) {
+    var m = re.exec(css);
+    if (!m) {
+      return null;
+    }
+    var str = m[0];
+    updatePosition(str);
+    css = css.slice(str.length);
+    return m;
+  }
+
+  /**
+   * Parse whitespace.
+   */
+  function whitespace() {
+    match(/^\s*/);
+  }
+
+  /**
+   * Parse comments;
+   */
+  function comments(rules) {
+    if ( rules === void 0 ) rules = [];
+
+    var c;
+    rules = rules || [];
+    while ((c = comment()) !== null) {
+      if (c !== false) {
+        rules.push(c);
+      }
+    }
+    return rules;
+  }
+
+  /**
+   * Parse comment.
+   */
+  function comment() {
+    var pos = position();
+    if (css.charAt(0) !== '/' || css.charAt(1) !== '*') {
+      return null;
+    }
+    var i = 2;
+    while (css.charAt(i) !== '' && (css.charAt(i) !== '*' || css.charAt(i + 1) !== '/')) {
+      i += 1;
+    }
+    i += 2;
+    if (css.charAt(i - 1) === '') {
+      return error('End of comment missing');
+    }
+    var str = css.slice(2, i - 2);
+    column += 2;
+    updatePosition(str);
+    css = css.slice(i);
+    column += 2;
+    return pos({
+      type: 'comment',
+      comment: str,
+    });
+  }
+
+  /**
+   * Parse selector.
+   */
+
+  function selector() {
+    var m = match(/^([^{]+)/);
+    if (!m) {
+      return null;
+    }
+    /* @fix Remove all comments from selectors
+     * http://ostermiller.org/findcomment.html */
+    return trim(m[0])
+      .replace(/\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/+/g, '')
+      .replace(/"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function (m) { return m.replace(/,/g, '\u200C'); })
+      .split(/\s*(?![^(]*\)),\s*/)
+      .map(function (s) { return s.replace(/\u200C/g, ','); });
+  }
+
+  /**
+   * convert string value to string degree
+   * @param {string} value
+   * @param {string} unit
+   */
+  function convertToDegree(value, unit) {
+    if ( unit === void 0 ) unit = DEGREE_UNIT.DEG;
+
+    var convertedNumValue = parseFloat(value);
+    var result = value || '';
+    var ref = value.split('.');
+    var decimals = ref[1];
+    if (decimals && decimals.length > 2) {
+      result = convertedNumValue.toFixed(2);
+    }
+    switch (unit) {
+      // turn unit
+      case DEGREE_UNIT.TURN:
+        result = "" + ((convertedNumValue * 360).toFixed(2));
+        break;
+      // radius unit
+      case DEGREE_UNIT.RAD:
+        result = "" + ((180 / Math.PI * convertedNumValue).toFixed(2));
+        break;
+    }
+    return result;
+  }
+
+  /**
+   * parse gradient angle or direction
+   * @param {string} value
+   */
+  function getLinearGradientAngle(value) {
+    var processedValue = (value || '').replace(/\s*/g, '').toLowerCase();
+    var reg = /^([+-]?\d+\.?\d*)+(deg|turn|rad)|(to\w+)$/g;
+    var valueList = reg.exec(processedValue);
+    if (!Array.isArray(valueList)) { return; }
+    // default direction is to bottom, i.e. 180degree
+    var angle = '180';
+    var direction = valueList[0];
+    var angleValue = valueList[1];
+    var angleUnit = valueList[2];
+    if (angleValue && angleUnit) { // angle value
+      angle = convertToDegree(angleValue, angleUnit);
+    } else if (direction && typeof LINEAR_GRADIENT_DIRECTION_MAP[direction] !== 'undefined') { // direction description
+      angle = LINEAR_GRADIENT_DIRECTION_MAP[direction];
+    } else {
+      warn('linear-gradient direction or angle is invalid, default value [to bottom] would be used');
+    }
+    return angle;
+  }
+
+  /**
+   * parse gradient color stop
+   * @param {string} value
+   */
+  function getLinearGradientColorStop(value) {
+    var processedValue = (value || '').replace(/\s+/g, ' ').trim();
+    var ref = processedValue.split(/\s+(?![^(]*?\))/);
+    var color = ref[0];
+    var percentage = ref[1];
+    var percentageCheckReg = /^([+-]?\d+\.?\d*)%$/g;
+    if (color && !percentageCheckReg.exec(color) && !percentage) {
+      return {
+        color: translateColor(color),
+      };
+    }
+    if (color && percentageCheckReg.exec(percentage)) {
+      return {
+        // color stop ratio
+        ratio: parseFloat(percentage.split('%')[0]) / 100,
+        color: translateColor(color),
+      };
+    }
+    warn('linear-gradient color stop is invalid');
+  }
+
+  /**
+   * parse backgroundImage
+   * @param {string} property
+   * @param {string|Object|number|boolean} value
+   * @returns {(string|{})[]}
+   */
+  function parseBackgroundImage(property, value) {
+    var assign;
+
+    var processedValue = value;
+    var processedProperty = property;
+    if (value.indexOf('linear-gradient') === 0) {
+      processedProperty = 'linearGradient';
+      var valueString = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')'));
+      var tokens = valueString.split(/,(?![^(]*?\))/);
+      var colorStopList = [];
+      processedValue = {};
+      tokens.forEach(function (value, index) {
+        if (index === 0) {
+          // the angle of linear-gradient parameter can be optional
+          var angle = getLinearGradientAngle(value);
+          if (angle) {
+            processedValue.angle = angle;
+          } else {
+            // if angle ignored, default direction is to bottom, i.e. 180degree
+            processedValue.angle = '180';
+            var colorObject = getLinearGradientColorStop(value);
+            if (colorObject) { colorStopList.push(colorObject); }
+          }
+        } else {
+          var colorObject$1 = getLinearGradientColorStop(value);
+          if (colorObject$1) { colorStopList.push(colorObject$1); }
+        }
+      });
+      processedValue.colorStopList = colorStopList;
+    } else {
+      var regexp = /(?:\(['"]?)(.*?)(?:['"]?\))/;
+      var executed = regexp.exec(value);
+      if (executed && executed.length > 1) {
+        (assign = executed, processedValue = assign[1]);
+      }
+    }
+    return [processedProperty, processedValue];
+  }
+
+  /**
+   * Parse declaration.
+   */
+  function declaration() {
+    var assign;
+
+    var pos = position();
+    // prop
+    var prop = match(/^(\*?[-#/*\\\w]+(\[[0-9a-z_-]+\])?)\s*/);
+    if (!prop) {
+      return null;
+    }
+    prop = trim(prop[0]);
+    // :
+    if (!match(/^:\s*/)) {
+      return error('property missing \':\'');
+    }
+    // val
+    var propertyName = prop.replace(commentRegexp, '');
+    var camelizedProperty = camelize(propertyName);
+    var property = (function () {
+      var property = PROPERTIES_MAP[camelizedProperty];
+      if (property) {
+        return property;
+      }
+      return camelizedProperty;
+    })();
+    var val = match(/^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^)]*?\)|[^};])+)/);
+    var value = val ? trim(val[0]).replace(commentRegexp, '') : '';
+    switch (property) {
+      case 'backgroundImage': {
+        (assign = parseBackgroundImage(property, value), property = assign[0], value = assign[1]);
+        break;
+      }
+      case 'transform': {
+        var keyReg = /((\w+)\s*\()/;
+        var valueReg = /(?:\(['"]?)(.*?)(?:['"]?\))/;
+        var oldValue = value;
+        value = [];
+        oldValue.split(' ').forEach(function (transformKeyValue) {
+          if (keyReg.test(transformKeyValue)) {
+            var key = keyReg.exec(transformKeyValue)[2];
+            var v = valueReg.exec(transformKeyValue)[1];
+            if (v.indexOf('.') === 0) {
+              v = "0" + v;
+            }
+            if (parseFloat(v).toString() === v) {
+              v = parseFloat(v);
+            }
+            var transform = {};
+            transform[key] = v;
+            value.push(transform);
+          } else {
+            error('missing \'(\'');
+          }
+        });
+        break;
+      }
+      case 'fontWeight':
+        // Keep string and going on.
+        break;
+      case 'textShadowOffset': {
+        var pos$1 = value.split(' ')
+          .filter(function (v) { return v; })
+          .map(function (v) { return convertPxUnitToPt(v); });
+        var ref = pos$1;
+        var width = ref[0];
+        var ref$1 = pos$1;
+        var height = ref$1[1];
+        if (!height) {
+          height = width;
+        }
+        value = {
+          width: width,
+          height: height,
+        };
+        break;
+      }
+      case 'shadowOffset': {
+        var pos$2 = value.split(' ')
+          .filter(function (v) { return v; })
+          .map(function (v) { return convertPxUnitToPt(v); });
+        var ref$2 = pos$2;
+        var x = ref$2[0];
+        var ref$3 = pos$2;
+        var y = ref$3[1];
+        if (!y) {
+          y = x;
+        }
+        // FIXME: should not be width and height, should be x and y.
+        value = {
+          x: x,
+          y: y,
+        };
+        break;
+      }
+      case 'collapsable':
+        value = Boolean(value);
+        break;
+      default: {
+        value = tryConvertNumber(value);
+        // Convert the px to pt for specific properties
+        var sizeProperties = ['top', 'left', 'right', 'bottom', 'height', 'width', 'size', 'padding', 'margin', 'ratio', 'radius', 'offset', 'spread'];
+        if (sizeProperties.find(function (size) { return property.toLowerCase().indexOf(size) > -1; })) {
+          value = convertPxUnitToPt(value);
+        }
+      }
+    }
+
+    var ret = pos({
+      type: 'declaration',
+      value: value,
+      property: property,
+    });
+    // ;
+    match(/^[;\s]*/);
+    return ret;
+  }
+
+  /**
+   * Parse declarations.
+   */
+  function declarations() {
+    var decls = [];
+    if (!open()) { return error('missing \'{\''); }
+    comments(decls);
+    // declarations
+    var decl;
+    while ((decl = declaration()) !== null) {
+      if (decl !== false) {
+        if (Array.isArray(decl)) {
+          decls = decls.concat(decl);
+        } else {
+          decls.push(decl);
+        }
+        comments(decls);
+      }
+    }
+    if (!close()) { return error('missing \'}\''); }
+    return decls;
+  }
+
+  /**
+   * Parse keyframe.
+   */
+  function keyframe() {
+    var m;
+    var vals = [];
+    var pos = position();
+    while ((m = match(/^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/)) !== null) {
+      vals.push(m[1]);
+      match(/^,\s*/);
+    }
+    if (!vals.length) {
+      return null;
+    }
+    return pos({
+      type: 'keyframe',
+      values: vals,
+      declarations: declarations(),
+    });
+  }
+
+  /**
+   * Parse keyframes.
+   */
+  function atkeyframes() {
+    var pos = position();
+    var m = match(/^@([-\w]+)?keyframes\s*/);
+    if (!m) {
+      return null;
+    }
+    var vendor = m[1];
+    // identifier
+    m = match(/^([-\w]+)\s*/);
+    if (!m) {
+      return error('@keyframes missing name');
+    }
+    var name = m[1];
+    if (!open()) { return error('@keyframes missing \'{\''); }
+    var frame;
+    var frames = comments();
+    while ((frame = keyframe()) !== null) {
+      frames.push(frame);
+      frames = frames.concat(comments());
+    }
+    if (!close()) { return error('@keyframes missing \'}\''); }
+    return pos({
+      type: 'keyframes',
+      name: name,
+      vendor: vendor,
+      keyframes: frames,
+    });
+  }
+
+  /**
+   * Parse supports.
+   */
+  function atsupports() {
+    var pos = position();
+    var m = match(/^@supports *([^{]+)/);
+    if (!m) {
+      return null;
+    }
+    var supports = trim(m[1]);
+    if (!open()) { return error('@supports missing \'{\''); }
+    var style = comments().concat(rules());
+    if (!close()) { return error('@supports missing \'}\''); }
+    return pos({
+      type: 'supports',
+      supports: supports,
+      rules: style,
+    });
+  }
+
+  /**
+   * Parse host.
+   */
+  function athost() {
+    var pos = position();
+    var m = match(/^@host\s*/);
+    if (!m) {
+      return null;
+    }
+    if (!open()) {
+      return error('@host missing \'{\'');
+    }
+    var style = comments().concat(rules());
+    if (!close()) {
+      return error('@host missing \'}\'');
+    }
+    return pos({
+      type: 'host',
+      rules: style,
+    });
+  }
+
+  /**
+   * Parse media.
+   */
+  function atmedia() {
+    var pos = position();
+    var m = match(/^@media *([^{]+)/);
+    if (!m) {
+      return null;
+    }
+    var media = trim(m[1]);
+    if (!open()) {
+      return error('@media missing \'{\'');
+    }
+    var style = comments().concat(rules());
+    if (!close()) {
+      return error('@media missing \'}\'');
+    }
+    return pos({
+      type: 'media',
+      media: media,
+      rules: style,
+    });
+  }
+
+
+  /**
+   * Parse custom-media.
+   */
+  function atcustommedia() {
+    var pos = position();
+    var m = match(/^@custom-media\s+(--[^\s]+)\s*([^{;]+);/);
+    if (!m) {
+      return null;
+    }
+
+    return pos({
+      type: 'custom-media',
+      name: trim(m[1]),
+      media: trim(m[2]),
+    });
+  }
+
+  /**
+   * Parse paged media.
+   */
+  function atpage() {
+    var pos = position();
+    var m = match(/^@page */);
+    if (!m) {
+      return null;
+    }
+    var sel = selector() || [];
+    if (!open()) {
+      return error('@page missing \'{\'');
+    }
+    var decls = comments();
+    // declarations
+    var decl;
+    while ((decl = declaration()) !== null) {
+      decls.push(decl);
+      decls = decls.concat(comments());
+    }
+    if (!close()) {
+      return error('@page missing \'}\'');
+    }
+    return pos({
+      type: 'page',
+      selectors: sel,
+      declarations: decls,
+    });
+  }
+
+  /**
+   * Parse document.
+   */
+  function atdocument() {
+    var pos = position();
+    var m = match(/^@([-\w]+)?document *([^{]+)/);
+    if (!m) {
+      return null;
+    }
+    var vendor = trim(m[1]);
+    var doc = trim(m[2]);
+    if (!open()) {
+      return error('@document missing \'{\'');
+    }
+    var style = comments().concat(rules());
+    if (!close()) {
+      return error('@document missing \'}\'');
+    }
+    return pos({
+      type: 'document',
+      document: doc,
+      vendor: vendor,
+      rules: style,
+    });
+  }
+
+  /**
+   * Parse font-face.
+   */
+  function atfontface() {
+    var pos = position();
+    var m = match(/^@font-face\s*/);
+    if (!m) {
+      return null;
+    }
+    if (!open()) {
+      return error('@font-face missing \'{\'');
+    }
+    var decls = comments();
+    // declarations
+    var decl;
+    while ((decl = declaration()) !== null) {
+      decls.push(decl);
+      decls = decls.concat(comments());
+    }
+    if (!close()) {
+      return error('@font-face missing \'}\'');
+    }
+    return pos({
+      type: 'font-face',
+      declarations: decls,
+    });
+  }
+
+  /**
+   * Parse import
+   */
+  var atimport = compileAtRule('import');
+
+  /**
+   * Parse charset
+   */
+  var atcharset = compileAtRule('charset');
+
+  /**
+   * Parse namespace
+   */
+  var atnamespace = compileAtRule('namespace');
+
+  /**
+   * Parse non-block at-rules
+   */
+  function compileAtRule(name) {
+    var re = new RegExp(("^@" + name + "\\s*([^;]+);"));
+    return function () {
+      var pos = position();
+      var m = match(re);
+      if (!m) {
+        return null;
+      }
+      var ret = { type: name };
+      ret[name] = m[1].trim();
+      return pos(ret);
+    };
+  }
+
+  /**
+   * Parse at rule.
+   */
+  function atrule() {
+    if (css[0] !== '@') {
+      return null;
+    }
+    return atkeyframes()
+      || atmedia()
+      || atcustommedia()
+      || atsupports()
+      || atimport()
+      || atcharset()
+      || atnamespace()
+      || atdocument()
+      || atpage()
+      || athost()
+      || atfontface();
+  }
+
+  /**
+   * Parse rule.
+   */
+  function rule() {
+    var pos = position();
+    var sel = selector();
+    if (!sel) { return error('selector missing'); }
+    comments();
+    return pos({
+      type: 'rule',
+      selectors: sel,
+      declarations: declarations(),
+    });
+  }
+  return addParent(stylesheet());
+}
+
+/*
+ * Tencent is pleased to support the open source community by making
+ * Hippy available.
+ *
+ * Copyright (C) 2017-2019 THL A29 Limited, a Tencent company.
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var sourceId = 0;
 
 /**
  * Convert the CSS text to AST that able to parse by selector parser.
@@ -5388,26 +5553,29 @@ var sourceId              = 0;
 function hippyVueCSSLoader(source) {
   var options = getOptions_1$1(this);
   var parsed = parseCSS(source, { source: sourceId });
+
+  var majorNodeVersion = parseInt(process.versions.node.split('.')[0], 10);
+  var hashType = majorNodeVersion >= 17 ? 'md5' : 'md4';
+  var hash = crypto.createHash(hashType);
+  var contentHash = hash.update(source).digest('hex');
   sourceId += 1;
-  var rulesAst = parsed.stylesheet.rules.filter(function (n) { return n.type === 'rule'; }).map(function (n) {
-    var rule = {
-      selectors: n.selectors,
-      declarations: n.declarations.map(function (dec) {
-        var value = dec.value;
-        // FIXME: Should have a strict property with colors map.
-        if (dec.property && dec.property.toLowerCase().indexOf('color') > -1) {
-          value = translateColor(value, options);
-        }
-        return {
-          type: dec.type,
-          property: dec.property,
-          value: value,
-        };
-      }),
-    };
-    return rule;
-  });
-  var code = "(function() {\n    if (!global['" + GLOBAL_STYLE_NAME + "']) {\n      global['" + GLOBAL_STYLE_NAME + "'] = [];\n    }\n    global['" + GLOBAL_STYLE_NAME + "'] = global['" + GLOBAL_STYLE_NAME + "'].concat(" + (JSON.stringify(rulesAst)) + ");\n    return global['" + GLOBAL_STYLE_NAME + "'];\n  })()";
+  var rulesAst = parsed.stylesheet.rules.filter(function (n) { return n.type === 'rule'; }).map(function (n) { return ({
+    hash: contentHash,
+    selectors: n.selectors,
+    declarations: n.declarations.map(function (dec) {
+      var value = dec.value;
+      // FIXME: Should have a strict property with colors map.
+      if (dec.property && dec.property.toLowerCase().indexOf('color') > -1) {
+        value = translateColor(value, options);
+      }
+      return {
+        type: dec.type,
+        property: dec.property,
+        value: value,
+      };
+    }),
+  }); });
+  var code = "(function() {\n    if (!global['" + GLOBAL_STYLE_NAME + "']) {\n      global['" + GLOBAL_STYLE_NAME + "'] = [];\n    }\n    global['" + GLOBAL_STYLE_NAME + "'] = global['" + GLOBAL_STYLE_NAME + "'].concat(" + (JSON.stringify(rulesAst)) + ");\n\n    if(module.hot) {\n      module.hot.dispose(() => {\n        console.log('disposeHandlers');\n        if(!global['" + GLOBAL_DISPOSE_STYLE_NAME + "']) {\n          global['" + GLOBAL_DISPOSE_STYLE_NAME + "'] = [];\n        }\n        global['" + GLOBAL_DISPOSE_STYLE_NAME + "'] = global['" + GLOBAL_DISPOSE_STYLE_NAME + "'].concat('" + contentHash + "');\n      })\n    }\n  })()";
   return ("module.exports=" + code);
 }
 
