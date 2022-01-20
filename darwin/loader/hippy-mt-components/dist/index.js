@@ -1,7 +1,7 @@
 /*!
  * @hippy/vue-mt-components v1.0.1
  * (Using Vue v2.6.11 and Hippy-Vue v2.12.0)
- * Build at: Mon Jan 10 2022 23:14:53 GMT+0800 (China Standard Time)
+ * Build at: Thu Jan 20 2022 21:23:53 GMT+0800 (China Standard Time)
  *
  * Tencent is pleased to support the open source community by making
  * Hippy available.
@@ -3210,20 +3210,20 @@ var HippyMtComponents = {
     MtDataBaseModule(Vue);
     mtModuleBroadcast(Vue);
     mtModuleBluetooth(Vue);
-    mtModuleConsole(Vue); 
+    mtModuleConsole(Vue);
     mtModuleIos(Vue);
     mtModuleWechat(Vue);
     mtModuleSystem(Vue);
     mtModuleJpush(Vue);
     mtModuleAlipay(Vue);
-    
+
     // component
     mtComponentProgress(Vue);
     mtComponentSvga(Vue);
     mtComponentQrcode(Vue);
     mtComponentSlider(Vue);
     mtComponentChart(Vue);
-  },
+  }
 };
 
 export default HippyMtComponents;
